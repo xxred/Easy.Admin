@@ -39,12 +39,12 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public IActionResult Login([FromForm]string userName, [FromForm]string password, [FromForm]bool? remember)
+        public dynamic Login([FromForm]string username, [FromForm]string password)
         {
             var handler = new JwtSecurityTokenHandler();
             var newTokenExpiration = DateTime.Now.Add(TimeSpan.FromHours(2));
             var identity = new ClaimsIdentity(
-                new GenericIdentity(userName, "TokenAuth"),
+                new GenericIdentity(username, "TokenAuth"),
                 new[] { new Claim("ID", "1") }
             );
 
@@ -63,7 +63,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             var encodeedToken = handler.WriteToken(securityToken);
 
-            return new JsonResult(new { token = "Bearer " + encodeedToken });
+            return new { Token = "Bearer " + encodeedToken };
         }
 
         // PUT: api/Account/5

@@ -28,6 +28,7 @@ namespace Easy.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // 身份验证
             services.AddAuthentication()
                 //.AddCookie(options =>
                 //{
@@ -61,6 +62,7 @@ namespace Easy.Admin
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            // 文档
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Easy.Admin API", Version = "v1" });
@@ -83,7 +85,7 @@ namespace Easy.Admin
                     In = "header",
                     Type = "apiKey"
                 });
-                
+
                 //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
                 //{
                 //    { "oauth2",new string[]{}}
@@ -95,6 +97,9 @@ namespace Easy.Admin
                     { "Bearer",new string[]{}}
                 });
             });
+
+            // 跨域
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -116,9 +121,18 @@ namespace Easy.Admin
                 app.UseHsts();
             }
 
+            // Http跳转Https
             app.UseHttpsRedirection();
 
+            // 身份认证
             app.UseAuthentication();
+
+            // 跨域
+            app.UseCors(config => 
+                config.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                    .AllowCredentials());
 
             app.UseMvc();
         }
