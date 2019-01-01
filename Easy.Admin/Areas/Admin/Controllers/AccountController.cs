@@ -6,11 +6,13 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using Easy.Admin.Areas.Admin.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
@@ -24,7 +26,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            var user = this.HttpContext.User;
+            var user = User;
             return new string[] { "value1", user.Identity.AuthenticationType, user.Identity.Name };
         }
 
@@ -61,9 +63,20 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 Audience = "EasyAdminAudience",
             });
 
-            var encodeedToken = handler.WriteToken(securityToken);
+            var encodedToken = handler.WriteToken(securityToken);
 
-            return new { Token = "Bearer " + encodeedToken };
+            var client = new MongoClient(new MongoUrl("mongodb://hebinghong.com:27017")
+            {
+                
+            });
+            var db = client.GetDatabase("EasyAdmin");
+            var doc = db.GetCollection<AccessToken>("AccessToken");
+            doc.InsertOne(new AccessToken()
+            {
+                Token = encodedToken
+            });
+
+            return new { Token = "Bearer " + encodedToken };
         }
 
         // PUT: api/Account/5

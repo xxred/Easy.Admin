@@ -328,3 +328,14 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/DLL
+/老式
+/新式包引用
+/新式
+/MigrationBackup/a25731b2/新式
+/Easy.Admin/XMLFile.xml
+/Easy.Admin/NewLife.XCode.props
+/Easy.Admin/Member.xml
+/Easy.Admin/Easy.Admin.nuget1.props
+/Easy.Admin/BuildModel.tt
+/Easy.Admin/Build.props
