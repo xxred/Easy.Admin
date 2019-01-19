@@ -101,7 +101,6 @@ namespace Easy.Admin
                     { "Bearer",new string[]{}}
                 });
             });
-            IHealthCheckPublisher
             // 跨域
             services.AddCors();
             // 运行情况检查
