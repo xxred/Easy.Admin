@@ -62,7 +62,8 @@ namespace Easy.Admin
 
                         ClockSkew = TimeSpan.Zero
                     };
-                });
+                })
+                .AddGoogle();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
