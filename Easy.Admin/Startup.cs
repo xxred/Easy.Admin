@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -29,6 +30,9 @@ namespace Easy.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // 添加基础Startup
+            services.AddTransient<IStartupFilter, BasicStartupFilter>();
+
             // 身份验证
             services.AddAuthentication()
                 //.AddCookie(options =>
@@ -111,9 +115,15 @@ namespace Easy.Admin
                     { "Bearer",new string[]{}}
                 });
             });
-
             // 跨域
             services.AddCors();
+            // 运行情况检查
+            services.AddHealthChecks()
+                .AddCheck(name: "example",
+                    check: () => HealthCheckResult.Healthy("ok123"),
+                    //(IHealthCheck)null,
+                    //failureStatus:HealthStatus.Unhealthy,
+                    tags: new[] { "example" });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
