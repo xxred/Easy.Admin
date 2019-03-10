@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Easy.Admin.Authentication.Github;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -63,7 +64,19 @@ namespace Easy.Admin
                         ClockSkew = TimeSpan.Zero
                     };
                 })
-                .AddGoogle();
+                .AddGithub(options =>
+                {
+                    options.ClientId = "c93fcad8f3d8e1ee8997";
+                    options.ClientSecret = "00feb809af81a0f98e2e8e767677ca25f1696129";
+
+                    //options.Scope.Add();
+
+                })
+                //.AddOpenIdConnect("QQ",options=>
+                //{
+                //    //options.Authority 
+                //})
+                ;
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

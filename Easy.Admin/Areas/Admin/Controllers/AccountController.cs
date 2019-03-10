@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
@@ -22,6 +25,22 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AccountController : ControllerBase
     {
+        public IAuthenticationSchemeProvider Schemes
+        {
+            get;
+            set;
+        }
+
+        public AccountController(IAuthenticationSchemeProvider schemes)
+        {
+            if (schemes == null)
+            {
+                throw new ArgumentNullException("schemes");
+            }
+
+            Schemes = schemes;
+        }
+
         // GET: api/Account
         [HttpGet]
         public IEnumerable<string> Get()
@@ -67,7 +86,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             var client = new MongoClient(new MongoUrl("mongodb://hebinghong.com:27017")
             {
-                
+
             });
             var db = client.GetDatabase("EasyAdmin");
             var doc = db.GetCollection<AccessToken>("AccessToken");
@@ -77,6 +96,47 @@ namespace Easy.Admin.Areas.Admin.Controllers
             });
 
             return new { Token = "Bearer " + encodedToken };
+        }
+
+        [HttpGet("{authenticationScheme}")]
+        [Route("Authorize")]
+        [AllowAnonymous]
+        public async Task<dynamic> AuthorizeAsync(string authenticationScheme)
+        {
+            var context = HttpContext;
+            context.Features.Set((IAuthenticationFeature)new AuthenticationFeature
+            {
+                OriginalPath = context.Request.Path,
+                OriginalPathBase = context.Request.PathBase
+            });
+
+            var handlers = context.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
+
+            foreach (AuthenticationScheme item in await Schemes.GetRequestHandlerSchemesAsync())
+            {
+                var authenticationRequestHandler = (await handlers.GetHandlerAsync(context, item.Name))
+                    as IAuthenticationRequestHandler;
+                bool flag = authenticationRequestHandler != null;
+                if (flag)
+                {
+                    flag = await authenticationRequestHandler.HandleRequestAsync();
+                }
+                if (flag)
+                {
+                    return null;
+                }
+            }
+            //AuthenticationScheme authenticationScheme = await Schemes.GetDefaultAuthenticateSchemeAsync();
+            if (authenticationScheme != null)
+            {
+                var authenticateResult = await context.AuthenticateAsync(authenticationScheme);
+                if (authenticateResult?.Principal != null)
+                {
+                    context.User = authenticateResult.Principal;
+                }
+            }
+
+            return new { Token = "Bearer "  };
         }
 
         // PUT: api/Account/5
