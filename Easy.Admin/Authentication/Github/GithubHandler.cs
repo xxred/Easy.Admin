@@ -25,7 +25,7 @@ namespace Easy.Admin.Authentication.Github
             AuthenticationProperties properties, OAuthTokenResponse tokens)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, Options.UserInformationEndpoint);
-            request.Headers.Authorization = new AuthenticationHeaderValue("", tokens.AccessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
 
             var response = await Backchannel.SendAsync(request, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
@@ -40,7 +40,7 @@ namespace Easy.Admin.Authentication.Github
             context.RunClaimActions();
             await Events.CreatingTicket(context);
 
-            return new AuthenticationTicket(context.Principal, Scheme.Name);
+            return new AuthenticationTicket(context.Principal, properties, Scheme.Name);
         }
     }
 }

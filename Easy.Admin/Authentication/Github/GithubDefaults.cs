@@ -16,5 +16,7 @@ namespace Easy.Admin.Authentication.Github
         public static readonly string TokenEndpoint = "https://github.com/login/oauth/access_token";
 
         public static readonly string UserInformationEndpoint = "https://api.github.com/user";
+
+        public static readonly string AvatarClaimTypes = "urn:github:avatar";
     }
 }

@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Authentication\Easy.Admin.Authentication.QQ.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Build.props" />
     <None Remove="Easy.Admin.nuget1.props" />
     <None Remove="NewLife.XCode.props" />
@@ -18,10 +14,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Authentication\Easy.Admin.Authentication.QQ.cs" />
   </ItemGroup>
   <ItemGroup>
 

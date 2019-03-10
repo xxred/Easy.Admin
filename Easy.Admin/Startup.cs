@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.Github;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,7 +35,14 @@ namespace Easy.Admin
             services.AddTransient<IStartupFilter, BasicStartupFilter>();
 
             // 身份验证
-            services.AddAuthentication()
+            services.AddAuthentication(
+                    options =>
+                    {
+                        options.DefaultAuthenticateScheme = "Bearer";
+                        options.DefaultSignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                    }
+                    )
+                .AddJwtBearerSignIn()
                 //.AddCookie(options =>
                 //{
                 //    options.LoginPath = "/Account/Login";
@@ -70,6 +78,8 @@ namespace Easy.Admin
                     options.ClientSecret = "00feb809af81a0f98e2e8e767677ca25f1696129";
 
                     //options.Scope.Add();
+
+                    options.SignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
 
                 })
                 //.AddOpenIdConnect("QQ",options=>

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Globalization;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.Facebook;
 
 namespace Easy.Admin.Authentication.QQ
 {
