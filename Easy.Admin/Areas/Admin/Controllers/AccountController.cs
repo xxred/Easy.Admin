@@ -68,16 +68,20 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         // POST: api/Account
-        [HttpPost]
+        [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
-        public dynamic Login([FromForm]string username, [FromForm]string password)
+        public dynamic Login([FromQuery]string username, [FromQuery]string password, [FromQuery]string returnUrl)
         {
             var handler = new JwtSecurityTokenHandler();
             var newTokenExpiration = DateTime.Now.Add(TimeSpan.FromHours(2));
-            var identity = new ClaimsIdentity(
-                new GenericIdentity(username, "TokenAuth"),
-                new[] { new Claim("ID", "1") }
+            var identity = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name,username),
+                    new Claim(ClaimTypes.NameIdentifier,"1"),
+                    new Claim(IdentityModel.JwtClaimTypes.Subject, "1"),
+                    new Claim("idp","auto"),
+                }, "TokenAuth"
             );
 
             var secretKey = "EasyAdminEasyAdminEasyAdmin";
@@ -105,6 +109,13 @@ namespace Easy.Admin.Areas.Admin.Controllers
             //{
             //    Token = encodedToken
             //});
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                // 为了下面重定向的时候带上token，往cookie写一份
+                Response.Cookies.Append("token", "Bearer " + encodedToken);
+                Response.Redirect(returnUrl);
+            }
 
             return new { Token = "Bearer " + encodedToken };
         }
@@ -198,7 +209,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (returnUrl != null)
             {
-                returnUrl += "?token=" + token;
+                returnUrl += "#token=" + token;
             }
             else
             {

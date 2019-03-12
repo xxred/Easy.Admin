@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.Github;
+using IdentityServer4;
+using IdentityServer4.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,14 +37,146 @@ namespace Easy.Admin
             // 添加基础Startup
             services.AddTransient<IStartupFilter, BasicStartupFilter>();
 
+            services.AddIdentityServer(options =>
+                {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                    // options.UserInteraction.ConsentUrl // 同意url，同意授权，给用户勾选
+                    options.UserInteraction.LoginReturnUrlParameter = "returnUrl";//返回url的参数名
+                    options.UserInteraction.LoginUrl = "/Admin/Account/Login?username=admin&password=123456";
+
+                    options.Authentication.CookieAuthenticationScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddInMemoryIdentityResources(new List<IdentityResource>()
+                {
+                    new IdentityResources.OpenId(),
+                    new IdentityResources.Profile()
+
+                })
+                .AddInMemoryApiResources(new List<ApiResource>()
+                {
+                    new ApiResource("api1", "IdentityServer4授权中心")
+                })
+                .AddInMemoryClients(new List<Client>()
+                {
+                    new Client
+                    {
+                        ClientId = "client",
+
+                        // no interactive user, use the clientid/secret for authentication
+                        AllowedGrantTypes = GrantTypes.Code,
+
+                        // secret for authentication
+                        ClientSecrets =
+                        {
+                            new Secret("client".Sha256())
+                        },
+
+                        // scopes that client has access to
+                        AllowedScopes =
+                        {
+                            "api1",
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile,
+                        },
+                        RequireConsent = false,
+
+                        RedirectUris = {"https://localhost:44336/sign-client"},
+
+                    },
+                    // resource owner password grant client
+                    new Client
+                    {
+                        ClientId = "ro.client",
+                        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+
+                        ClientSecrets =
+                        {
+                            new Secret("secret".Sha256())
+                        },
+                        AllowedScopes = {"api1"}
+                    },
+                    // OpenID Connect hybrid flow client (MVC)
+                    new Client
+                    {
+                        ClientId = "mvc",
+                        ClientName = "MVC Client",
+                        AllowedGrantTypes = GrantTypes.Hybrid,
+
+                        ClientSecrets =
+                        {
+                            new Secret("secret".Sha256())
+                        },
+
+                        RedirectUris = {"http://localhost:5002/signin-oidc"},
+                        PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
+
+                        AllowedScopes =
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile,
+                            "api1"
+                        },
+
+                        AllowOfflineAccess = true
+                    },
+                    // JavaScript Client
+                    new Client
+                    {
+                        ClientId = "js",
+                        ClientName = "JavaScript Client",
+                        AllowedGrantTypes = GrantTypes.Code,
+                        RequirePkce = true,
+                        RequireClientSecret = false,
+
+                        RedirectUris = {"http://localhost:5003/callback.html"},
+                        PostLogoutRedirectUris = {"http://localhost:5003/index.html"},
+                        AllowedCorsOrigins = {"http://localhost:5003"},
+
+                        AllowedScopes =
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile,
+                            "api1"
+                        }
+                    },
+                    ///////////////////////////////////////////
+                    // Device Flow Sample
+                    //////////////////////////////////////////
+                    new Client
+                    {
+                        ClientId = "device",
+                        ClientName = "Device Flow Client",
+
+                        AllowedGrantTypes = GrantTypes.DeviceFlow,
+                        RequireClientSecret = false,
+
+                        AllowOfflineAccess = true,
+
+                        AllowedCorsOrigins = {"*"}, // JS test client only
+
+                        AllowedScopes =
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile,
+                            IdentityServerConstants.StandardScopes.Email,
+                            "api1", "api2.read_only", "api2.full_access"
+                        }
+                    }
+                })
+                .AddDeveloperSigningCredential()
+                .AddJwtBearerClientAuthentication();
+
             // 身份验证
             services.AddAuthentication(
                     options =>
                     {
-                        options.DefaultAuthenticateScheme = "Bearer";
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                         options.DefaultSignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
-                    }
-                    )
+                    })
+                // 默认使用Jwt认证
                 .AddJwtBearerSignIn()
                 //.AddCookie(options =>
                 //{
@@ -79,14 +214,22 @@ namespace Easy.Admin
 
                     //options.Scope.Add();
 
-                    options.SignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
                 })
-                //.AddOpenIdConnect("QQ",options=>
-                //{
-                //    //options.Authority 
-                //})
-                ;
+                .AddOpenIdConnect("IdentityServer4", options =>
+                {
+                    options.Authority = "https://localhost:44336/";
+                    options.ClientId = "client";
+                    options.ClientSecret = "client";
+                    options.ResponseType = "code";
+                    options.SaveTokens = true;
+
+                    options.CallbackPath = "/sign-client";
+                    options.SignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+
+                    options.Scope.Add("api1");
+                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -158,15 +301,17 @@ namespace Easy.Admin
             // Http跳转Https
             app.UseHttpsRedirection();
 
-            // 身份认证
-            app.UseAuthentication();
-
             // 跨域
             app.UseCors(config =>
                 config.AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowAnyOrigin()
                     .AllowCredentials());
+
+            // 身份认证
+            //app.UseAuthentication();
+
+            app.UseIdentityServer();
 
             app.UseMvc();
         }
