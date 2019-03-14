@@ -1,0 +1,3 @@
+[submodule "Easy.Front-End"]
+	path = Easy.Front-End
+	url = https://github.com/xxred/Easy.Front-End.git
