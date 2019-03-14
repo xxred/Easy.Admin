@@ -12,9 +12,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SpaServices.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -277,6 +279,9 @@ namespace Easy.Admin
                     //(IHealthCheck)null,
                     //failureStatus:HealthStatus.Unhealthy,
                     tags: new[] { "example" });
+
+            services.AddSpaStaticFiles(options => { options.RootPath = 
+                @"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End\dist"; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -313,7 +318,18 @@ namespace Easy.Admin
 
             app.UseIdentityServer();
 
+            app.UseSpaStaticFiles();
+
             app.UseMvc();
+
+            app.UseSpa(config =>
+            {
+                //SpaStaticFilesOptions
+                config.Options.SourcePath = @"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End";
+                config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:8080/");
+//                config.Options.DefaultPageStaticFileOptions.FileProvider = new PhysicalFileProvider(@"F:\Downloads\Src\CSharp\MyProject\Easy.Admin\Easy.Admin\wwwroot");
+            });
+
         }
     }
 }
