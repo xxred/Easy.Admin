@@ -49,7 +49,8 @@ namespace Easy.Admin
                     options.UserInteraction.LoginReturnUrlParameter = "returnUrl";//返回url的参数名
                     options.UserInteraction.LoginUrl = "/Admin/Account/Login?username=admin&password=123456";
 
-                    options.Authentication.CookieAuthenticationScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                    options.Authentication.CookieAuthenticationScheme =
+                        IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 })
                 .AddInMemoryIdentityResources(new List<IdentityResource>()
                 {
@@ -216,7 +217,8 @@ namespace Easy.Admin
 
                     //options.Scope.Add();
 
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.SignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+
 
                 })
                 .AddOpenIdConnect("IdentityServer4", options =>
@@ -280,8 +282,11 @@ namespace Easy.Admin
                     //failureStatus:HealthStatus.Unhealthy,
                     tags: new[] { "example" });
 
-            services.AddSpaStaticFiles(options => { options.RootPath = 
-                @"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End\dist"; });
+            services.AddSpaStaticFiles(options =>
+            {
+                options.RootPath =
+@"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End\dist";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -326,8 +331,8 @@ namespace Easy.Admin
             {
                 //SpaStaticFilesOptions
                 config.Options.SourcePath = @"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End";
-                config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:8080/");
-//                config.Options.DefaultPageStaticFileOptions.FileProvider = new PhysicalFileProvider(@"F:\Downloads\Src\CSharp\MyProject\Easy.Admin\Easy.Admin\wwwroot");
+                config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:1337/");
+                //                config.Options.DefaultPageStaticFileOptions.FileProvider = new PhysicalFileProvider(@"F:\Downloads\Src\CSharp\MyProject\Easy.Admin\Easy.Admin\wwwroot");
             });
 
         }

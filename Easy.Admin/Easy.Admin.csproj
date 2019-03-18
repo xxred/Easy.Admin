@@ -17,6 +17,10 @@
   </ItemGroup>
   <ItemGroup>
 
+    <PackageReference Include="AspNetCore.Identity.XCode" Version="1.0.0-CI00000" />
+
+    <PackageReference Include="Extensions.Identity.Stores.XCode" Version="1.0.0-CI00000" />
+
     <PackageReference Include="IdentityServer4" Version="2.3.2" />
 
     <PackageReference Include="Microsoft.AspNetCore.App" />

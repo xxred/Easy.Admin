@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Authentication.Github;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 {
     [Route("Admin/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AccountController : ControllerBase
     {
@@ -32,13 +33,18 @@ namespace Easy.Admin.Areas.Admin.Controllers
             set;
         }
 
-        public AccountController(IAuthenticationSchemeProvider schemes)
+        private readonly IIdentityServerInteractionService _interaction;
+
+
+        public AccountController(IIdentityServerInteractionService interaction,
+            IAuthenticationSchemeProvider schemes)
         {
             if (schemes == null)
             {
                 throw new ArgumentNullException("schemes");
             }
 
+            _interaction = interaction;
             Schemes = schemes;
         }
 
@@ -99,17 +105,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             var encodedToken = handler.WriteToken(securityToken);
 
-            //var client = new MongoClient(new MongoUrl("mongodb://hebinghong.com:27017")
-            //{
-
-            //});
-            //var db = client.GetDatabase("EasyAdmin");
-            //var doc = db.GetCollection<AccessToken>("AccessToken");
-            //doc.InsertOne(new AccessToken()
-            //{
-            //    Token = encodedToken
-            //});
-
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
                 // 为了下面重定向的时候带上token，往cookie写一份
@@ -157,43 +152,36 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
         }
 
-        ///// <summary>
-        ///// initiate roundtrip to external authentication provider
-        ///// </summary>
-        //[HttpGet]
-        //[Route("Challenge")]
-        //public async Task<IActionResult> Challenge(string provider, string returnUrl)
-        //{
-        //    if (string.IsNullOrEmpty(returnUrl)) returnUrl = "~/";
+        /// <summary>
+        /// initiate roundtrip to external authentication provider
+        /// </summary>
+        [HttpGet]
+        [Route("Challenge")]
+        [AllowAnonymous]
+        public Task<IActionResult> Challenge(string provider, string returnUrl)
+        {
+            if (string.IsNullOrEmpty(returnUrl)) returnUrl = "~/";
 
-        //    // validate returnUrl - either it is a valid OIDC URL or back to a local page
-        //    if (Url.IsLocalUrl(returnUrl) == false && _interaction.IsValidReturnUrl(returnUrl) == false)
-        //    {
-        //        // user might have clicked on a malicious link - should be logged
-        //        throw new Exception("invalid return URL");
-        //    }
+            // validate returnUrl - either it is a valid OIDC URL or back to a local page
+            if (Url.IsLocalUrl(returnUrl) == false && _interaction.IsValidReturnUrl(returnUrl) == false)
+            {
+                // user might have clicked on a malicious link - should be logged
+                throw new Exception("invalid return URL");
+            }
 
-        //    if (AccountOptions.WindowsAuthenticationSchemeName == provider)
-        //    {
-        //        // windows authentication needs special handling
-        //        return await ProcessWindowsLoginAsync(returnUrl);
-        //    }
-        //    else
-        //    {
-        //        // start challenge and roundtrip the return URL and scheme 
-        //        var props = new AuthenticationProperties
-        //        {
-        //            RedirectUri = Url.Action(nameof(Callback)),
-        //            Items =
-        //            {
-        //                { "returnUrl", returnUrl },
-        //                { "scheme", provider },
-        //            }
-        //        };
+            // start challenge and roundtrip the return URL and scheme 
+            var props = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action(nameof(Callback)),
+                Items =
+                {
+                    {"returnUrl", returnUrl},
+                    {"scheme", provider},
+                }
+            };
 
-        //        return Challenge(props, provider);
-        //    }
-        //}
+            return Task.FromResult((IActionResult)Challenge(props, provider));
+        }
 
         /// <summary>
         /// Post processing of external authentication
@@ -209,7 +197,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (returnUrl != null)
             {
-                returnUrl += "#token=" + token;
+                returnUrl += "?token=" + token;
             }
             else
             {
