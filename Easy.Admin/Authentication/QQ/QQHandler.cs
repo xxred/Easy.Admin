@@ -1,9 +1,8 @@
-// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Easy.Admin.Authentication.QQ
@@ -27,15 +27,15 @@ namespace Easy.Admin.Authentication.QQ
 
         protected override async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, OAuthTokenResponse tokens)
         {
+            // 首先获取OpenId
+            var openIdEndpoint = QueryHelpers.AddQueryString(Options.OpenIdEndpoint, "access_token", tokens.AccessToken);
+            var openIdResponse = await Backchannel.GetAsync(openIdEndpoint, Context.RequestAborted);
+            var openIdContent = await openIdResponse.Content.ReadAsStringAsync();
+            openIdContent.TrimStart("callback( ").TrimEnd(" );\\n");
+            var openIdPayload = JObject.Parse(openIdContent);
+
+
             var endpoint = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, "access_token", tokens.AccessToken);
-            if (Options.SendAppSecretProof)
-            {
-                endpoint = QueryHelpers.AddQueryString(endpoint, "appsecret_proof", GenerateAppSecretProof(tokens.AccessToken));
-            }
-            if (Options.Fields.Count > 0)
-            {
-                endpoint = QueryHelpers.AddQueryString(endpoint, "fields", string.Join(",", Options.Fields));
-            }
 
             var response = await Backchannel.GetAsync(endpoint, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
@@ -51,29 +51,61 @@ namespace Easy.Admin.Authentication.QQ
             return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
 
-        private string GenerateAppSecretProof(string accessToken)
+        protected override async Task<OAuthTokenResponse> ExchangeCodeAsync(string code, string redirectUri)
         {
-            using (var algorithm = new HMACSHA256(Encoding.ASCII.GetBytes(Options.AppSecret)))
+            var tokenRequestParameters = new Dictionary<string, string>()
             {
-                var hash = algorithm.ComputeHash(Encoding.ASCII.GetBytes(accessToken));
-                var builder = new StringBuilder();
-                for (int i = 0; i < hash.Length; i++)
-                {
-                    builder.Append(hash[i].ToString("x2", CultureInfo.InvariantCulture));
-                }
-                return builder.ToString();
+                { "client_id", Options.ClientId },
+                { "redirect_uri", redirectUri },
+                { "client_secret", Options.ClientSecret },
+                { "code", code },
+                { "grant_type", "authorization_code" },
+            };
+            var endpoint = QueryHelpers.AddQueryString(Options.TokenEndpoint, tokenRequestParameters);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var response = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
+            //var response = await Backchannel.GetAsync(endpoint, Context.RequestAborted);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                var payload = await ConvertContentToJObject(response);
+                return OAuthTokenResponse.Success(payload);
+            }
+            else
+            {
+                var error = "OAuth token endpoint failure: " + await Display(response);
+                return OAuthTokenResponse.Failed(new Exception(error));
             }
         }
 
-        protected override string FormatScope(IEnumerable<string> scopes)
+        private static async Task<string> Display(HttpResponseMessage response)
         {
-            // Facebook deviates from the OAuth spec here. They require comma separated instead of space separated.
-            // https://developers.facebook.com/docs/reference/dialogs/oauth
-            // http://tools.ietf.org/html/rfc6749#section-3.3
-            return string.Join(",", scopes);
+            var output = new StringBuilder();
+            output.Append("Status: " + response.StatusCode + ";");
+            output.Append("Headers: " + response.Headers.ToString() + ";");
+            output.Append("Body: " + await response.Content.ReadAsStringAsync() + ";");
+            return output.ToString();
         }
 
-        protected override string FormatScope()
-            => base.FormatScope();
+        private static async Task<JObject> ConvertContentToJObject(HttpResponseMessage response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"An error occurred when retrieving QQ user information ({response.StatusCode}). Please check if the authentication information is correct and the corresponding QQ API is enabled.");
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var queries = QueryHelpers.ParseQuery(content);
+            var payload = new JObject();
+            foreach (var query in queries)
+            {
+                payload[query.Key] = query.Value.ToString();
+            }
+
+            return payload;
+        }
     }
 }

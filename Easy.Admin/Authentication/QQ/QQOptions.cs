@@ -22,16 +22,13 @@ namespace Easy.Admin.Authentication.QQ
         /// </summary>
         public QQOptions()
         {
-            CallbackPath = new PathString("/signin-qq");
-            SendAppSecretProof = true;
+            CallbackPath = new PathString("/sign-qq");
             AuthorizationEndpoint = QQDefaults.AuthorizationEndpoint;
             TokenEndpoint = QQDefaults.TokenEndpoint;
+            OpenIdEndpoint = QQDefaults.OpenIdEndpoint;
             UserInformationEndpoint = QQDefaults.UserInformationEndpoint;
-            Scope.Add("email");
-            Fields.Add("name");
-            Fields.Add("email");
-            Fields.Add("first_name");
-            Fields.Add("last_name");
+
+            Scope.Add("get_user_info");
 
             ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
             //ClaimActions.MapJsonSubKey("urn:facebook:age_range_min", "age_range", "min");
@@ -50,53 +47,9 @@ namespace Easy.Admin.Authentication.QQ
         }
 
         /// <summary>
-        /// Check that the options are valid.  Should throw an exception if things are not ok.
+        /// 获取OpenId的链接
         /// </summary>
-        public override void Validate()
-        {
-            if (string.IsNullOrEmpty(AppId))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, nameof(AppId)), nameof(AppId));
-            }
+        public string OpenIdEndpoint { get; set; }
 
-            if (string.IsNullOrEmpty(AppSecret))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, nameof(AppSecret)), nameof(AppSecret));
-            }
-
-            base.Validate();
-        }
-
-        // Facebook uses a non-standard term for this field.
-        /// <summary>
-        /// Gets or sets the Facebook-assigned appId.
-        /// </summary>
-        public string AppId
-        {
-            get { return ClientId; }
-            set { ClientId = value; }
-        }
-
-        // Facebook uses a non-standard term for this field.
-        /// <summary>
-        /// Gets or sets the Facebook-assigned app secret.
-        /// </summary>
-        public string AppSecret
-        {
-            get { return ClientSecret; }
-            set { ClientSecret = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets if the appsecret_proof should be generated and sent with Facebook API calls.
-        /// This is enabled by default.
-        /// </summary>
-        public bool SendAppSecretProof { get; set; }
-
-        /// <summary>
-        /// The list of fields to retrieve from the UserInformationEndpoint.
-        /// https://developers.facebook.com/docs/graph-api/reference/user
-        /// </summary>
-        public ICollection<string> Fields { get; } = new HashSet<string>();
     }
 }

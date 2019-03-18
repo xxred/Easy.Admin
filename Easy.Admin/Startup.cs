@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.Github;
+using Easy.Admin.Authentication.QQ;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.StaticFiles;
@@ -233,6 +235,11 @@ namespace Easy.Admin
                     options.SignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
 
                     options.Scope.Add("api1");
+                })
+                .AddQQ(options =>
+                {
+                    options.ClientId = "101554717";
+                    options.ClientSecret = "fa819f1077ecbdffedbefb1f63039d9f";
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -309,7 +316,7 @@ namespace Easy.Admin
             }
 
             // Http跳转Https
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             // 跨域
             app.UseCors(config =>
