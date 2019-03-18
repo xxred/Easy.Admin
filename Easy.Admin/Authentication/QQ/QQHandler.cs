@@ -28,16 +28,33 @@ namespace Easy.Admin.Authentication.QQ
         protected override async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, OAuthTokenResponse tokens)
         {
             // 首先获取OpenId
-            var openIdEndpoint = QueryHelpers.AddQueryString(Options.OpenIdEndpoint, "access_token", tokens.AccessToken);
+            var openIdEndpoint = QueryHelpers.AddQueryString(Options.OpenIdEndpoint, 
+                "access_token", tokens.AccessToken);
             var openIdResponse = await Backchannel.GetAsync(openIdEndpoint, Context.RequestAborted);
             var openIdContent = await openIdResponse.Content.ReadAsStringAsync();
-            openIdContent.TrimStart("callback( ").TrimEnd(" );\\n");
+            openIdContent = openIdContent.TrimStart("callback( ").TrimEnd(" );\n");
             var openIdPayload = JObject.Parse(openIdContent);
 
+            // 存储openid，绑定到系统的用户，作为系统在第三方的唯一标识
+            var openId = openIdPayload["openid"].Value<string>();
 
-            var endpoint = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, "access_token", tokens.AccessToken);
+            var tokenRequestParameters = new Dictionary<string, string>()
+            {
+                { "access_token", tokens.AccessToken },
+                { "oauth_consumer_key", Options.ClientId },
+                { "openid", openId },
+            };
 
-            var response = await Backchannel.GetAsync(endpoint, Context.RequestAborted);
+            var endpoint = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, tokenRequestParameters);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var response = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
+
+            //var endpoint = QueryHelpers.AddQueryString(Options.UserInformationEndpoint,
+            //    "access_token", tokens.AccessToken);
+            //var response = await Backchannel.GetAsync(endpoint, Context.RequestAborted);
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException($"An error occurred when retrieving Facebook user information ({response.StatusCode}). Please check if the authentication information is correct and the corresponding Facebook Graph API is enabled.");

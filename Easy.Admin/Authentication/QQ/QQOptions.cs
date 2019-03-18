@@ -30,20 +30,9 @@ namespace Easy.Admin.Authentication.QQ
 
             Scope.Add("get_user_info");
 
-            ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-            //ClaimActions.MapJsonSubKey("urn:facebook:age_range_min", "age_range", "min");
-            //ClaimActions.MapJsonSubKey("urn:facebook:age_range_max", "age_range", "max");
-            ClaimActions.MapJsonKey(ClaimTypes.DateOfBirth, "birthday");
-            ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-            ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-            ClaimActions.MapJsonKey(ClaimTypes.GivenName, "first_name");
-            //ClaimActions.MapJsonKey("urn:facebook:middle_name", "middle_name");
-            ClaimActions.MapJsonKey(ClaimTypes.Surname, "last_name");
+            ClaimActions.MapJsonKey(ClaimTypes.Name, "nickname");
             ClaimActions.MapJsonKey(ClaimTypes.Gender, "gender");
-            //ClaimActions.MapJsonKey("urn:facebook:link", "link");
-            //ClaimActions.MapJsonSubKey("urn:facebook:location", "location", "name");
-            ClaimActions.MapJsonKey(ClaimTypes.Locality, "locale");
-            //ClaimActions.MapJsonKey("urn:facebook:timezone", "timezone");
+            ClaimActions.MapJsonKey("urn:qq:avatar", "figureurl_qq_2");
         }
 
         /// <summary>

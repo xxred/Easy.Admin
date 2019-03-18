@@ -56,7 +56,10 @@ namespace Easy.Admin.Areas.Admin.Controllers
             var user = new
             {
                 Name = identity?.Name,
-                Avatar = identity?.FindFirst(GithubDefaults.AvatarClaimTypes)?.Value,
+                Avatar = identity?.FindFirst(
+//                    GithubDefaults.AvatarClaimTypes
+                    "urn:qq:avatar"
+                    )?.Value,
                 DisplayName = identity?.Label,
                 Roles = new[] { "admin" }
             };
