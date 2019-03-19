@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -301,14 +302,8 @@ namespace Easy.Admin
         {
             if (env.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
-                    c.InjectJavascript("/swagger.js");//注入js
-                });
+
                 app.UseDeveloperExceptionPage();
-                app.UseStaticFiles();
             }
             else
             {
@@ -317,6 +312,19 @@ namespace Easy.Admin
 
             // Http跳转Https
             //app.UseHttpsRedirection();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
+                c.InjectJavascript("/swagger.js");//注入js
+                });
+
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"))
+            });
 
             // 跨域
             app.UseCors(config =>
@@ -330,16 +338,23 @@ namespace Easy.Admin
 
             app.UseIdentityServer();
 
-            app.UseSpaStaticFiles();
-
             app.UseMvc();
 
             app.UseSpa(config =>
             {
                 //SpaStaticFilesOptions
-                config.Options.SourcePath = @"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End";
-                config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:1337/");
-                //                config.Options.DefaultPageStaticFileOptions.FileProvider = new PhysicalFileProvider(@"F:\Downloads\Src\CSharp\MyProject\Easy.Admin\Easy.Admin\wwwroot");
+                //config.Options.SourcePath = Path.Combine(env.WebRootPath, "dist");
+
+                // 下面的代理可以在本地开发使用，线上部署使用StaticFile，设置默认页和文件地址
+                //config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:1337/");
+
+                // 这个设置用来处理所有前面没有命中的请求，
+                // 比如 /indexl.html(返回默认主页文件的内容，但是前端没有这个路由)、/(返回默认主页文件的内容)、/404(返回默认主页文件的内容)等
+                // 总的来说就是返回默认主页的的内容，而路由由前端处理，
+                // UseSpaStaticFiles返回前端文件，可以设置相对目录，比如这里是放在dist文件夹，前端无需处理
+                config.Options.DefaultPageStaticFileOptions = new StaticFileOptions();
+                config.Options.DefaultPageStaticFileOptions.FileProvider =
+                new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"));
             });
 
         }

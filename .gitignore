@@ -339,3 +339,4 @@ ASALocalRun/
 /Easy.Admin/Easy.Admin.nuget1.props
 /Easy.Admin/BuildModel.tt
 /Easy.Admin/Build.props
+/Easy.Admin/wwwroot/dist
