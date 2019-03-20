@@ -57,7 +57,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             {
                 Name = identity?.Name,
                 Avatar = identity?.FindFirst(
-//                    GithubDefaults.AvatarClaimTypes
+                    //                    GithubDefaults.AvatarClaimTypes
                     "urn:qq:avatar"
                     )?.Value,
                 DisplayName = identity?.Label,
@@ -80,7 +80,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
-        public dynamic Login([FromQuery]string username, [FromQuery]string password, [FromQuery]string returnUrl)
+        public dynamic Login([FromQuery]string username, [FromQuery]string password)
         {
             var handler = new JwtSecurityTokenHandler();
             var newTokenExpiration = DateTime.Now.Add(TimeSpan.FromHours(2));
@@ -108,12 +108,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             var encodedToken = handler.WriteToken(securityToken);
 
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                // 为了下面重定向的时候带上token，往cookie写一份
-                Response.Cookies.Append("token", "Bearer " + encodedToken);
-                Response.Redirect(returnUrl);
-            }
+            // 为了下面重定向的时候带上token，往cookie写一份
+            Response.Cookies.Append("Admin-Token", "Bearer " + encodedToken);
 
             return new { Token = "Bearer " + encodedToken };
         }
@@ -195,7 +191,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         public async Task<IActionResult> Callback()
         {
             //// read external identity from the temporary cookie
-            var token = Request.Cookies.ContainsKey("token") ? Request.Cookies["token"] : null;
+            var token = Request.Cookies.ContainsKey("Admin-Token") ? Request.Cookies["Admin-Token"] : null;
             var returnUrl = Request.Cookies.ContainsKey("returnUrl") ? Request.Cookies["returnUrl"] : null;
 
             if (returnUrl != null)

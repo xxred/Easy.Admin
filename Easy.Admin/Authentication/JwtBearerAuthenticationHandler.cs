@@ -7,6 +7,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -24,7 +25,7 @@ namespace Easy.Admin.Authentication
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (Request.Cookies.TryGetValue("token", out var token))
+            if (Request.Cookies.TryGetValue("Admin-Token", out var token))
             {
                 Request.Headers["Authorization"] = token;
                 var authenticateResult = await Context.AuthenticateAsync("Bearer");
@@ -34,7 +35,7 @@ namespace Easy.Admin.Authentication
                 var claims = authenticateResult.Principal.Claims;
                 // sub 唯一标识，用于identityServer，
                 // 同时它也应该具有具有唯一标识，ClaimTypes.NameIdentity
-                var hasSub = authenticateResult.Principal.HasClaim(h => h.Type == "sub");
+                var hasSub = authenticateResult.Principal.HasClaim(h => h.Type == JwtClaimTypes.Subject);
                 if (!hasSub)
                 {
                     if (authenticateResult.Principal.HasClaim(h => h.Type == ClaimTypes.NameIdentifier))
@@ -42,9 +43,9 @@ namespace Easy.Admin.Authentication
                         ClaimsIdentity claimsIdentity;
                         if ((claimsIdentity = authenticateResult.Principal.Identity as ClaimsIdentity) != null)
                         {
-                            var sub = authenticateResult.Principal.FindFirst(f => f.Type == ClaimTypes.NameIdentifier)
+                            var value = authenticateResult.Principal.FindFirst(f => f.Type == ClaimTypes.NameIdentifier)
                                 .Value;
-                            claimsIdentity.AddClaim(new Claim("sub", sub));
+                            claimsIdentity.AddClaim(new Claim(JwtClaimTypes.Subject, value));
                         }
                     }
                     if (authenticateResult.Principal.HasClaim(h => h.Type == "http://schemas.microsoft.com/identity/claims/identityprovider"))
@@ -52,9 +53,19 @@ namespace Easy.Admin.Authentication
                         ClaimsIdentity claimsIdentity;
                         if ((claimsIdentity = authenticateResult.Principal.Identity as ClaimsIdentity) != null)
                         {
-                            var sub = authenticateResult.Principal.FindFirst(f => f.Type == "http://schemas.microsoft.com/identity/claims/identityprovider")
+                            var value = authenticateResult.Principal.FindFirst(f => f.Type == "http://schemas.microsoft.com/identity/claims/identityprovider")
                                 .Value;
-                            claimsIdentity.AddClaim(new Claim("idp", sub));
+                            claimsIdentity.AddClaim(new Claim(JwtClaimTypes.IdentityProvider, value));
+                        }
+                    }
+                    if (authenticateResult.Principal.HasClaim(h => h.Type == JwtClaimTypes.IssuedAt))
+                    {
+                        ClaimsIdentity claimsIdentity;
+                        if ((claimsIdentity = authenticateResult.Principal.Identity as ClaimsIdentity) != null)
+                        {
+                            var value = authenticateResult.Principal.FindFirst(f => f.Type == JwtClaimTypes.IssuedAt)
+                                .Value;
+                            claimsIdentity.AddClaim(new Claim(JwtClaimTypes.AuthenticationTime, value));
                         }
                     }
                 }
@@ -91,7 +102,7 @@ namespace Easy.Admin.Authentication
 
             var encodedToken = "Bearer " + handler.WriteToken(securityToken);
 
-            Response.Cookies.Append("token", encodedToken);
+            Response.Cookies.Append("Admin-Token", encodedToken);
 
             if (properties.Items.ContainsKey("returnUrl"))
             {

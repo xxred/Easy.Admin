@@ -44,11 +44,13 @@
   </ItemGroup>
 
   <Target Name="Vue-Build" BeforeTargets="Build">
-    <Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>
+    <!--<Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>-->
     <Exec WorkingDirectory="../Easy.Front-End" Command="yarn build"></Exec>
     <ItemGroup>
       <VueSourceFiles Include="../Easy.Front-End/dist/**" />
     </ItemGroup>
     <Copy DestinationFiles="@(VueSourceFiles->'wwwroot/dist/%(RecursiveDir)%(Filename)%(Extension)')" SourceFiles="@(VueSourceFiles)"></Copy>
   </Target>
+
+  <ProjectExtensions><VisualStudio><UserProperties wwwroot_4dist_4js_4app_10f8b8bab_1js_1map__JSONSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

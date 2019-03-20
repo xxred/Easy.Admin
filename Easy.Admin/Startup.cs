@@ -50,10 +50,11 @@ namespace Easy.Admin
                     options.Events.RaiseSuccessEvents = true;
                     // options.UserInteraction.ConsentUrl // 同意url，同意授权，给用户勾选
                     options.UserInteraction.LoginReturnUrlParameter = "returnUrl";//返回url的参数名
-                    options.UserInteraction.LoginUrl = "/Admin/Account/Login?username=admin&password=123456";
+                    //options.UserInteraction.LoginUrl = "/Admin/Account/Login?username=admin&password=123456";
+                    options.UserInteraction.LoginUrl = "/login";
 
-                    options.Authentication.CookieAuthenticationScheme =
-                        IdentityServerConstants.ExternalCookieAuthenticationScheme;
+
+                    options.Authentication.CookieAuthenticationScheme = "Jwt-Cookie";
                 })
                 .AddInMemoryIdentityResources(new List<IdentityResource>()
                 {
@@ -179,11 +180,14 @@ namespace Easy.Admin
             services.AddAuthentication(
                     options =>
                     {
-                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                        //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultAuthenticateScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
                         options.DefaultSignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
                     })
                 // 默认使用Jwt认证
                 .AddJwtBearerSignIn()
+                .AddJwtBearerSignIn("Jwt-Cookie")
                 //.AddCookie(options =>
                 //{
                 //    options.LoginPath = "/Account/Login";
@@ -226,7 +230,7 @@ namespace Easy.Admin
                 })
                 .AddOpenIdConnect("IdentityServer4", options =>
                 {
-                    options.Authority = "https://localhost:44336/";
+                    options.Authority = "https://localhost:44336";
                     options.ClientId = "client";
                     options.ClientSecret = "client";
                     options.ResponseType = "code";
@@ -311,14 +315,14 @@ namespace Easy.Admin
             }
 
             // Http跳转Https
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
                 c.InjectJavascript("/swagger.js");//注入js
-                });
+            });
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles(new StaticFileOptions
