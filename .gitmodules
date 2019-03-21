@@ -1,3 +1,6 @@
 [submodule "Easy.Front-End"]
 	path = Easy.Front-End
 	url = https://github.com/xxred/Easy.Front-End.git
+[submodule "IdentityServer4.XCode"]
+	path = IdentityServer4.XCode
+	url = https://github.com/xxred/IdentityServer4.XCode.git
