@@ -1,9 +1,8 @@
 using System;
+using Easy.Admin.Authentication.QQ;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Facebook;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Easy.Admin.Authentication.QQ
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class FacebookAuthenticationOptionsExtensions
     {

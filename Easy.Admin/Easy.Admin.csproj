@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <!--复制依赖的插件到本地-->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <LangVersion>7.2</LangVersion>
     <UserSecretsId>79e66a00-f0b6-4a90-ba08-3ac212e4a57e</UserSecretsId>
   </PropertyGroup>
@@ -16,8 +18,26 @@
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Controllers\" />
   </ItemGroup>
-  <ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\admin\.DS_Store" />
+    <None Include="wwwroot\admin\assets\env.js" />
+    <None Include="wwwroot\admin\assets\fonts\fontawesome-webfont.woff2" />
+    <None Include="wwwroot\admin\assets\fonts\Roboto.woff2" />
+    <None Include="wwwroot\admin\assets\scripts\bootstrap.min.js" />
+    <None Include="wwwroot\admin\assets\scripts\jquery.min.js" />
+    <None Include="wwwroot\admin\assets\scripts\tether.min.js" />
+    <None Include="wwwroot\admin\env\env.js" />
+    <None Include="wwwroot\admin\main.567cefa08166c9d48d54.js" />
+    <None Include="wwwroot\admin\main.d296649575a6d7c6699e.js" />
+    <None Include="wwwroot\admin\polyfills.b820930a925b05746dcc.js" />
+    <None Include="wwwroot\admin\Roboto.5d4aeb4e5f5ef754e307.woff2" />
+    <None Include="wwwroot\admin\runtime.06daa30a2963fa413676.js" />
+    <None Include="wwwroot\admin\scripts.730292c744802ef10a95.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="IdentityExpress.Manager.Api.Community" Version="2.3.2.53" />
+    <PackageReference Include="IdentityExpress.Manager.BusinessLogic.Community" Version="2.3.2.53" />
     <PackageReference Include="AspNetCore.Identity.XCode" Version="1.0.0-CI00000" />
 
     <PackageReference Include="Extensions.Identity.Stores.XCode" Version="1.0.0-CI00000" />
@@ -26,7 +46,10 @@
 
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityServer4.XCode\IdentityServer4.XCode.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

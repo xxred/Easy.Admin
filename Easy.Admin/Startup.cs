@@ -29,12 +29,15 @@ namespace Easy.Admin
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration,IHostingEnvironment env)
         {
             Configuration = configuration;
+            Environment = env;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -56,122 +59,129 @@ namespace Easy.Admin
 
                     options.Authentication.CookieAuthenticationScheme = "Jwt-Cookie";
                 })
-                .AddInMemoryIdentityResources(new List<IdentityResource>()
+                //.AddInMemoryIdentityResources(new List<IdentityResource>()
+                //{
+                //    new IdentityResources.OpenId(),
+                //    new IdentityResources.Profile()
+
+                //})
+                //.AddInMemoryApiResources(new List<ApiResource>()
+                //{
+                //    new ApiResource("api1", "IdentityServer4授权中心")
+                //})
+                //.AddInMemoryClients(new List<Client>()
+                //{
+                //    new Client
+                //    {
+                //        ClientId = "client",
+
+                //        // no interactive user, use the clientid/secret for authentication
+                //        AllowedGrantTypes = GrantTypes.Code,
+
+                //        // secret for authentication
+                //        ClientSecrets =
+                //        {
+                //            new Secret("client".Sha256())
+                //        },
+
+                //        // scopes that client has access to
+                //        AllowedScopes =
+                //        {
+                //            "api1",
+                //            IdentityServerConstants.StandardScopes.OpenId,
+                //            IdentityServerConstants.StandardScopes.Profile,
+                //        },
+                //        RequireConsent = false,
+
+                //        RedirectUris = {"https://localhost:44336/sign-client"},
+
+                //    },
+                //    // resource owner password grant client
+                //    new Client
+                //    {
+                //        ClientId = "ro.client",
+                //        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+
+                //        ClientSecrets =
+                //        {
+                //            new Secret("secret".Sha256())
+                //        },
+                //        AllowedScopes = {"api1"}
+                //    },
+                //    // OpenID Connect hybrid flow client (MVC)
+                //    new Client
+                //    {
+                //        ClientId = "mvc",
+                //        ClientName = "MVC Client",
+                //        AllowedGrantTypes = GrantTypes.Hybrid,
+
+                //        ClientSecrets =
+                //        {
+                //            new Secret("secret".Sha256())
+                //        },
+
+                //        RedirectUris = {"http://localhost:5002/signin-oidc"},
+                //        PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
+
+                //        AllowedScopes =
+                //        {
+                //            IdentityServerConstants.StandardScopes.OpenId,
+                //            IdentityServerConstants.StandardScopes.Profile,
+                //            "api1"
+                //        },
+
+                //        AllowOfflineAccess = true
+                //    },
+                //    // JavaScript Client
+                //    new Client
+                //    {
+                //        ClientId = "js",
+                //        ClientName = "JavaScript Client",
+                //        AllowedGrantTypes = GrantTypes.Code,
+                //        RequirePkce = true,
+                //        RequireClientSecret = false,
+
+                //        RedirectUris = {"http://localhost:5003/callback.html"},
+                //        PostLogoutRedirectUris = {"http://localhost:5003/index.html"},
+                //        AllowedCorsOrigins = {"http://localhost:5003"},
+
+                //        AllowedScopes =
+                //        {
+                //            IdentityServerConstants.StandardScopes.OpenId,
+                //            IdentityServerConstants.StandardScopes.Profile,
+                //            "api1"
+                //        }
+                //    },
+                //    ///////////////////////////////////////////
+                //    // Device Flow Sample
+                //    //////////////////////////////////////////
+                //    new Client
+                //    {
+                //        ClientId = "device",
+                //        ClientName = "Device Flow Client",
+
+                //        AllowedGrantTypes = GrantTypes.DeviceFlow,
+                //        RequireClientSecret = false,
+
+                //        AllowOfflineAccess = true,
+
+                //        AllowedCorsOrigins = {"*"}, // JS test client only
+
+                //        AllowedScopes =
+                //        {
+                //            IdentityServerConstants.StandardScopes.OpenId,
+                //            IdentityServerConstants.StandardScopes.Profile,
+                //            IdentityServerConstants.StandardScopes.Email,
+                //            "api1", "api2.read_only", "api2.full_access"
+                //        }
+                //    }
+                //})
+                .AddXCodeConfigurationStore()
+                .AddXCodeOperationalStore(options =>
                 {
-                    new IdentityResources.OpenId(),
-                    new IdentityResources.Profile()
-
-                })
-                .AddInMemoryApiResources(new List<ApiResource>()
-                {
-                    new ApiResource("api1", "IdentityServer4授权中心")
-                })
-                .AddInMemoryClients(new List<Client>()
-                {
-                    new Client
-                    {
-                        ClientId = "client",
-
-                        // no interactive user, use the clientid/secret for authentication
-                        AllowedGrantTypes = GrantTypes.Code,
-
-                        // secret for authentication
-                        ClientSecrets =
-                        {
-                            new Secret("client".Sha256())
-                        },
-
-                        // scopes that client has access to
-                        AllowedScopes =
-                        {
-                            "api1",
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile,
-                        },
-                        RequireConsent = false,
-
-                        RedirectUris = {"https://localhost:44336/sign-client"},
-
-                    },
-                    // resource owner password grant client
-                    new Client
-                    {
-                        ClientId = "ro.client",
-                        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-
-                        ClientSecrets =
-                        {
-                            new Secret("secret".Sha256())
-                        },
-                        AllowedScopes = {"api1"}
-                    },
-                    // OpenID Connect hybrid flow client (MVC)
-                    new Client
-                    {
-                        ClientId = "mvc",
-                        ClientName = "MVC Client",
-                        AllowedGrantTypes = GrantTypes.Hybrid,
-
-                        ClientSecrets =
-                        {
-                            new Secret("secret".Sha256())
-                        },
-
-                        RedirectUris = {"http://localhost:5002/signin-oidc"},
-                        PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
-
-                        AllowedScopes =
-                        {
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile,
-                            "api1"
-                        },
-
-                        AllowOfflineAccess = true
-                    },
-                    // JavaScript Client
-                    new Client
-                    {
-                        ClientId = "js",
-                        ClientName = "JavaScript Client",
-                        AllowedGrantTypes = GrantTypes.Code,
-                        RequirePkce = true,
-                        RequireClientSecret = false,
-
-                        RedirectUris = {"http://localhost:5003/callback.html"},
-                        PostLogoutRedirectUris = {"http://localhost:5003/index.html"},
-                        AllowedCorsOrigins = {"http://localhost:5003"},
-
-                        AllowedScopes =
-                        {
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile,
-                            "api1"
-                        }
-                    },
-                    ///////////////////////////////////////////
-                    // Device Flow Sample
-                    //////////////////////////////////////////
-                    new Client
-                    {
-                        ClientId = "device",
-                        ClientName = "Device Flow Client",
-
-                        AllowedGrantTypes = GrantTypes.DeviceFlow,
-                        RequireClientSecret = false,
-
-                        AllowOfflineAccess = true,
-
-                        AllowedCorsOrigins = {"*"}, // JS test client only
-
-                        AllowedScopes =
-                        {
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile,
-                            IdentityServerConstants.StandardScopes.Email,
-                            "api1", "api2.read_only", "api2.full_access"
-                        }
-                    }
+                    // this enables automatic token cleanup. this is optional.
+                    options.EnableTokenCleanup = true;
+                    // options.TokenCleanupInterval = 15; // interval in seconds. 15 seconds useful for debugging
                 })
                 .AddDeveloperSigningCredential()
                 .AddJwtBearerClientAuthentication();
@@ -247,43 +257,44 @@ namespace Easy.Admin
                     options.ClientSecret = "fa819f1077ecbdffedbefb1f63039d9f";
                 });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // 文档
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info { Title = "Easy.Admin API", Version = "v1" });
-                //c.AddSecurityDefinition("oauth2", new OAuth2Scheme
-                //{
-                //    Type = "oauth2",
-                //    Flow = "password",
-                //    TokenUrl = "/Admin/Account/Login",
-                //    Description = "OAuth2登陆授权",
-                //    Scopes = new Dictionary<string, string>
-                //    {
-                //        { "user", "普通用户"}
-                //    }
-                //});
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new Info { Title = "Easy.Admin API", Version = "v1" });
+            //    //c.AddSecurityDefinition("oauth2", new OAuth2Scheme
+            //    //{
+            //    //    Type = "oauth2",
+            //    //    Flow = "password",
+            //    //    TokenUrl = "/Admin/Account/Login",
+            //    //    Description = "OAuth2登陆授权",
+            //    //    Scopes = new Dictionary<string, string>
+            //    //    {
+            //    //        { "user", "普通用户"}
+            //    //    }
+            //    //});
 
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                {
-                    Description = "JWT Authorization",
-                    Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
-                });
+            //    c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+            //    {
+            //        Description = "JWT Authorization",
+            //        Name = "Authorization",
+            //        In = "header",
+            //        Type = "apiKey"
+            //    });
 
-                //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                //{
-                //    { "oauth2",new string[]{}}
-                //});
+            //    //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+            //    //{
+            //    //    { "oauth2",new string[]{}}
+            //    //});
 
-                // 这个要加上，否则请求的时候头部不会带Authorization
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                {
-                    { "Bearer",new string[]{}}
-                });
-            });
+            //    // 这个要加上，否则请求的时候头部不会带Authorization
+            //    c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+            //    {
+            //        { "Bearer",new string[]{}}
+            //    });
+            //});
+
             // 跨域
             services.AddCors();
             // 运行情况检查
@@ -296,9 +307,10 @@ namespace Easy.Admin
 
             services.AddSpaStaticFiles(options =>
             {
-                options.RootPath =
-@"F:\Downloads\Src\CSharp\MyProject\Easy.Front-End\dist";
+                options.RootPath = Path.Combine(Environment.WebRootPath, "dist");
             });
+
+            services.UseAdminUI();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -317,18 +329,20 @@ namespace Easy.Admin
             // Http跳转Https
             app.UseHttpsRedirection();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
-                c.InjectJavascript("/swagger.js");//注入js
-            });
+            //app.UseSwagger();
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
+            //    c.InjectJavascript("/swagger.js");//注入js
+            //});
+
+            app.UseDefaultFiles();
 
             app.UseStaticFiles();
-            app.UseSpaStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"))
-            });
+            //app.UseSpaStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"))
+            //});
 
             // 跨域
             app.UseCors(config =>
@@ -342,7 +356,9 @@ namespace Easy.Admin
 
             app.UseIdentityServer();
 
-            app.UseMvc();
+            app.UseMvcWithDefaultRoute();//.UseMvc();
+
+            app.UseAdminUI();
 
             app.UseSpa(config =>
             {
@@ -360,7 +376,6 @@ namespace Easy.Admin
                 config.Options.DefaultPageStaticFileOptions.FileProvider =
                 new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"));
             });
-
         }
     }
 }

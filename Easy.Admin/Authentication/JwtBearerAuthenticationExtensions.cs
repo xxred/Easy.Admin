@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Easy.Admin.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Easy.Admin.Authentication
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class JwtBearerAuthenticationExtensions
     {

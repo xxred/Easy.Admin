@@ -340,3 +340,6 @@ ASALocalRun/
 /Easy.Admin/BuildModel.tt
 /Easy.Admin/Build.props
 /Easy.Admin/wwwroot/dist
+/Easy.Admin/wwwroot/admin
+/Easy.Admin/IdentityServer.db
+/Easy.Admin/AspIdUsers.db
