@@ -180,11 +180,12 @@ namespace Easy.Admin
                 .AddXCodeOperationalStore(options =>
                 {
                     // this enables automatic token cleanup. this is optional.
-                    options.EnableTokenCleanup = true;
+                    options.EnableTokenCleanup = false;
                     // options.TokenCleanupInterval = 15; // interval in seconds. 15 seconds useful for debugging
                 })
                 .AddDeveloperSigningCredential()
-                .AddJwtBearerClientAuthentication();
+                //.AddJwtBearerClientAuthentication()
+                ;
 
             // 身份验证
             services.AddAuthentication(
@@ -260,40 +261,40 @@ namespace Easy.Admin
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // 文档
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new Info { Title = "Easy.Admin API", Version = "v1" });
-            //    //c.AddSecurityDefinition("oauth2", new OAuth2Scheme
-            //    //{
-            //    //    Type = "oauth2",
-            //    //    Flow = "password",
-            //    //    TokenUrl = "/Admin/Account/Login",
-            //    //    Description = "OAuth2登陆授权",
-            //    //    Scopes = new Dictionary<string, string>
-            //    //    {
-            //    //        { "user", "普通用户"}
-            //    //    }
-            //    //});
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Easy.Admin API", Version = "v1" });
+                //c.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                //{
+                //    Type = "oauth2",
+                //    Flow = "password",
+                //    TokenUrl = "/Admin/Account/Login",
+                //    Description = "OAuth2登陆授权",
+                //    Scopes = new Dictionary<string, string>
+                //    {
+                //        { "user", "普通用户"}
+                //    }
+                //});
 
-            //    c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-            //    {
-            //        Description = "JWT Authorization",
-            //        Name = "Authorization",
-            //        In = "header",
-            //        Type = "apiKey"
-            //    });
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    Description = "JWT Authorization",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
 
-            //    //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-            //    //{
-            //    //    { "oauth2",new string[]{}}
-            //    //});
+                //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                //{
+                //    { "oauth2",new string[]{}}
+                //});
 
-            //    // 这个要加上，否则请求的时候头部不会带Authorization
-            //    c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-            //    {
-            //        { "Bearer",new string[]{}}
-            //    });
-            //});
+                // 这个要加上，否则请求的时候头部不会带Authorization
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer",new string[]{}}
+                });
+            });
 
             // 跨域
             services.AddCors();
@@ -310,7 +311,7 @@ namespace Easy.Admin
                 options.RootPath = Path.Combine(Environment.WebRootPath, "dist");
             });
 
-            services.UseAdminUI();
+            //services.UseAdminUI();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -329,12 +330,12 @@ namespace Easy.Admin
             // Http跳转Https
             app.UseHttpsRedirection();
 
-            //app.UseSwagger();
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
-            //    c.InjectJavascript("/swagger.js");//注入js
-            //});
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
+                //c.InjectJavascript("/swagger.js");//注入js
+            });
 
             app.UseDefaultFiles();
 
@@ -356,9 +357,11 @@ namespace Easy.Admin
 
             app.UseIdentityServer();
 
-            app.UseMvcWithDefaultRoute();//.UseMvc();
+            app
+                //.UseMvcWithDefaultRoute();//
+            .UseMvc();
 
-            app.UseAdminUI();
+            //app.UseAdminUI();
 
             app.UseSpa(config =>
             {
@@ -366,15 +369,15 @@ namespace Easy.Admin
                 //config.Options.SourcePath = Path.Combine(env.WebRootPath, "dist");
 
                 // 下面的代理可以在本地开发使用，线上部署使用StaticFile，设置默认页和文件地址
-                //config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:1337/");
+                config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:1337/");
 
                 // 这个设置用来处理所有前面没有命中的请求，
                 // 比如 /indexl.html(返回默认主页文件的内容，但是前端没有这个路由)、/(返回默认主页文件的内容)、/404(返回默认主页文件的内容)等
                 // 总的来说就是返回默认主页的的内容，而路由由前端处理，
                 // UseSpaStaticFiles返回前端文件，可以设置相对目录，比如这里是放在dist文件夹，前端无需处理
-                config.Options.DefaultPageStaticFileOptions = new StaticFileOptions();
-                config.Options.DefaultPageStaticFileOptions.FileProvider =
-                new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"));
+                //config.Options.DefaultPageStaticFileOptions = new StaticFileOptions();
+                //config.Options.DefaultPageStaticFileOptions.FileProvider =
+                //new PhysicalFileProvider(Path.Combine(env.WebRootPath, "dist"));
             });
         }
     }

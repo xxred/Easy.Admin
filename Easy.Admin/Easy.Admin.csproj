@@ -36,8 +36,6 @@
     <None Include="wwwroot\admin\scripts.730292c744802ef10a95.js" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IdentityExpress.Manager.Api.Community" Version="2.3.2.53" />
-    <PackageReference Include="IdentityExpress.Manager.BusinessLogic.Community" Version="2.3.2.53" />
     <PackageReference Include="AspNetCore.Identity.XCode" Version="1.0.0-CI00000" />
 
     <PackageReference Include="Extensions.Identity.Stores.XCode" Version="1.0.0-CI00000" />
@@ -45,6 +43,8 @@
     <PackageReference Include="IdentityServer4" Version="2.3.2" />
 
     <PackageReference Include="Microsoft.AspNetCore.App" />
+
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
   </ItemGroup>

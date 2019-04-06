@@ -23,7 +23,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
 {
     [Route("Admin/[controller]")]
     [ApiController]
-    [Authorize]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AccountController : ControllerBase
     {
