@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Tables Version="9.6.6663.16294" NameSpace="Easy.Admin.Areas.Admin.Models" ConnName="EasyAdmin" Output="" BaseClass="Entity"
+         xmlns="http://www.newlifex.com/ModelSchema.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com https://raw.githubusercontent.com/NewLifeX/X/master/XCode/ModelSchema.xsd" >
+  <Table Name="VuePage" Description="Vue页面" RenderGenEntity="true">
+    <Columns>
+      <Column Name="ID" DataType="Int32"  Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="页面名称" />
+      <Column Name="Path" DataType="String" Description="路径" />
+      <Column Name="Component" DataType="String" Description="组件路径" />
+      <Column Name="Redirect" DataType="String" Description="跳转路径" />
+      <Column Name="AlwaysShow" DataType="Boolean" Description="允许展示" />
+      <Column Name="Hidden" DataType="Boolean" Description="是否隐藏" />
+      <Column Name="Pid" DataType="Int32" Description="父级id" />
+      </Columns>
+  </Table>
+  <Table Name="VuePageMeta" Description="Vue页面元数据" RenderGenEntity="true">
+    <Columns>
+      <Column Name="ID" DataType="Int32"  Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="VuePageID" DataType="Int32" Description="页面id" />
+      <Column Name="Title" DataType="String" Master="True" Nullable="False" Description="页面名称" />
+      <Column Name="Icon" DataType="String" Description="图标" />
+      <Column Name="NoCache" DataType="Boolean" Description="是否不缓存" />
+      <Column Name="RolesStr" DataType="String" Description="角色字符串" />
+    </Columns>
+  </Table>
+</Tables>

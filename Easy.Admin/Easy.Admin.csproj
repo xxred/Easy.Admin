@@ -7,7 +7,9 @@
     <LangVersion>7.2</LangVersion>
     <UserSecretsId>79e66a00-f0b6-4a90-ba08-3ac212e4a57e</UserSecretsId>
   </PropertyGroup>
-
+<PropertyGroup>
+      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Build.props" />
     <None Remove="Easy.Admin.nuget1.props" />
