@@ -18,7 +18,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             var json = @" [
   {
     path: '/permission',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: '/permission/index',
     alwaysShow: true,
     meta: {
@@ -58,7 +58,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/icon',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     children: [
       {
         path: 'index',
@@ -71,7 +71,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/components',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: 'noredirect',
     name: 'ComponentDemo',
     meta: {
@@ -167,7 +167,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
   },
   {
     path: '/charts',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: 'noredirect',
     name: 'Charts',
     meta: {
@@ -197,7 +197,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
   },
   {
     path: '/nested',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: '/nested/menu1/menu1-1',
     name: 'Nested',
     meta: {
@@ -258,7 +258,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/example',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: '/example/list',
     name: 'Example',
     meta: {
@@ -290,7 +290,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/tab',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     children: [
       {
         path: 'index',
@@ -303,7 +303,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/error',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: 'noredirect',
     name: 'ErrorPages',
     meta: {
@@ -328,7 +328,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/error-log',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: 'noredirect',
     children: [
       {
@@ -342,7 +342,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/excel',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: '/excel/export-excel',
     name: 'Excel',
     meta: {
@@ -379,7 +379,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/zip',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: '/zip/download',
     alwaysShow: true,
     meta: { title: 'zip', icon: 'zip' },
@@ -395,7 +395,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/pdf',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: '/pdf/index',
     children: [
       {
@@ -414,7 +414,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/theme',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: 'noredirect',
     children: [
       {
@@ -428,7 +428,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/clipboard',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     redirect: 'noredirect',
     children: [
       {
@@ -442,7 +442,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: '/i18n',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     children: [
       {
         path: 'index',
@@ -455,7 +455,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
   {
     path: 'external-link',
-    component: 'layout/Layout',
+    component: 'views/layout/Layout',
     children: [
       {
         path: 'https://github.com/PanJiaChen/vue-element-admin',
