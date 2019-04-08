@@ -7,14 +7,9 @@
     <LangVersion>7.2</LangVersion>
     <UserSecretsId>79e66a00-f0b6-4a90-ba08-3ac212e4a57e</UserSecretsId>
   </PropertyGroup>
-<PropertyGroup>
-      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Build.props" />
-    <None Remove="Easy.Admin.nuget1.props" />
-    <None Remove="NewLife.XCode.props" />
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
@@ -22,32 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\admin\.DS_Store" />
-    <None Include="wwwroot\admin\assets\env.js" />
-    <None Include="wwwroot\admin\assets\fonts\fontawesome-webfont.woff2" />
-    <None Include="wwwroot\admin\assets\fonts\Roboto.woff2" />
-    <None Include="wwwroot\admin\assets\scripts\bootstrap.min.js" />
-    <None Include="wwwroot\admin\assets\scripts\jquery.min.js" />
-    <None Include="wwwroot\admin\assets\scripts\tether.min.js" />
-    <None Include="wwwroot\admin\env\env.js" />
-    <None Include="wwwroot\admin\main.567cefa08166c9d48d54.js" />
-    <None Include="wwwroot\admin\main.d296649575a6d7c6699e.js" />
-    <None Include="wwwroot\admin\polyfills.b820930a925b05746dcc.js" />
-    <None Include="wwwroot\admin\Roboto.5d4aeb4e5f5ef754e307.woff2" />
-    <None Include="wwwroot\admin\runtime.06daa30a2963fa413676.js" />
-    <None Include="wwwroot\admin\scripts.730292c744802ef10a95.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="AspNetCore.Identity.XCode" Version="1.0.0-CI00000" />
+    <PackageReference Include="AspNetCore.Identity.XCode" Version="1.0.0-CI0000" />
 
     <PackageReference Include="Extensions.Identity.Stores.XCode" Version="1.0.0-CI00000" />
 
-    <PackageReference Include="IdentityServer4" Version="2.3.2" />
+    <PackageReference Include="IdentityServer4" Version="2.4.0" />
 
     <PackageReference Include="Microsoft.AspNetCore.App" />
-
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
@@ -55,17 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="BuildModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BuildModel.tt.log</LastGenOutput>
-    </None>
-    <None Update="BuildModel.tt.log">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>BuildModel.tt</DependentUpon>
-    </None>
   </ItemGroup>
 
   <Target Name="Vue-Build" BeforeTargets="Build">
@@ -77,5 +43,9 @@
     <Copy DestinationFiles="@(VueSourceFiles->'wwwroot/dist/%(RecursiveDir)%(Filename)%(Extension)')" SourceFiles="@(VueSourceFiles)"></Copy>
   </Target>
 
-  <ProjectExtensions><VisualStudio><UserProperties wwwroot_4dist_4js_4app_10f8b8bab_1js_1map__JSONSchema="" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties wwwroot_4dist_4js_4app_10f8b8bab_1js_1map__JSONSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
