@@ -3,12 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <!--复制依赖的插件到本地-->
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <LangVersion>7.2</LangVersion>
-    <UserSecretsId>79e66a00-f0b6-4a90-ba08-3ac212e4a57e</UserSecretsId>
-  </PropertyGroup>
-  <PropertyGroup>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <LangVersion>latest</LangVersion>
+    <UserSecretsId>79e66a00-f0b6-4a90-ba08-3ac212e4a57e</UserSecretsId>
+    <!--默认web项目不可打包，设置此属性可打包-->
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +24,8 @@
 
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="NewLife.Core" Version="8.1.2019.406" />
+    <PackageReference Include="NewLife.XCode" Version="9.11.2019.406" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
@@ -34,14 +35,14 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
-  <Target Name="Vue-Build" BeforeTargets="Build">
-    <!--<Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>-->
+  <!--<Target Name="Vue-Build" BeforeTargets="Build">
+    --><!--<Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>--><!--
     <Exec WorkingDirectory="../Easy.Front-End" Command="yarn build"></Exec>
     <ItemGroup>
       <VueSourceFiles Include="../Easy.Front-End/dist/**" />
     </ItemGroup>
     <Copy DestinationFiles="@(VueSourceFiles->'wwwroot/dist/%(RecursiveDir)%(Filename)%(Extension)')" SourceFiles="@(VueSourceFiles)"></Copy>
-  </Target>
+  </Target>-->
 
   <ProjectExtensions>
     <VisualStudio>

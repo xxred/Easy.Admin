@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.Github;
 using Easy.Admin.Authentication.QQ;
+using Easy.Admin.Configuration;
+using Easy.Admin.Middleware;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -59,123 +61,6 @@ namespace Easy.Admin
 
                     options.Authentication.CookieAuthenticationScheme = "Jwt-Cookie";
                 })
-                //.AddInMemoryIdentityResources(new List<IdentityResource>()
-                //{
-                //    new IdentityResources.OpenId(),
-                //    new IdentityResources.Profile()
-
-                //})
-                //.AddInMemoryApiResources(new List<ApiResource>()
-                //{
-                //    new ApiResource("api1", "IdentityServer4授权中心")
-                //})
-                //.AddInMemoryClients(new List<Client>()
-                //{
-                //    new Client
-                //    {
-                //        ClientId = "client",
-
-                //        // no interactive user, use the clientid/secret for authentication
-                //        AllowedGrantTypes = GrantTypes.Code,
-
-                //        // secret for authentication
-                //        ClientSecrets =
-                //        {
-                //            new Secret("client".Sha256())
-                //        },
-
-                //        // scopes that client has access to
-                //        AllowedScopes =
-                //        {
-                //            "api1",
-                //            IdentityServerConstants.StandardScopes.OpenId,
-                //            IdentityServerConstants.StandardScopes.Profile,
-                //        },
-                //        RequireConsent = false,
-
-                //        RedirectUris = {"https://localhost:44336/sign-client"},
-
-                //    },
-                //    // resource owner password grant client
-                //    new Client
-                //    {
-                //        ClientId = "ro.client",
-                //        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-
-                //        ClientSecrets =
-                //        {
-                //            new Secret("secret".Sha256())
-                //        },
-                //        AllowedScopes = {"api1"}
-                //    },
-                //    // OpenID Connect hybrid flow client (MVC)
-                //    new Client
-                //    {
-                //        ClientId = "mvc",
-                //        ClientName = "MVC Client",
-                //        AllowedGrantTypes = GrantTypes.Hybrid,
-
-                //        ClientSecrets =
-                //        {
-                //            new Secret("secret".Sha256())
-                //        },
-
-                //        RedirectUris = {"http://localhost:5002/signin-oidc"},
-                //        PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
-
-                //        AllowedScopes =
-                //        {
-                //            IdentityServerConstants.StandardScopes.OpenId,
-                //            IdentityServerConstants.StandardScopes.Profile,
-                //            "api1"
-                //        },
-
-                //        AllowOfflineAccess = true
-                //    },
-                //    // JavaScript Client
-                //    new Client
-                //    {
-                //        ClientId = "js",
-                //        ClientName = "JavaScript Client",
-                //        AllowedGrantTypes = GrantTypes.Code,
-                //        RequirePkce = true,
-                //        RequireClientSecret = false,
-
-                //        RedirectUris = {"http://localhost:5003/callback.html"},
-                //        PostLogoutRedirectUris = {"http://localhost:5003/index.html"},
-                //        AllowedCorsOrigins = {"http://localhost:5003"},
-
-                //        AllowedScopes =
-                //        {
-                //            IdentityServerConstants.StandardScopes.OpenId,
-                //            IdentityServerConstants.StandardScopes.Profile,
-                //            "api1"
-                //        }
-                //    },
-                //    ///////////////////////////////////////////
-                //    // Device Flow Sample
-                //    //////////////////////////////////////////
-                //    new Client
-                //    {
-                //        ClientId = "device",
-                //        ClientName = "Device Flow Client",
-
-                //        AllowedGrantTypes = GrantTypes.DeviceFlow,
-                //        RequireClientSecret = false,
-
-                //        AllowOfflineAccess = true,
-
-                //        AllowedCorsOrigins = {"*"}, // JS test client only
-
-                //        AllowedScopes =
-                //        {
-                //            IdentityServerConstants.StandardScopes.OpenId,
-                //            IdentityServerConstants.StandardScopes.Profile,
-                //            IdentityServerConstants.StandardScopes.Email,
-                //            "api1", "api2.read_only", "api2.full_access"
-                //        }
-                //    }
-                //})
                 .AddXCodeConfigurationStore()
                 .AddXCodeOperationalStore(options =>
                 {
@@ -258,7 +143,8 @@ namespace Easy.Admin
                     options.ClientSecret = "fa819f1077ecbdffedbefb1f63039d9f";
                 });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(JsonOptionsConfig.ConfigJsonOptions);
 
             // 文档
             services.AddSwaggerGen(c =>
@@ -317,10 +203,11 @@ namespace Easy.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseApiExceptionHandler();
+
             if (env.IsDevelopment())
             {
-
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
             else
             {
@@ -329,6 +216,8 @@ namespace Easy.Admin
 
             // Http跳转Https
             app.UseHttpsRedirection();
+
+
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -357,9 +246,7 @@ namespace Easy.Admin
 
             app.UseIdentityServer();
 
-            app
-                //.UseMvcWithDefaultRoute();//
-            .UseMvc();
+            app.UseMvc();
 
             //app.UseAdminUI();
 

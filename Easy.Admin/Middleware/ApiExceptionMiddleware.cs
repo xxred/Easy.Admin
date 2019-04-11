@@ -40,7 +40,7 @@ namespace Easy.Admin.Middleware
             catch (Exception e)
             {
                 //记录系统的异常信息
-                XTrace.WriteLine(e.Message);
+                XTrace.WriteException(e);
 
                 // 如果已经开始响应到客户端，直接抛出异常，否则下面写入响应也会抛异常
                 if (context.Response.HasStarted)

@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using NewLife.Data;
 using Easy.Admin.Entities;
 using XCode;
+using System.Reflection;
+using NewLife.Serialization;
+using NewLife.Reflection;
+
 namespace Easy.Admin.Areas.Admin.Controllers
 {
     /// <summary>
@@ -33,7 +37,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="id">对象id</param>
         /// <returns><see cref="T:TEntity" /></returns>
         [HttpGet("{id}")]
-        public virtual ApiResult Get([FromRoute]int id)
+        public virtual ApiResult Get([FromRoute]string id)
         {
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)
@@ -49,23 +53,47 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <param name="value">需要添加的对象</param>
         [HttpPost]
-        public virtual ApiResult Post(TEntity value)
+        public virtual ApiResult Post([FromBody]TEntity value)
         {
             value.Insert();
-            var id = value["ID"].ToInt();
+
+            var key = Entity<TEntity>.Meta.Unique;
+
+            var id = value[key].ToInt();
             return ApiResult.Ok(id);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="value">需要删除的对象</param>
+        /// <param name="value">需要更新的对象</param>
         /// <returns></returns>
         [HttpPut]
-        public virtual ApiResult Put(TEntity value)
+        public virtual ApiResult Put([FromBody]TEntity value)
         {
-            value.Update();
-            var id = value["ID"].ToInt();
+            var key = Entity<TEntity>.Meta.Unique;
+            var entity = Entity<TEntity>.FindByKey(value[key]);
+
+            if (entity == null)
+            {
+                throw new ApiException(402, "未找到实体");
+            }
+
+            // 反射获取脏属性，得到修改的属性集合
+            var dirtys = value.GetValue("Dirtys") as DirtyCollection;
+
+            foreach (var item in dirtys)
+            {
+                if (key.Name == item)
+                {
+                    continue;
+                }
+
+                entity.SetItem(item, value[item]);
+            }
+
+            entity.Update();
+            var id = value[key];
             return ApiResult.Ok(id);
         }
 
@@ -74,7 +102,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <param name="id">需要删除对象的id</param>
         [HttpDelete("{id}")]
-        public virtual ApiResult Delete(int id)
+        public virtual ApiResult Delete([FromRoute]string id)
         {
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)
@@ -83,7 +111,28 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
             entity.Delete();
 
-            return ApiResult<Boolean>.Ok(true);
+            return ApiResult.Ok(true);
+        }
+
+        [HttpGet]
+        [Route("GetColumns")]
+        public virtual ApiResult GetColumns()
+        {
+            var fields = Entity<TEntity>.Meta.AllFields;
+            var fieldDtoList = new List<TableColumnDto>(fields.Length);
+
+            foreach (var field in fields)
+            {
+                var fieldDto = new TableColumnDto();
+                fieldDto.Copy(field);
+
+                // 处理成小驼峰命名规则
+                fieldDto.Name = fieldDto.Name.ToLower()[0].ToString() + fieldDto.Name.Substring(1);
+
+                fieldDtoList.Add(fieldDto);
+            }
+
+            return ApiResult.Ok(fieldDtoList);
         }
     }
 }
