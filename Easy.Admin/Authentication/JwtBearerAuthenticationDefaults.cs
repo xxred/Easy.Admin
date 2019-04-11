@@ -11,5 +11,10 @@ namespace Easy.Admin.Authentication
         /// The default value used for JwtBearerAuthenticationOptions.AuthenticationScheme
         /// </summary>
         public const string AuthenticationScheme = "JwtBearerSignIn";
+        
+        /// <summary>
+        /// 用于签名的key
+        /// </summary>
+        public const string BearerSecretKey = "EasyAdminEasyAdminEasyAdmin";
     }
 }

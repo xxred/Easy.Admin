@@ -1,5 +1,8 @@
+#if DEBUG
 using Easy.Admin.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
+using XCode.Membership;
+
 namespace Easy.Admin.Areas.Admin.Controllers
 {
     /// <summary>
@@ -8,7 +11,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
     /// <typeparam name="User"></typeparam>
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : EntityController<User>
+    public class UserController : EntityController<UserX>
     {
     }
 }
+#endif

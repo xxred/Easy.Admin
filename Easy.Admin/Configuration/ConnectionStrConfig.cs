@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NewLife.Log;
 using XCode.DataAccessLayer;
 
-namespace Easy.Admin.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// 连接字符串配置
@@ -19,9 +19,15 @@ namespace Easy.Admin.Configuration
         /// 添加连接字符串
         /// </summary>
         /// <param name="services"></param>
-        public static void AddConnectionStr(this IServiceCollection services, IConfiguration configuration)
+        public static void AddConnectionStr(this IServiceCollection services)
         {
+            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
             var connectionStrings = configuration.GetSection("connectionStrings");
+            if (connectionStrings == null)
+            {
+                return;
+            }
             var connections = connectionStrings.GetChildren();
             foreach (var conn in connections)
             {

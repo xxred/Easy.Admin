@@ -1,8 +1,8 @@
-using Extensions.Identity.Stores.XCode;
+//using Extensions.Identity.Stores.XCode;
 namespace Easy.Admin.Areas.Admin.Models
 {
-    public class User : IdentityUser<User>
-    {
+    //    public class User : IdentityUser<User>
+    //    {
 
-    }
+    //    }
 }

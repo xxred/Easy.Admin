@@ -2,14 +2,13 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using NewLife.Log;
 using Newtonsoft.Json;
 using Easy.Admin.Entities;
 
-namespace Easy.Admin.Middleware
+namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
     /// 异常拦截处理

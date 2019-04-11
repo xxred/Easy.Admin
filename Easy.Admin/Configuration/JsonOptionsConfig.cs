@@ -7,28 +7,35 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using XCode;
 
-namespace Easy.Admin.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public class JsonOptionsConfig
+    public static class JsonOptionsConfig
     {
-        public static void ConfigJsonOptions(MvcJsonOptions options)
+        /// <summary>
+        /// 配置json序列化
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void ConfigJsonOptions(this IMvcBuilder builder)
         {
-            var settings = options.SerializerSettings;
-            //日期类型默认格式化处理
-            // //setting.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
-            settings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+            builder.AddJsonOptions(options =>
+            {
+                var settings = options.SerializerSettings;
+                //日期类型默认格式化处理
+                // //setting.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
+                settings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
 
-            //// 空值处理
-            //setting.NullValueHandling = NullValueHandling.Ignore;
+                //// 空值处理
+                //setting.NullValueHandling = NullValueHandling.Ignore;
 
-            // 最大序列化深度，包括请求传参的序列化深度，不可设置太小了
-            settings.MaxDepth = 5;
+                // 最大序列化深度，包括请求传参的序列化深度，不可设置太小了
+                settings.MaxDepth = 5;
 
-            // 忽略循环引用
-            settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                // 忽略循环引用
+                settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-            // 全局设置要排除的字段
-            settings.ContractResolver = new LimitPropsContractResolver(new[] { "password", "extends" }, false);
+                // 全局设置要排除的字段
+                settings.ContractResolver = new LimitPropsContractResolver(new[] { "password", "extends" }, false);
+            });
         }
     }
 

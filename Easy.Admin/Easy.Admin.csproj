@@ -10,26 +10,22 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Controllers\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.Identity.XCode" Version="1.0.0-CI0000" />
-
-    <PackageReference Include="Extensions.Identity.Stores.XCode" Version="1.0.0-CI00000" />
-
-    <PackageReference Include="IdentityServer4" Version="2.4.0" />
 
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="NewLife.Core" Version="8.1.2019.406" />
     <PackageReference Include="NewLife.XCode" Version="9.11.2019.406" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IdentityServer4.XCode\IdentityServer4.XCode.csproj" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

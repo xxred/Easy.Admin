@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 
 namespace Easy.Admin.Authentication
 {
     public class JwtBearerAuthenticationHandler : SignInAuthenticationHandler<JwtBearerAuthenticationOptions>
     {
-        public JwtBearerAuthenticationHandler(IOptionsMonitor<JwtBearerAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        IConfiguration _configuration;
+
+        public JwtBearerAuthenticationHandler(IOptionsMonitor<JwtBearerAuthenticationOptions> options,
+            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IConfiguration configuration)
+            : base(options, logger, encoder, clock)
         {
+            _configuration = configuration;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -31,44 +31,6 @@ namespace Easy.Admin.Authentication
                 var authenticateResult = await Context.AuthenticateAsync("Bearer");
 
                 if (!authenticateResult.Succeeded) return authenticateResult;
-
-                var claims = authenticateResult.Principal.Claims;
-                // sub 唯一标识，用于identityServer，
-                // 同时它也应该具有具有唯一标识，ClaimTypes.NameIdentity
-                var hasSub = authenticateResult.Principal.HasClaim(h => h.Type == JwtClaimTypes.Subject);
-                if (!hasSub)
-                {
-                    if (authenticateResult.Principal.HasClaim(h => h.Type == ClaimTypes.NameIdentifier))
-                    {
-                        ClaimsIdentity claimsIdentity;
-                        if ((claimsIdentity = authenticateResult.Principal.Identity as ClaimsIdentity) != null)
-                        {
-                            var value = authenticateResult.Principal.FindFirst(f => f.Type == ClaimTypes.NameIdentifier)
-                                .Value;
-                            claimsIdentity.AddClaim(new Claim(JwtClaimTypes.Subject, value));
-                        }
-                    }
-                    if (authenticateResult.Principal.HasClaim(h => h.Type == "http://schemas.microsoft.com/identity/claims/identityprovider"))
-                    {
-                        ClaimsIdentity claimsIdentity;
-                        if ((claimsIdentity = authenticateResult.Principal.Identity as ClaimsIdentity) != null)
-                        {
-                            var value = authenticateResult.Principal.FindFirst(f => f.Type == "http://schemas.microsoft.com/identity/claims/identityprovider")
-                                .Value;
-                            claimsIdentity.AddClaim(new Claim(JwtClaimTypes.IdentityProvider, value));
-                        }
-                    }
-                    if (authenticateResult.Principal.HasClaim(h => h.Type == JwtClaimTypes.IssuedAt))
-                    {
-                        ClaimsIdentity claimsIdentity;
-                        if ((claimsIdentity = authenticateResult.Principal.Identity as ClaimsIdentity) != null)
-                        {
-                            var value = authenticateResult.Principal.FindFirst(f => f.Type == JwtClaimTypes.IssuedAt)
-                                .Value;
-                            claimsIdentity.AddClaim(new Claim(JwtClaimTypes.AuthenticationTime, value));
-                        }
-                    }
-                }
 
                 return authenticateResult;
             }
@@ -87,7 +49,7 @@ namespace Easy.Admin.Authentication
             var newTokenExpiration = DateTime.Now.Add(TimeSpan.FromHours(2));
             var identity = new ClaimsIdentity(user.Identity);
 
-            var secretKey = "EasyAdminEasyAdminEasyAdmin";
+            var secretKey = _configuration["BearerSecretKey"] ?? JwtBearerAuthenticationDefaults.BearerSecretKey;
             var signingKey = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
                 SecurityAlgorithms.HmacSha256);
 
@@ -96,8 +58,8 @@ namespace Easy.Admin.Authentication
                 SigningCredentials = signingKey,
                 Subject = identity,
                 Expires = newTokenExpiration,
-                Issuer = "EasyAdminUser",
-                Audience = "EasyAdminAudience",
+                //Issuer = "EasyAdminUser",
+                //Audience = "EasyAdminAudience",
             });
 
             var encodedToken = "Bearer " + handler.WriteToken(securityToken);

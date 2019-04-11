@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#if DEBUG
+using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Easy.Admin.Areas.Admin.Models;
-using Easy.Admin.Authentication.Github;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Easy.Admin.Areas.Admin.Controllers
@@ -31,18 +23,14 @@ namespace Easy.Admin.Areas.Admin.Controllers
             set;
         }
 
-        private readonly IIdentityServerInteractionService _interaction;
 
-
-        public AccountController(IIdentityServerInteractionService interaction,
-            IAuthenticationSchemeProvider schemes)
+        public AccountController(IAuthenticationSchemeProvider schemes)
         {
             if (schemes == null)
             {
                 throw new ArgumentNullException("schemes");
             }
 
-            _interaction = interaction;
             Schemes = schemes;
         }
 
@@ -86,7 +74,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 {
                     new Claim(ClaimTypes.Name,username),
                     new Claim(ClaimTypes.NameIdentifier,"1"),
-                    new Claim(IdentityModel.JwtClaimTypes.Subject, "1"),
                     new Claim("idp","auto"),
                 }, "TokenAuth"
             );
@@ -115,7 +102,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Authorize")]
         [AllowAnonymous]
-        public async Task<dynamic> AuthorizeAsync([FromQuery]string authenticationScheme, string returnUrl)
+        public dynamic AuthorizeAsync([FromQuery]string authenticationScheme, string returnUrl)
         {
             var provider = authenticationScheme;
             if (string.IsNullOrEmpty(returnUrl)) returnUrl = "http://localhost:8080/";
@@ -127,12 +114,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 //throw new Exception("invalid return URL");
             }
 
-            //if (AccountOptions.WindowsAuthenticationSchemeName == provider)
-            //{
-            //    // windows authentication needs special handling
-            //    return await ProcessWindowsLoginAsync(returnUrl);
-            //}
-            //else
             {
                 // start challenge and roundtrip the return URL and scheme 
                 var props = new AuthenticationProperties
@@ -160,7 +141,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             if (string.IsNullOrEmpty(returnUrl)) returnUrl = "~/";
 
             // validate returnUrl - either it is a valid OIDC URL or back to a local page
-            if (Url.IsLocalUrl(returnUrl) == false && _interaction.IsValidReturnUrl(returnUrl) == false)
+            if (Url.IsLocalUrl(returnUrl) == false)
             {
                 // user might have clicked on a malicious link - should be logged
                 throw new Exception("invalid return URL");
@@ -186,7 +167,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Callback")]
         [AllowAnonymous]
-        public async Task<IActionResult> Callback()
+        public IActionResult Callback()
         {
             //// read external identity from the temporary cookie
             var token = Request.Cookies.ContainsKey("Admin-Token") ? Request.Cookies["Admin-Token"] : null;
@@ -200,52 +181,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
             {
                 returnUrl = "~/";
             }
-
-            //if (result?.Succeeded != true)
-            //{
-            //    throw new Exception("External authentication error");
-            //}
-
-            //// lookup our user and external provider info
-            //var (user, provider, providerUserId, claims) = FindUserFromExternalProvider(result);
-            //if (user == null)
-            //{
-            //    // this might be where you might initiate a custom workflow for user registration
-            //    // in this sample we don't show how that would be done, as our sample implementation
-            //    // simply auto-provisions new external user
-            //    user = AutoProvisionUser(provider, providerUserId, claims);
-            //}
-
-            //// this allows us to collect any additonal claims or properties
-            //// for the specific prtotocols used and store them in the local auth cookie.
-            //// this is typically used to store data needed for signout from those protocols.
-            //var additionalLocalClaims = new List<Claim>();
-            //var localSignInProps = new AuthenticationProperties();
-            //ProcessLoginCallbackForOidc(result, additionalLocalClaims, localSignInProps);
-            //ProcessLoginCallbackForWsFed(result, additionalLocalClaims, localSignInProps);
-            //ProcessLoginCallbackForSaml2p(result, additionalLocalClaims, localSignInProps);
-
-            //// issue authentication cookie for user
-            //await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.SubjectId, user.Username));
-            //await HttpContext.SignInAsync(user.SubjectId, user.Username, provider, localSignInProps, additionalLocalClaims.ToArray());
-
-            //// delete temporary cookie used during external authentication
-            //await HttpContext.SignOutAsync(IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme);
-
-            // retrieve return URL
-            //var returnUrl = "/";//result.Properties.Items["returnUrl"] ?? "~/";
-
-            //// check if external login is in the context of an OIDC request
-            //var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-            //if (context != null)
-            //{
-            //    if (await _clientStore.IsPkceClientAsync(context.ClientId))
-            //    {
-            //        // if the client is PKCE then we assume it's native, so this change in how to
-            //        // return the response is for better UX for the end user.
-            //        return View("Redirect", new RedirectViewModel { RedirectUrl = returnUrl });
-            //    }
-            //}
 
             return Redirect(returnUrl);
         }
@@ -264,3 +199,5 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
     }
 }
+#endif
+
