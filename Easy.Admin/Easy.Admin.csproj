@@ -31,8 +31,9 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
-  <!--<Target Name="Vue-Build" BeforeTargets="Build">
-    --><!--<Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>--><!--
+  <!--不便用于自动化-->
+  <!--<Target Name="Vue-Build" BeforeTargets="Build" Condition="'$(Configuration)'=='Debug'">
+    <Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>
     <Exec WorkingDirectory="../Easy.Front-End" Command="yarn build"></Exec>
     <ItemGroup>
       <VueSourceFiles Include="../Easy.Front-End/dist/**" />

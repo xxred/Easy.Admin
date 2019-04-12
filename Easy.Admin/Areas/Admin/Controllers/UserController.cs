@@ -8,7 +8,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     /// <summary>
     /// 用户
     /// </summary>
-    /// <typeparam name="User"></typeparam>
+    /// <typeparam name="UserX"></typeparam>
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : EntityController<UserX>
