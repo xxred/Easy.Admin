@@ -13,8 +13,8 @@
   <PropertyGroup>
     <Deterministic>false</Deterministic>
     <AssemblyVersion>1.1.*</AssemblyVersion>
-    <FileVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddhhmm`))</FileVersion>
-    <PackageVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddhhmm`))</PackageVersion>
+    <FileVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</FileVersion>
+    <PackageVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -46,7 +46,8 @@
   <ItemGroup>
 
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3"
+    PrivateAssets="all" />
     <PackageReference Include="NewLife.Core" Version="8.1.2019.406" />
     <PackageReference Include="NewLife.XCode" Version="9.11.2019.406" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
