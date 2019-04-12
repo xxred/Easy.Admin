@@ -10,13 +10,37 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Deterministic>false</Deterministic>
+    <AssemblyVersion>1.1.*</AssemblyVersion>
+    <FileVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddhhmm`))</FileVersion>
+    <PackageVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddhhmm`))</PackageVersion>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings*.json" Pack="false" />
+    <Content Remove="Properties\**" Pack="false" />    
+    <Content Remove="wwwroot\dist\**" Pack="false" />
+    <Content Include="appsettings*.json" Pack="false" />
+    <Content Include="Properties\**" Pack="false" />
+    <Content Include="wwwroot\dist\**" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="NuGet.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="NuGet.config" />
   </ItemGroup>
 
   <ItemGroup>
