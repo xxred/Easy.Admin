@@ -56,11 +56,13 @@ namespace Easy.Admin
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = signingKey,
 
-                        //ValidateIssuer = true,
-                        //ValidIssuer = "EasyAdminUser",
+                        ValidateIssuer = false,
+                        //ValidIssuer = Configuration["ValidIssuer"]
+                        //              ?? JwtBearerAuthenticationDefaults.ValidIssuer,
 
-                        //ValidateAudience = true,
-                        //ValidAudience = "EasyAdminAudience",
+                        ValidateAudience = false,
+                        //ValidAudience = Configuration["ValidAudience"]
+                        //                ?? JwtBearerAuthenticationDefaults.ValidAudience,
 
                         ValidateLifetime = true,
 
@@ -125,7 +127,7 @@ namespace Easy.Admin
             // 身份认证
             app.UseAuthentication();
 
-            //app.UseMvc();
+            app.UseMvc();
 
             app.UseSpa(config =>
             {

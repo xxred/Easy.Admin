@@ -87,8 +87,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 SigningCredentials = signingKey,
                 Subject = identity,
                 Expires = newTokenExpiration,
-                Issuer = "EasyAdminUser",
-                Audience = "EasyAdminAudience",
+                //Issuer = "EasyAdminUser",
+                //Audience = "EasyAdminAudience",
             });
 
             var encodedToken = handler.WriteToken(securityToken);

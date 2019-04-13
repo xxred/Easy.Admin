@@ -16,5 +16,9 @@ namespace Easy.Admin.Authentication
         /// 用于签名的key
         /// </summary>
         public const string BearerSecretKey = "EasyAdminEasyAdminEasyAdmin";
+
+        public const string ValidIssuer = "EasyAdminUser";
+
+        public const string ValidAudience = "EasyAdminAudience";
     }
 }
