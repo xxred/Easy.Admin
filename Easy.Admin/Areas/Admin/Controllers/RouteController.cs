@@ -10,7 +10,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RouteController : ControllerBase
+    public class RouteController : BaseController
     {
         [HttpGet]
         public IActionResult Get()
@@ -18,7 +18,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             var json = @" [
   {
     path: '/permission',
-    component: 'views/layout/Layout',
+    component: './src/views/layout/Layout',
     redirect: '/permission/index',
     alwaysShow: true,
     meta: {
@@ -29,7 +29,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     children: [
       {
         path: 'page',
-        component: 'views/permission/page',
+        component: './src/views/permission/page',
         name: 'PagePermission',
         meta: {
           title: 'pagePermission',
@@ -38,7 +38,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
       },
       {
         path: 'directive',
-        component: 'views/permission/directive',
+        component: './src/views/permission/directive',
         name: 'DirectivePermission',
         meta: {
           title: 'directivePermission'
@@ -46,7 +46,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
       },
       {
         path: 'role',
-        component: 'views/permission/role',
+        component: './src/views/permission/role',
         name: 'RolePermission',
         meta: {
           title: 'rolePermission',
@@ -302,45 +302,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
   },
 
   {
-    path: '/error',
-    component: 'views/layout/Layout',
-    redirect: 'noredirect',
-    name: 'ErrorPages',
-    meta: {
-      title: 'errorPages',
-      icon: '404'
-    },
-    children: [
-      {
-        path: '401',
-        component: 'views/errorPage/401',
-        name: 'Page401',
-        meta: { title: 'page401', noCache: true }
-      },
-      {
-        path: '404',
-        component: 'views/errorPage/404',
-        name: 'Page404',
-        meta: { title: 'page404', noCache: true }
-      }
-    ]
-  },
-
-  {
-    path: '/error-log',
-    component: 'views/layout/Layout',
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'log',
-        component: 'views/errorLog/index',
-        name: 'ErrorLog',
-        meta: { title: 'errorLog', icon: 'bug' }
-      }
-    ]
-  },
-
-  {
     path: '/excel',
     component: 'views/layout/Layout',
     redirect: '/excel/export-excel',
@@ -462,9 +423,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         meta: { title: 'externalLink', icon: 'link' }
       }
     ]
-  },
-
-  { path: '*', redirect: '/404', hidden: true }
+  }
 ]
 ";
             var jobj = JArray .Parse(json);

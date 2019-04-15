@@ -15,7 +15,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [Route("Admin/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class AccountController : ControllerBase
+    public class AccountController : BaseController
     {
         public IAuthenticationSchemeProvider Schemes
         {
@@ -87,8 +87,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 SigningCredentials = signingKey,
                 Subject = identity,
                 Expires = newTokenExpiration,
-                //Issuer = "EasyAdminUser",
-                //Audience = "EasyAdminAudience",
+                Issuer = "EasyAdminUser",
+                Audience = "EasyAdminAudience",
             });
 
             var encodedToken = handler.WriteToken(securityToken);
