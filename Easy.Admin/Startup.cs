@@ -46,7 +46,7 @@ namespace Easy.Admin
                 {
                     options.SaveToken = true;
 
-                    var secretKey = Configuration["BearerSecretKey"] 
+                    var secretKey = Configuration["BearerSecretKey"]
                     ?? JwtBearerAuthenticationDefaults.BearerSecretKey;
                     var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
 
@@ -134,7 +134,7 @@ namespace Easy.Admin
                 if (Environment.IsDevelopment())
                 {
                     // 下面的代理可以在本地开发使用，线上部署使用StaticFile，设置默认页和文件地址
-                    config.UseProxyToSpaDevelopmentServer("http://127.0.0.1:1337/");
+                    config.UseProxyToSpaDevelopmentServer(Configuration["SpaDevServer"] ?? "https://127.0.0.1:1337/");
                 }
                 else
                 {

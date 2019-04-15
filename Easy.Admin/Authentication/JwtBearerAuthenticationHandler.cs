@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Easy.Admin.Areas.Admin.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -63,6 +64,11 @@ namespace Easy.Admin.Authentication
             });
 
             var encodedToken = "Bearer " + handler.WriteToken(securityToken);
+
+            var jwtToken = new JwtToken{ Token = encodedToken};
+
+            Context.Features[typeof(JwtToken)] = jwtToken;
+            properties.Items[nameof(JwtToken)] = encodedToken;
 
             Response.Cookies.Append("Admin-Token", encodedToken);
 
