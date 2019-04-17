@@ -66,8 +66,23 @@ namespace Easy.Admin
 
                         ValidateLifetime = true,
 
+                        ValidateTokenReplay = false,
+
                         ClockSkew = TimeSpan.Zero
                     };
+                })
+                .AddOpenIdConnect("IdentityServer4", options =>
+                {
+                    options.Authority = "https://localhost:44352";
+                    options.ClientId = "client";
+                    options.ClientSecret = "client";
+                    options.ResponseType = "code";
+                    options.SaveTokens = true;
+
+                    options.CallbackPath = "/sign-client";
+                    options.SignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+
+                    options.Scope.Add("api1");
                 });
 
             services.AddMvc(options =>

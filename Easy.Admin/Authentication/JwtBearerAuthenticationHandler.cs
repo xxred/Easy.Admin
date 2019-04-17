@@ -26,17 +26,61 @@ namespace Easy.Admin.Authentication
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (Request.Cookies.TryGetValue("Admin-Token", out var token))
+            if (!Request.Cookies.TryGetValue("Admin-Token", out var token))
             {
-                Request.Headers["Authorization"] = token;
-                var authenticateResult = await Context.AuthenticateAsync("Bearer");
+                return AuthenticateResult.Fail("Cookie中没有发现token");
+            }
 
-                if (!authenticateResult.Succeeded) return authenticateResult;
+            Request.Headers["Authorization"] = token;
+            var authenticateResult = await Context.AuthenticateAsync("Bearer");
 
+            // 采用Bearer方案认证，认证失败直接返回，
+            if (!authenticateResult.Succeeded) return authenticateResult;
+
+            /*
+             * 以下是为identityServer认证提供必要的声明，可能在identityServer中定义可解决此问题
+             * 不应该在这里处理，这里只是暂时这么处理
+             */
+
+            // sub 唯一标识，用于identityServer，
+            // 同时它也应该具有具有唯一标识，ClaimTypes.NameIdentity
+            // 以下简称位于JwtClaimTypes
+            var subject = "sub"; // JwtClaimTypes.Subject
+            var identityProvider = "idp"; // JwtClaimTypes.IdentityProvider
+            var issuedAt = "iat"; // JwtClaimTypes.IssuedAt
+            var authenticationTime = "auth_time"; // JwtClaimTypes.AuthenticationTime
+
+            var principal = authenticateResult.Principal;
+            var claimsIdentity = principal.Identity as ClaimsIdentity;
+            if (claimsIdentity == null)
+            {
                 return authenticateResult;
             }
 
-            return AuthenticateResult.Fail("Cookie中没有发现token");
+            var hasSub = principal.HasClaim(h => h.Type == subject);
+            if (!hasSub)
+            {
+                var subjectClaim = principal.FindFirst(f => f.Type == ClaimTypes.NameIdentifier);
+                if (subjectClaim != null)
+                {
+                    claimsIdentity.AddClaim(new Claim(subject, subjectClaim.Value));
+                }
+
+                var identityProviderClaim = authenticateResult.Principal.FindFirst(f =>
+                    f.Type == "http://schemas.microsoft.com/identity/claims/identityprovider");
+                claimsIdentity.AddClaim(identityProviderClaim != null
+                    ? new Claim(identityProvider, identityProviderClaim.Value)
+                    : new Claim(identityProvider, "local"));// IdentityServerConstants.LocalIdentityProvider
+
+                var authenticationTimeClaim = principal.FindFirst(f => f.Type == issuedAt);
+                if (authenticationTimeClaim != null)
+                {
+                    claimsIdentity.AddClaim(new Claim(authenticationTime, authenticationTimeClaim.Value));
+                }
+            }
+
+            return authenticateResult;
+
         }
 
         protected override Task HandleSignOutAsync(AuthenticationProperties properties)
@@ -65,7 +109,7 @@ namespace Easy.Admin.Authentication
 
             var encodedToken = "Bearer " + handler.WriteToken(securityToken);
 
-            var jwtToken = new JwtToken{ Token = encodedToken};
+            var jwtToken = new JwtToken { Token = encodedToken };
 
             Context.Features[typeof(JwtToken)] = jwtToken;
             properties.Items[nameof(JwtToken)] = encodedToken;
