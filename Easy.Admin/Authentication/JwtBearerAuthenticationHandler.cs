@@ -6,10 +6,12 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 
 namespace Easy.Admin.Authentication
 {
@@ -26,13 +28,22 @@ namespace Easy.Admin.Authentication
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!Request.Cookies.TryGetValue("Admin-Token", out var token))
+            /*
+             * oauth认证过程需要用到cookie，此处将cookie中的token设置到头部Authorization
+             * 然后调用调用bearer方案进行认证，
+             */
+
+            if (!Request.Headers.ContainsKey(HeaderNames.Authorization))
             {
-                return AuthenticateResult.Fail("Cookie中没有发现token");
+                if (!Request.Cookies.TryGetValue("Admin-Token", out var token))
+                {
+                    return AuthenticateResult.Fail("Cookie中没有发现token项Admin-Token");
+                }
+
+                Request.Headers[HeaderNames.Authorization] = token;
             }
 
-            Request.Headers["Authorization"] = token;
-            var authenticateResult = await Context.AuthenticateAsync("Bearer");
+            var authenticateResult = await Context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
 
             // 采用Bearer方案认证，认证失败直接返回，
             if (!authenticateResult.Succeeded) return authenticateResult;
