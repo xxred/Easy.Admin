@@ -98,10 +98,10 @@ namespace Easy.Admin
             // 跨域
             services.AddCors();
 
-            services.AddSpaStaticFiles(options =>
-            {
-                options.RootPath = Path.Combine(Environment.WebRootPath, "dist");
-            });
+            //services.AddSpaStaticFiles(options =>
+            //{
+            //    options.RootPath = Path.Combine(Environment.WebRootPath, "dist");
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -119,7 +119,7 @@ namespace Easy.Admin
             }
 
             // Http跳转Https
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -157,10 +157,12 @@ namespace Easy.Admin
                     // 比如 /indexl.html(返回默认主页文件的内容，但是前端没有这个路由)、/(返回默认主页文件的内容)、/404(返回默认主页文件的内容)等
                     // 总的来说就是返回默认主页的的内容，而路由由前端处理，
                     // UseSpaStaticFiles返回前端文件，可以设置相对目录，比如这里是放在dist文件夹，前端无需处理
-
-                    config.Options.DefaultPageStaticFileOptions = new StaticFileOptions();
-                    config.Options.DefaultPageStaticFileOptions.FileProvider =
-                    new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"));
+                    if (!Environment.WebRootPath.IsNullOrWhiteSpace())
+                    {
+                        config.Options.DefaultPageStaticFileOptions = new StaticFileOptions();
+                        config.Options.DefaultPageStaticFileOptions.FileProvider =
+                        new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"));
+                    }
                 }
             });
         }
