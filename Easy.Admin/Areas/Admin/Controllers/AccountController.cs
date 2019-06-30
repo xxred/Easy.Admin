@@ -1,37 +1,35 @@
-﻿#if DEBUG
+﻿
+using Easy.Admin.Areas.Admin.Models;
+using Microsoft.AspNetCore.Identity;
+using XCode.Membership;
+#if DEBUG
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Easy.Admin.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using IdentityUser = Extensions.Identity.Stores.XCode.IdentityUser;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
     [Route("Admin/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize()]
     public class AccountController : BaseController
     {
-        public IAuthenticationSchemeProvider Schemes
+        //private readonly UserManager<User> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+
+        public AccountController(//UserManager<User> userManager,
+            SignInManager<IdentityUser> signInManager)
         {
-            get;
-            set;
-        }
-
-
-        public AccountController(IAuthenticationSchemeProvider schemes)
-        {
-            if (schemes == null)
-            {
-                throw new ArgumentNullException("schemes");
-            }
-
-            Schemes = schemes;
+            //_userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: api/Account
@@ -66,37 +64,19 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
-        public dynamic Login([FromQuery]string username, [FromQuery]string password)
+        public async Task<JwtToken> Login([FromQuery]string username, [FromQuery]string password,
+            [FromQuery]bool rememberMe = false)
         {
-            var handler = new JwtSecurityTokenHandler();
-            var newTokenExpiration = DateTime.Now.Add(TimeSpan.FromHours(2));
-            var identity = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name,username),
-                    new Claim(ClaimTypes.NameIdentifier,"1"),
-                    new Claim("idp","auto"),
-                }, "TokenAuth"
-            );
+            var result = await _signInManager.PasswordSignInAsync(
+                username, password, rememberMe, false);
 
-            var secretKey = "EasyAdminEasyAdminEasyAdmin";
-            var signingKey = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
-                SecurityAlgorithms.HmacSha256);
-
-            var securityToken = handler.CreateToken(new SecurityTokenDescriptor()
+            if (result.Succeeded)
             {
-                SigningCredentials = signingKey,
-                Subject = identity,
-                Expires = newTokenExpiration,
-                Issuer = "EasyAdminUser",
-                Audience = "EasyAdminAudience",
-            });
+                var jwtToken = HttpContext.Features.Get<JwtToken>();
+                return jwtToken;
+            }
 
-            var encodedToken = handler.WriteToken(securityToken);
-
-            // 为了下面重定向的时候带上token，往cookie写一份
-            Response.Cookies.Append("Admin-Token", "Bearer " + encodedToken);
-
-            return new { Token = "Bearer " + encodedToken };
+            throw new ApiException(2, "登陆错误");
         }
 
         [HttpGet]
@@ -150,7 +130,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
             // start challenge and roundtrip the return URL and scheme 
             var props = new AuthenticationProperties
             {
-                RedirectUri = Url.Action(nameof(Callback)),
+                //RedirectUri = Url.Action(nameof(Callback)),
+                RedirectUri = returnUrl,
                 Items =
                 {
                     {"returnUrl", returnUrl},
@@ -176,6 +157,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             if (returnUrl != null)
             {
                 returnUrl += "?token=" + token;
+
             }
             else
             {

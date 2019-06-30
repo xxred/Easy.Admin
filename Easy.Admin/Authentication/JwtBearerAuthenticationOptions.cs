@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Easy.Admin.Authentication
 {
-    public class JwtBearerAuthenticationOptions: AuthenticationSchemeOptions
+    public class JwtBearerAuthenticationOptions : JwtBearerOptions
     {
+        /// <summary>
+        /// token过期时间，默认一个小时
+        /// </summary>
+        public TimeSpan ExpireTimeSpan { get; set; } = TimeSpan.FromMinutes(60);
     }
 }

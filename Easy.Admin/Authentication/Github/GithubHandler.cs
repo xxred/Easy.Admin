@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace Easy.Admin.Authentication.Github
 {
+    /// <summary>
+    /// 参考 https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/
+    /// </summary>
     public class GithubHandler : OAuthHandler<GithubOptions>
     {
         public GithubHandler(IOptionsMonitor<GithubOptions> options, ILoggerFactory logger,

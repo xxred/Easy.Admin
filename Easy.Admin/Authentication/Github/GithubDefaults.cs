@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Easy.Admin.Authentication.Github
 {
+    /*
+     * https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/
+     */
     public static class GithubDefaults
     {
         public const string AuthenticationScheme = "Github";

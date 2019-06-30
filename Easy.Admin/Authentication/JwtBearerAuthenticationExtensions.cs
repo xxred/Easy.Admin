@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Easy.Admin.Authentication;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using NewLife.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -18,14 +20,26 @@ namespace Microsoft.Extensions.DependencyInjection
         public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme)
             => builder.AddJwtBearerSignIn(authenticationScheme, configureOptions: null);
 
-        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, Action<JwtBearerAuthenticationOptions> configureOptions)
+        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, Action<JwtBearerOptions> configureOptions)
             => builder.AddJwtBearerSignIn(JwtBearerAuthenticationDefaults.AuthenticationScheme, configureOptions);
 
-        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme, Action<JwtBearerAuthenticationOptions> configureOptions)
+        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme, Action<JwtBearerOptions> configureOptions)
             => builder.AddJwtBearerSignIn(authenticationScheme, displayName: null, configureOptions: configureOptions);
 
-        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<JwtBearerAuthenticationOptions> configureOptions)
+        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme,
+            string displayName, Action<JwtBearerAuthenticationOptions> configureOptions)
         {
+            builder.AddJwtBearer(authenticationScheme + JwtBearerDefaults.AuthenticationScheme, options =>
+              {
+                // 复制一份给JwtBearerOptions
+                var opts = new JwtBearerAuthenticationOptions();
+                  configureOptions(opts);
+                  options.Copy(opts,false,
+                      //nameof(JwtBearerAuthenticationOptions.ExpireTimeSpan),
+                      nameof(JwtBearerAuthenticationOptions.Events)
+                      );
+              });
+
             return builder.AddScheme<JwtBearerAuthenticationOptions, JwtBearerAuthenticationHandler>(authenticationScheme, displayName, configureOptions);
         }
     }

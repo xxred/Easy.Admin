@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Easy.Admin", "Easy.Admin\Easy.Admin.csproj", "{842D299F-6DFD-425E-9BFD-2D1F64F82922}"
-EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Easy.Front-End", "Easy.Front-End\Easy.Front-End.njsproj", "{E6B092F6-572E-4192-BB58-30A1D233D7B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer4.XCode", "IdentityServer4.XCode\IdentityServer4.XCode.csproj", "{62766DE9-415C-4E19-9AA5-73C5B98DBCCC}"
 EndProject
@@ -19,10 +17,6 @@ Global
 		{842D299F-6DFD-425E-9BFD-2D1F64F82922}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{842D299F-6DFD-425E-9BFD-2D1F64F82922}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{842D299F-6DFD-425E-9BFD-2D1F64F82922}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6B092F6-572E-4192-BB58-30A1D233D7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6B092F6-572E-4192-BB58-30A1D233D7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6B092F6-572E-4192-BB58-30A1D233D7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6B092F6-572E-4192-BB58-30A1D233D7B3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{62766DE9-415C-4E19-9AA5-73C5B98DBCCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{62766DE9-415C-4E19-9AA5-73C5B98DBCCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62766DE9-415C-4E19-9AA5-73C5B98DBCCC}.Release|Any CPU.ActiveCfg = Release|Any CPU

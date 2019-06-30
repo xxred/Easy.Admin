@@ -1,10 +1,14 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Text;
+using AspNetCore.Identity.XCode;
 using Easy.Admin.Authentication;
 using Easy.Admin.ModelBinders;
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +21,9 @@ namespace Easy.Admin
     {
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
+            // 清空所有ClaimType映射，不进行任何转换
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             Configuration = configuration;
             Environment = env;
         }
@@ -31,23 +38,27 @@ namespace Easy.Admin
             // 添加数据库连接
             services.AddConnectionStr();
 
+            // 添加XCode实现的身份认证
+            services.AddIdentityXCode();
+
             // 身份验证
-            services.AddAuthentication(
+            services
+                .AddAuthentication(
                     options =>
                     {
-                        options.DefaultScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultScheme = IdentityConstants.ApplicationScheme;
                         //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultAuthenticateScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
-                        options.DefaultSignInScheme = JwtBearerAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
                     })
-                // 默认使用Jwt认证
-                .AddJwtBearerSignIn()
-                .AddJwtBearer(options =>
+                //.AddIdentityServerAuthentication()
+                // SignManager内部使用IdentityConstants.ApplicationScheme作为登陆方案名称
+                .AddJwtBearerSignIn(IdentityConstants.ApplicationScheme, options =>
                 {
                     options.SaveToken = true;
 
                     var secretKey = Configuration["BearerSecretKey"]
-                    ?? JwtBearerAuthenticationDefaults.BearerSecretKey;
+                                    ?? JwtBearerAuthenticationDefaults.BearerSecretKey;
                     var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
 
 
@@ -71,6 +82,12 @@ namespace Easy.Admin
                         ClockSkew = TimeSpan.Zero
                     };
                 })
+                .AddJwtBearerSignIn(IdentityConstants.ExternalScheme)
+                .AddJwtBearerSignIn(IdentityConstants.TwoFactorRememberMeScheme)
+                .AddJwtBearerSignIn(IdentityConstants.TwoFactorUserIdScheme)
+                // IdentityServer内部Cookie登陆方案名称，避免跟正常使用的JwtBearerSignIn方案名称一致，
+                // TODO 一样的话将会验证多一些声明，具体未详细记录
+                //.AddJwtBearerSignIn("Jwt-Cookie")
                 .AddOpenIdConnect("IdentityServer4", options =>
                 {
                     options.Authority = "https://localhost:44352";
