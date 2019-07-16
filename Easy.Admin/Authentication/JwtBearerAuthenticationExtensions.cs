@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
               {
                 // 复制一份给JwtBearerOptions
                 var opts = new JwtBearerAuthenticationOptions();
-                  configureOptions(opts);
+                  configureOptions?.Invoke(opts);
                   options.Copy(opts,false,
                       //nameof(JwtBearerAuthenticationOptions.ExpireTimeSpan),
                       nameof(JwtBearerAuthenticationOptions.Events)
