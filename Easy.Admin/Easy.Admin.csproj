@@ -16,6 +16,12 @@
     <FileVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</FileVersion>
     <PackageVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</PackageVersion>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <Authors>xxred</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/xxred/Easy.Admin</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>基于Asp.Net Core 的通用权限管理系统</Description>
+    <PackageTags>Asp.Net Core,通用权限</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,7 +30,7 @@
 
   <ItemGroup>
     <Content Remove="appsettings*.json" Pack="false" />
-    <Content Remove="Properties\**" Pack="false" />    
+    <Content Remove="Properties\**" Pack="false" />
     <Content Remove="wwwroot\dist\**" Pack="false" />
     <Content Include="appsettings*.json" Pack="false" />
     <Content Include="Properties\**" Pack="false" />
