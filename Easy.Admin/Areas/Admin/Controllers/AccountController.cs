@@ -10,6 +10,7 @@ using Easy.Admin.Areas.Admin.RequestParams;
 using Easy.Admin.Authentication;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
+using Easy.Admin.Filters;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -114,7 +115,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <remarks>只能本人修改，或者管理员</remarks>
         /// <returns></returns>
         [HttpPut("[action]")]
-        //[ApiAuthorizeFilter(PermissionFlags.Update)]
+        [ApiAuthorizeFilter(PermissionFlags.Update)]
         public async Task<ApiResult> UpdateUserInfo(RequestUpdateUserInfo requestUpdateUserInfo)
         {
             var user = await _userManager.FindByIdAsync(requestUpdateUserInfo.UserId);

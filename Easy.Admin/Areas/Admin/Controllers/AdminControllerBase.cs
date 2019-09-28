@@ -13,7 +13,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [Route("api/[controller]")]
     [ApiResultFilter]
     [ApiController]
-    //[ApiAuthenticateFilter()]
+    [ApiAuthenticateFilter()]
     public class AdminControllerBase : ControllerBase
     {
 

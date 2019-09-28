@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using Easy.Admin.Entities;
+using Easy.Admin.Filters;
 using Microsoft.AspNetCore.Mvc;
 using NewLife.Data;
-using Easy.Admin.Entities;
-using XCode;
-using System.Reflection;
-using NewLife.Serialization;
 using NewLife.Reflection;
+using XCode;
+using XCode.Membership;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
     /// <summary>
     /// 基类Api
     /// </summary>
-    // [ApiAuthorize]
     public class EntityController<TEntity> : AdminControllerBase where TEntity : Entity<TEntity>, new()
     {
         /// <summary>
@@ -24,7 +25,9 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [Route("Search")]
         [HttpPost]
-        public virtual ApiResult Search([FromQuery]PageParameter p, [FromBody]Search search)
+        [ApiAuthorizeFilter(PermissionFlags.Detail)]
+        [DisplayName("搜索{type}")]
+        public virtual ApiResult<IList<TEntity>> Search([FromQuery]PageParameter p, [FromBody]Search search)
         {
             var exp = search?.Expressions<TEntity>();
             var list = Entity<TEntity>.FindAll(exp, p);
@@ -37,7 +40,9 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="id">对象id</param>
         /// <returns><see cref="T:TEntity" /></returns>
         [HttpGet("{id}")]
-        public virtual ApiResult Get([FromRoute]string id)
+        [ApiAuthorizeFilter(PermissionFlags.Detail)]
+        [DisplayName("查看{type}")]
+        public virtual ApiResult<TEntity> Get([FromRoute]string id)
         {
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)
@@ -53,6 +58,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <param name="value">需要添加的对象</param>
         [HttpPost]
+        [ApiAuthorizeFilter(PermissionFlags.Insert)]
+        [DisplayName("添加{type}")]
         public virtual ApiResult Post([FromBody]TEntity value)
         {
             value.Insert();
@@ -69,6 +76,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="value">需要更新的对象</param>
         /// <returns></returns>
         [HttpPut]
+        [ApiAuthorizeFilter(PermissionFlags.Update)]
+        [DisplayName("更新{type}")]
         public virtual ApiResult Put([FromBody]TEntity value)
         {
             var key = Entity<TEntity>.Meta.Unique;
@@ -102,6 +111,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <param name="id">需要删除对象的id</param>
         [HttpDelete("{id}")]
+        [ApiAuthorizeFilter(PermissionFlags.Delete)]
+        [DisplayName("删除{type}")]
         public virtual ApiResult Delete([FromRoute]string id)
         {
             var entity = Entity<TEntity>.FindByKey(id);
@@ -114,12 +125,23 @@ namespace Easy.Admin.Areas.Admin.Controllers
             return ApiResult.Ok(true);
         }
 
+        /// <summary>
+        /// 获取模型列信息
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetColumns")]
-        public virtual ApiResult GetColumns()
+        [ApiAuthorizeFilter(PermissionFlags.Detail)]
+        [DisplayName("列信息{type}")]
+        public virtual ApiResult<List<TableColumnDto>> GetColumns()
         {
-            var fields = Entity<TEntity>.Meta.AllFields;
-            var fieldDtoList = new List<TableColumnDto>(fields.Length);
+            var fields = Entity<TEntity>.Meta.AllFields.Where(
+                w => !w.Type.IsGenericType
+                && !typeof(EntityBase).IsAssignableFrom(w.Type)
+                && !w.Type.IsInterface
+                && !w.Type.IsArray
+            ).ToList();
+            var fieldDtoList = new List<TableColumnDto>(fields.Count);
 
             foreach (var field in fields)
             {
@@ -127,9 +149,23 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 fieldDto.Copy(field);
 
                 // 处理成小驼峰命名规则
-                fieldDto.Name = fieldDto.Name.ToLower()[0].ToString() + fieldDto.Name.Substring(1);
+                // fieldDto.Name = fieldDto.Name.ToLower()[0].ToString() + fieldDto.Name.Substring(1);
 
-                fieldDtoList.Add(fieldDto);
+                // 非数据库字段设置为只读
+                if (field.Field == null)
+                {
+                    fieldDto.ReadOnly = true;
+                }
+
+                if (field.PrimaryKey)
+                {
+                    fieldDtoList.Insert(0, fieldDto);
+                }
+                else
+                {
+                    fieldDtoList.Add(fieldDto);
+                }
+
             }
 
             return ApiResult.Ok(fieldDtoList);
