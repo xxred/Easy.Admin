@@ -20,7 +20,7 @@ namespace Easy.Admin
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             // 清空所有ClaimType映射，不进行任何转换
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             Configuration = configuration;
             Environment = env;
@@ -36,8 +36,12 @@ namespace Easy.Admin
             // 添加数据库连接
             services.AddConnectionStr();
 
-            // 添加XCode实现的身份认证
-            //services.AddIdentity();
+            // 添加身份认证
+            services.AddIdentity(options =>
+            {
+                options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
+                options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.UniqueName;
+            });
 
             // 身份验证
             services

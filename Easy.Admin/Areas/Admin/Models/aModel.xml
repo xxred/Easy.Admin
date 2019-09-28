@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Tables Version="9.6.6663.16294" NameSpace="Easy.Admin.Areas.Admin.Models" ConnName="EasyAdmin" Output="" BaseClass="Entity"
-         xmlns="http://www.newlifex.com/ModelSchema.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com https://raw.githubusercontent.com/NewLifeX/X/master/XCode/ModelSchema.xsd" >
-  <Table Name="VuePage" Description="Vue页面" RenderGenEntity="true">
+<Tables Version="9.12.7126.42294" NameSpace="Winoble.Admin.Base.Areas.Admin.Models" ConnName="EasyAdmin" Output="" BaseClass="Entity" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com https://raw.githubusercontent.com/NewLifeX/X/master/XCode/ModelSchema.xsd" xmlns="http://www.newlifex.com/ModelSchema.xsd">
+  <Table Name="UserConnect" Description="用户链接。第三方绑定" ConnName="Membership" RenderGenEntity="True">
     <Columns>
-      <Column Name="ID" DataType="Int32"  Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="页面名称" />
-      <Column Name="Path" DataType="String" Description="路径" />
-      <Column Name="Component" DataType="String" Description="组件路径" />
-      <Column Name="Redirect" DataType="String" Description="跳转路径" />
-      <Column Name="AlwaysShow" DataType="Boolean" Description="允许展示" />
-      <Column Name="Hidden" DataType="Boolean" Description="是否隐藏" />
-      <Column Name="Pid" DataType="Int32" Description="父级id" />
-      </Columns>
-  </Table>
-  <Table Name="VuePageMeta" Description="Vue页面元数据" RenderGenEntity="true">
-    <Columns>
-      <Column Name="ID" DataType="Int32"  Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="VuePageID" DataType="Int32" Description="页面id" />
-      <Column Name="Title" DataType="String" Master="True" Nullable="False" Description="页面名称" />
-      <Column Name="Icon" DataType="String" Description="图标" />
-      <Column Name="NoCache" DataType="Boolean" Description="是否不缓存" />
-      <Column Name="RolesStr" DataType="String" Description="角色字符串" />
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="Provider" DataType="String" Description="提供商" />
+      <Column Name="UserID" DataType="Int32" Description="用户。本地用户" />
+      <Column Name="OpenID" DataType="String" Description="身份标识。用户名、OpenID" />
+      <Column Name="LinkID" DataType="Int64" Description="用户编号。第三方用户编号" />
+      <Column Name="NickName" DataType="String" Description="昵称" />
+      <Column Name="Avatar" DataType="String" Length="200" Description="头像" />
+      <Column Name="AccessToken" DataType="String" Length="500" Description="访问令牌" />
+      <Column Name="RefreshToken" DataType="String" Length="500" Description="刷新令牌" />
+      <Column Name="Expire" DataType="DateTime" Description="过期时间" />
+      <Column Name="Enable" DataType="Boolean" Description="启用" />
+      <Column Name="CreateUserID" DataType="Int32" Description="创建用户" />
+      <Column Name="CreateIP" DataType="String" Description="创建地址" />
+      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+      <Column Name="UpdateUserID" DataType="Int32" Description="更新用户" />
+      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+      <Column Name="Remark" DataType="String" Length="500" Description="备注" />
     </Columns>
+    <Indexes>
+      <Index Columns="Provider,OpenID" Unique="True" />
+      <Index Columns="UserID" />
+    </Indexes>
   </Table>
 </Tables>
