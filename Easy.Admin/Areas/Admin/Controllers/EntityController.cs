@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// 获取实体列表
         /// </summary>
         /// <param name="p">分页</param>
-        /// <param name="search">条件</param>
+        /// <param name="key">搜索关键字</param>
         /// <returns></returns>
         [Route("Search")]
         [HttpPost]
@@ -29,7 +29,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [DisplayName("搜索{type}")]
         public virtual ApiResult<IList<TEntity>> Search([FromQuery]PageParameter p, [FromBody]Search search)
         {
-            var exp = search?.Expressions<TEntity>();
+            var exp = Entity<TEntity>.SearchWhereByKey(key);
             var list = Entity<TEntity>.FindAll(exp, p);
             return ApiResult.Ok(list, p);
         }
