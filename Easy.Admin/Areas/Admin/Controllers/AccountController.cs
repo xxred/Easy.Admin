@@ -1,65 +1,75 @@
-﻿
-using Easy.Admin.Areas.Admin.Models;
-using Microsoft.AspNetCore.Identity;
-using XCode.Membership;
-#if DEBUG
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Easy.Admin.Areas.Admin.Models;
+using Easy.Admin.Areas.Admin.RequestParams;
+using Easy.Admin.Authentication;
+using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using NewLife.Log;
+using NewLife.Serialization;
+using XCode.Membership;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
-    [Route("Admin/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
-    [Authorize()]
-    public class AccountController : BaseController
+    [DisplayName("账号")]
+    public class AccountController : AdminControllerBase
     {
-        //private readonly UserManager<User> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly JwtBearerAuthenticationOptions _authenticationOptions;
+        private readonly OAuthConfiguration _oAuthConfiguration;
 
-        public AccountController(//UserManager<User> userManager,
-            SignInManager<IdentityUser> signInManager)
+
+
+        public AccountController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IOptions<JwtBearerAuthenticationOptions> authenticationOptions,
+            OAuthConfiguration oAuthConfiguration)
         {
-            //_userManager = userManager;
+            _userManager = userManager;
             _signInManager = signInManager;
+            _authenticationOptions = authenticationOptions.Value;
+            _oAuthConfiguration = oAuthConfiguration;
         }
 
-        // GET: api/Account
-        [HttpGet]
-        public dynamic Get()
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public ApiResult GetUserInfo()
         {
-            var identity = User.Identity as ClaimsIdentity;
-            var user = new
+            //var principal = User;
+            var identity = User.Identity as ApplicationUser;
+
+            if (identity == null)
             {
-                Name = identity?.Name,
-                Avatar = identity?.FindFirst(
-                    //                    GithubDefaults.AvatarClaimTypes
-                    "urn:qq:avatar"
-                    )?.Value,
-                DisplayName = identity?.Label,
-                Roles = new[] { "admin" }
-            };
+                return ApiResult.Err("用户类型错误", 500);
+            }
 
-            return user;
-            //            var user = User;
-            //            return new string[] { "value1", user.Identity.AuthenticationType, user.Identity.Name };
+            return ApiResult.Ok(identity);
         }
 
-        // GET: api/Account/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST: api/Account
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="rememberMe"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
@@ -75,42 +85,158 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return jwtToken;
             }
 
-            throw new ApiException(2, "登陆错误");
-        }
-
-        [HttpGet]
-        [Route("Authorize")]
-        [AllowAnonymous]
-        public dynamic AuthorizeAsync([FromQuery]string authenticationScheme, string returnUrl)
-        {
-            var provider = authenticationScheme;
-            if (string.IsNullOrEmpty(returnUrl)) returnUrl = "http://localhost:8080/";
-
-            // validate returnUrl - either it is a valid OIDC URL or back to a local page
-            //if (Url.IsLocalUrl(returnUrl) == false && _interaction.IsValidReturnUrl(returnUrl) == false)
-            {
-                // user might have clicked on a malicious link - should be logged
-                //throw new Exception("invalid return URL");
-            }
-
-            {
-                // start challenge and roundtrip the return URL and scheme 
-                var props = new AuthenticationProperties
-                {
-                    RedirectUri = Url.Action(nameof(Callback)),
-                    Items =
-                    {
-                        { "returnUrl", returnUrl },
-                        { "scheme", provider },
-                    }
-                };
-
-                return Challenge(props, provider);
-            }
+            throw new ApiException(402, "用户名或密码错误");
         }
 
         /// <summary>
-        /// initiate roundtrip to external authentication provider
+        /// 注册
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<ApiResult> Register(RequestRegister model)
+        {
+            var user = new ApplicationUser { Name = model.UserName };
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                return ApiResult.Ok();
+            }
+
+            return ApiResult.Err("注册失败");
+        }
+
+        /// <summary>
+        /// 修改用户信息
+        /// </summary>
+        /// <remarks>只能本人修改，或者管理员</remarks>
+        /// <returns></returns>
+        [HttpPut("[action]")]
+        //[ApiAuthorizeFilter(PermissionFlags.Update)]
+        public async Task<ApiResult> UpdateUserInfo(RequestUpdateUserInfo requestUpdateUserInfo)
+        {
+            var user = await _userManager.FindByIdAsync(requestUpdateUserInfo.UserId);
+            user.DisplayName = requestUpdateUserInfo.DisplayName;
+
+            var appUser = AppUser;
+            if (!IsSupperAdmin || appUser.ID != user.ID)
+            {
+                return ApiResult.Err("无权限修改");
+            }
+
+            await _userManager.UpdateAsync(user);
+
+            return ApiResult.Ok();
+        }
+
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <remarks>只能本人修改，或者管理员</remarks>
+        /// <returns></returns>
+        [HttpPut("[action]")]
+        public async Task<ApiResult> UpdatePwd(RequestUpdateUserInfo requestUpdateUserInfo)
+        {
+            var user = await _userManager.FindByIdAsync(requestUpdateUserInfo.UserId);
+            user.Password = requestUpdateUserInfo.Pwd;
+
+            var appUser = AppUser;
+            if (!IsSupperAdmin || appUser.ID != user.ID)
+            {
+                return ApiResult.Err("无权限修改");
+            }
+
+            await _userManager.UpdateAsync(user);
+
+            return ApiResult.Ok();
+        }
+
+        /// <summary>
+        /// 根据授权码向外部身份验证机构认证，颁发本系统token，用于swagger
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetToken")]
+        [AllowAnonymous]
+        public async Task<ActionResult> GetTokenAsync([FromForm]string grant_type, [FromForm]string code, [FromForm]string client_id, [FromForm]string redirect_uri)
+        {
+            #region 获取token
+            var tokenEndpoint = _oAuthConfiguration.Authority.EnsureEnd("/") + "connect/token";
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint);
+            requestMessage.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { nameof(grant_type),grant_type },
+                { nameof(code),code },
+                { nameof(client_id),client_id },
+                { nameof(redirect_uri),redirect_uri },
+            });
+
+            requestMessage.Headers.Add("Authorization", Request.Headers["Authorization"].ToString());
+
+            var backchannel = HttpClientFactory.Create();
+            var responseMessage = await backchannel.SendAsync(requestMessage);
+
+            var contentMediaType = responseMessage.Content.Headers.ContentType?.MediaType;
+            if (string.IsNullOrEmpty(contentMediaType))
+            {
+                XTrace.WriteLine($"Unexpected token response format. Status Code: {(int)responseMessage.StatusCode}. Content-Type header is missing.");
+            }
+            else if (!string.Equals(contentMediaType, "application/json", StringComparison.OrdinalIgnoreCase))
+            {
+                XTrace.WriteLine($"Unexpected token response format. Status Code: {(int)responseMessage.StatusCode}. Content-Type {responseMessage.Content.Headers.ContentType}.");
+            }
+
+            // Error handling:
+            // 1. If the response body can't be parsed as json, throws.
+            // 2. If the response's status code is not in 2XX range, throw OpenIdConnectProtocolException. If the body is correct parsed,
+            //    pass the error information from body to the exception.
+            OpenIdConnectMessage message;
+            try
+            {
+                var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                message = new OpenIdConnectMessage(responseContent);
+            }
+            catch (Exception ex)
+            {
+                throw new OpenIdConnectProtocolException($"Failed to parse token response body as JSON. Status Code: {(int)responseMessage.StatusCode}. Content-Type: {responseMessage.Content.Headers.ContentType}", ex);
+            }
+
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                throw new ApiException(500, $"获取token失败：{message.Error}");
+            }
+            #endregion
+
+            #region 解析token，颁发本系统token
+
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(message.AccessToken);
+
+            var id = token.Claims.First(f => f.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            if (id == null)
+            {
+                throw ApiException.Common("token中找不到sub声明");
+            }
+            var applicationUser = ApplicationUser.FindByKey(id);
+
+            await _signInManager.SignInAsync(applicationUser, false);
+
+            var jwtToken = HttpContext.Features.Get<JwtToken>();
+
+            var tokenResult = new
+            {
+                access_token = jwtToken.Token.Replace(message.TokenType + " ", ""),
+                expires_in = message.ExpiresIn,
+                token_type = message.TokenType
+            };
+
+            return Content(tokenResult.ToJson(), "application/json");
+            #endregion
+        }
+
+        /// <summary>
+        /// 重定向到外部身份验证提供程序的链接
         /// </summary>
         [HttpGet]
         [Route("Challenge")]
@@ -129,8 +255,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
             // start challenge and roundtrip the return URL and scheme 
             var props = new AuthenticationProperties
             {
-                //RedirectUri = Url.Action(nameof(Callback)),
-                RedirectUri = returnUrl,
+                RedirectUri = Url.Action(nameof(Callback)),
+                //RedirectUri = returnUrl,
                 Items =
                 {
                     {"returnUrl", returnUrl},
@@ -149,9 +275,12 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [AllowAnonymous]
         public IActionResult Callback()
         {
+            var tokenKey = _authenticationOptions.TokenKey;
+            var returnUrlKey = _authenticationOptions.ReturnUrlKey;
+
             //// read external identity from the temporary cookie
-            var token = Request.Cookies.ContainsKey("Admin-Token") ? Request.Cookies["Admin-Token"] : null;
-            var returnUrl = Request.Cookies.ContainsKey("returnUrl") ? Request.Cookies["returnUrl"] : null;
+            var token = Request.Cookies.ContainsKey(tokenKey) ? Request.Cookies[tokenKey] : null;
+            var returnUrl = Request.Cookies.ContainsKey(returnUrlKey) ? Request.Cookies[returnUrlKey] : null;
 
             if (returnUrl != null)
             {
@@ -163,22 +292,18 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 returnUrl = "~/";
             }
 
+            Response.Cookies.Delete(returnUrlKey);
+
             return Redirect(returnUrl);
         }
 
         [HttpPost()]
         [Route("Logout")]
-        public void Logout()
+        public async Task<ApiResult> Logout()
         {
+            await _signInManager.SignOutAsync();
 
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return ApiResult.Ok();
         }
     }
 }
-#endif
-

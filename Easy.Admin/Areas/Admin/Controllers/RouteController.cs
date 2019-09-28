@@ -10,7 +10,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RouteController : BaseController
+    public class RouteController : AdminControllerBase
     {
         [HttpGet]
         public IActionResult Get()

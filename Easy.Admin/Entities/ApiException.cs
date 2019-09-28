@@ -22,5 +22,15 @@ namespace Easy.Admin.Entities
             Status = status;
             Message = msg;
         }
+
+        /// <summary>
+        /// 异常通用封装。状态402，信息显示给用户看
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        public static ApiException Common(string msg)
+        {
+            return new ApiException(402, msg);
+        }
     }
 }

@@ -1,19 +1,39 @@
 using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using NewLife.Data;
-using NewLife.Remoting;
+using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
+using Microsoft.AspNetCore.Mvc;
+using NewLife.Data;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
     /// <summary>
     /// 基类Api
     /// </summary>
+    [Route("api/[controller]")]
     [ApiResultFilter]
-    public class BaseController : ControllerBase
+    [ApiController]
+    //[ApiAuthenticateFilter()]
+    public class AdminControllerBase : ControllerBase
     {
+
+        private ApplicationUser _appUser;
+
+        /// <summary>
+        /// 当前用户
+        /// </summary>
+        public ApplicationUser AppUser
+        {
+            get => _appUser ?? (_appUser = HttpContext.Features.Get<ApplicationUser>());
+            set => _appUser = value;
+        }
+
+        /// <summary>
+        /// 是否超级管理员
+        /// </summary>
+        public bool IsSupperAdmin => AppUser.Role.IsSystem;
+
+
         /// <summary>
         /// 返回可带分页的结果
         /// </summary>

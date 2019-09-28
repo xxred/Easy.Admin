@@ -14,7 +14,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     /// 基类Api
     /// </summary>
     // [ApiAuthorize]
-    public class EntityController<TEntity> : BaseController where TEntity : Entity<TEntity>, new()
+    public class EntityController<TEntity> : AdminControllerBase where TEntity : Entity<TEntity>, new()
     {
         /// <summary>
         /// 获取实体列表

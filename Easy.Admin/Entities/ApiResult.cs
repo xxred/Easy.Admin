@@ -59,5 +59,14 @@ namespace Easy.Admin.Entities
         {
             return new ApiResult<T> { Data = data, Paper = p };
         }
+
+        /// <summary>
+        /// 返回带Data的正常响应结果
+        /// </summary>
+        /// <returns></returns>
+        public static ApiResult<string> Ok()
+        {
+            return ApiResult.Ok((string)null);
+        }
     }
 }
