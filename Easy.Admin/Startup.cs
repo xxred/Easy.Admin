@@ -2,10 +2,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Text;
-using AspNetCore.Identity.XCode;
 using Easy.Admin.Authentication;
 using Easy.Admin.ModelBinders;
-using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -39,7 +37,7 @@ namespace Easy.Admin
             services.AddConnectionStr();
 
             // 添加XCode实现的身份认证
-            services.AddIdentityXCode();
+            //services.AddIdentity();
 
             // 身份验证
             services

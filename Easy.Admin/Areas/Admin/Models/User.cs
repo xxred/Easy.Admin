@@ -1,7 +1,8 @@
-using Extensions.Identity.Stores.XCode;
+using XCode.Membership;
+
 namespace Easy.Admin.Areas.Admin.Models
 {
-    public class User : IdentityUser<User>
+    public class ApplicationUser : User<ApplicationUser>
     {
 
     }
