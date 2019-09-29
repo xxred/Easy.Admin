@@ -88,19 +88,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 throw new ApiException(402, "未找到实体");
             }
 
-            // 反射获取脏属性，得到修改的属性集合
-            var dirtys = value.GetValue("Dirtys") as DirtyCollection;
-
-            foreach (var item in dirtys)
-            {
-                if (key.Name == item)
-                {
-                    continue;
-                }
-
-                entity.SetItem(item, value[item]);
-            }
-
             entity.Update();
             var id = value[key];
             return ApiResult.Ok(id);

@@ -29,7 +29,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Admin\Data\**" />
     <Content Remove="appsettings*.json" Pack="false" />
+    <Content Remove="Areas\Admin\Data\**" />
     <Content Remove="Properties\**" Pack="false" />
     <Content Remove="wwwroot\dist\**" Pack="false" />
     <Content Include="appsettings*.json" Pack="false" />
@@ -38,7 +40,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Data\" />
+    <EmbeddedResource Remove="Areas\Admin\Data\**" />
+    <None Remove="Areas\Admin\Data\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Controllers\" />
   </ItemGroup>
 

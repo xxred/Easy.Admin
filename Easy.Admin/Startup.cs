@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Text;
 using Easy.Admin.Authentication;
+using Easy.Admin.Configuration;
 using Easy.Admin.ModelBinders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -104,6 +105,8 @@ namespace Easy.Admin
                     options.Scope.Add("api1");
                 });
 
+            services.AddSingleton<OAuthConfiguration>();
+
             services.AddMvc(options =>
             {
                 options.ModelBinderProviders.Insert(0, new PagerModelBinderProvider());
@@ -118,10 +121,8 @@ namespace Easy.Admin
             // 跨域
             services.AddCors();
 
-            //services.AddSpaStaticFiles(options =>
-            //{
-            //    options.RootPath = Path.Combine(Environment.WebRootPath, "dist");
-            //});
+            // 扫描控制器添加菜单
+            services.ScanController();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
