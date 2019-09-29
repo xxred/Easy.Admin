@@ -41,13 +41,13 @@ namespace Microsoft.Extensions.DependencyInjection
                     ConfigureJwtBearerOptions(options, configuration);
                 })
                 .AddJwtBearerSignIn(IdentityConstants.ExternalScheme)
-                //// 处理第三方登录
-                //.AddOAuthSignIn(OAuthSignInAuthenticationDefaults.AuthenticationScheme, options =>
-                //{
-                //    ConfigureJwtBearerOptions(options, configuration);
+                // 处理第三方登录
+                .AddOAuthSignIn(OAuthSignInAuthenticationDefaults.AuthenticationScheme, options =>
+                {
+                    ConfigureJwtBearerOptions(options, configuration);
 
-                //    //options.CreateUserOnOAuthLogin = false;
-                //})
+                    //options.CreateUserOnOAuthLogin = false;
+                })
                 .AddJwtBearerSignIn(IdentityConstants.TwoFactorRememberMeScheme)
                 .AddJwtBearerSignIn(IdentityConstants.TwoFactorUserIdScheme);
 

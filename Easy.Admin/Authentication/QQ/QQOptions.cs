@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using System.Globalization;
+using Easy.Admin.Authentication.OAuthSignIn;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Facebook;
@@ -30,9 +31,12 @@ namespace Easy.Admin.Authentication.QQ
 
             Scope.Add("get_user_info");
 
-            ClaimActions.MapJsonKey(ClaimTypes.Name, "nickname");
-            ClaimActions.MapJsonKey(ClaimTypes.Gender, "gender");
-            ClaimActions.MapJsonKey("urn:qq:avatar", "figureurl_qq_2");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Sub, "openid");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.GivenName, "nickname");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Gender, "gender");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Avatar, "figureurl_2");
+
+            SignInScheme = OAuthSignInAuthenticationDefaults.AuthenticationScheme;
         }
 
         /// <summary>

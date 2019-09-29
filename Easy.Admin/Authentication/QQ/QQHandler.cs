@@ -63,8 +63,13 @@ namespace Easy.Admin.Authentication.QQ
             var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
             var context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity), properties, Context, Scheme,
                 Options, Backchannel, tokens, payload);
+
+            // Ìî³äopenid
+            payload["openid"] = openId;
+
             context.RunClaimActions();
             await Events.CreatingTicket(context);
+
             return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
 

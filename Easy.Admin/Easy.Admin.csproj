@@ -29,23 +29,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Areas\Admin\Data\**" />
     <Content Remove="appsettings*.json" Pack="false" />
-    <Content Remove="Areas\Admin\Data\**" />
     <Content Remove="Properties\**" Pack="false" />
-    <Content Remove="wwwroot\dist\**" Pack="false" />
+    <Content Remove="wwwroot\**" Pack="false" />
     <Content Include="appsettings*.json" Pack="false" />
     <Content Include="Properties\**" Pack="false" />
-    <Content Include="wwwroot\dist\**" Pack="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="Areas\Admin\Data\**" />
-    <None Remove="Areas\Admin\Data\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Content Include="wwwroot\**" Pack="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,20 +47,5 @@
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
-  <!--不便用于自动化-->
-  <!--<Target Name="Vue-Build" BeforeTargets="Build" Condition="'$(Configuration)'=='Debug'">
-    <Exec WorkingDirectory="../Easy.Front-End" Command="yarn"></Exec>
-    <Exec WorkingDirectory="../Easy.Front-End" Command="yarn build"></Exec>
-    <ItemGroup>
-      <VueSourceFiles Include="../Easy.Front-End/dist/**" />
-    </ItemGroup>
-    <Copy DestinationFiles="@(VueSourceFiles->'wwwroot/dist/%(RecursiveDir)%(Filename)%(Extension)')" SourceFiles="@(VueSourceFiles)"></Copy>
-  </Target>-->
-
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties wwwroot_4dist_4js_4app_10f8b8bab_1js_1map__JSONSchema="" />
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" appsettings_1development_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

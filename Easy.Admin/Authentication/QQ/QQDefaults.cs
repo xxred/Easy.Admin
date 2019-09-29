@@ -1,5 +1,8 @@
 namespace Easy.Admin.Authentication.QQ
 {
+    /// <summary>
+    /// https://wiki.connect.qq.com/%E4%BD%BF%E7%94%A8authorization_code%E8%8E%B7%E5%8F%96access_token
+    /// </summary>
     public static class QQDefaults
     {
         public const string AuthenticationScheme = "QQ";

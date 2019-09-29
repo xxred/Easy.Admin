@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Easy.Admin.Authentication.OAuthSignIn;
 using Microsoft.AspNetCore.Authentication.Google;
 
 namespace Easy.Admin.Authentication.Github
@@ -24,10 +25,11 @@ namespace Easy.Admin.Authentication.Github
             Scope.Add("openid");
 
             // 从第三方出请求回来的用户信息对应关系
-            ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-            ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-            ClaimActions.MapJsonKey(GithubDefaults.AvatarClaimTypes, "avatar_url");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Sub, "id");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.GivenName, "name");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Avatar, "avatar_url");
 
+            SignInScheme = OAuthSignInAuthenticationDefaults.AuthenticationScheme;
         }
     }
 }

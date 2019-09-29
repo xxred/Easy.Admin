@@ -108,27 +108,22 @@ namespace Easy.Admin
 
             app.UseMvc();
 
-            app.UseSpa(config =>
+            // 以下为SPA准备
+            if (Environment.WebRootPath != null)
             {
-                if (Environment.IsDevelopment())
+                app.UseSpaStaticFiles(new StaticFileOptions()
                 {
-                    // 下面的代理可以在本地开发使用，线上部署使用StaticFile，设置默认页和文件地址
-                    config.UseProxyToSpaDevelopmentServer(Configuration["SpaDevServer"] ?? "http://127.0.0.1:1337/");
-                }
-                else
+                    FileProvider = new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"))
+                });
+
+                app.UseSpa(options =>
                 {
-                    // 这个设置用来处理所有前面没有命中的请求，
-                    // 比如 /indexl.html(返回默认主页文件的内容，但是前端没有这个路由)、/(返回默认主页文件的内容)、/404(返回默认主页文件的内容)等
-                    // 总的来说就是返回默认主页的的内容，而路由由前端处理，
-                    // UseSpaStaticFiles返回前端文件，可以设置相对目录，比如这里是放在dist文件夹，前端无需处理
-                    if (!Environment.WebRootPath.IsNullOrWhiteSpace())
+                    options.Options.DefaultPageStaticFileOptions = new StaticFileOptions()
                     {
-                        config.Options.DefaultPageStaticFileOptions = new StaticFileOptions();
-                        config.Options.DefaultPageStaticFileOptions.FileProvider =
-                        new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"));
-                    }
-                }
-            });
+                        FileProvider = new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"))
+                    };
+                });
+            }
         }
     }
 }
