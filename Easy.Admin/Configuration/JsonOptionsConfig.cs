@@ -43,7 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// 限制某些属性输出或排除，设置为保留时，只输出保留属性，其他属性全部忽略。
     /// 设置为排除，只排除设置的属性
     /// </summary>
-    public class LimitPropsContractResolver : CamelCasePropertyNamesContractResolver // DefaultContractResolver// 小写开头用这个 CamelCasePropertyNamesContractResolver
+    public class LimitPropsContractResolver : DefaultContractResolver // 小写开头用这个 CamelCasePropertyNamesContractResolver
     {
         private readonly string[] _props = null;
 

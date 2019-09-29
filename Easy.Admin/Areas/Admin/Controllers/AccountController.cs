@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Areas.Admin.RequestParams;
 using Easy.Admin.Authentication;
+using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;

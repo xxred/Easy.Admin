@@ -21,7 +21,8 @@ namespace Easy.Admin
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             // 清空所有ClaimType映射，不进行任何转换
-            //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            // JwtBearer认证后会将简短的声明转成长声明
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             Configuration = configuration;
             Environment = env;
@@ -37,73 +38,15 @@ namespace Easy.Admin
             // 添加数据库连接
             services.AddConnectionStr();
 
-            // 添加身份认证
+            // 添加身份标识Identity
             services.AddIdentity(options =>
             {
                 options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
                 options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.UniqueName;
             });
 
-            // 身份验证
-            services
-                .AddAuthentication(
-                    options =>
-                    {
-                        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                        //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-                        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
-                    })
-                //.AddIdentityServerAuthentication()
-                // SignManager内部使用IdentityConstants.ApplicationScheme作为登陆方案名称
-                .AddJwtBearerSignIn(IdentityConstants.ApplicationScheme, options =>
-                {
-                    options.SaveToken = true;
-
-                    var secretKey = Configuration["BearerSecretKey"]
-                                    ?? JwtBearerAuthenticationDefaults.BearerSecretKey;
-                    var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
-
-
-                    options.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = signingKey,
-
-                        ValidateIssuer = false,
-                        //ValidIssuer = Configuration["ValidIssuer"]
-                        //              ?? JwtBearerAuthenticationDefaults.ValidIssuer,
-
-                        ValidateAudience = false,
-                        //ValidAudience = Configuration["ValidAudience"]
-                        //                ?? JwtBearerAuthenticationDefaults.ValidAudience,
-
-                        ValidateLifetime = true,
-
-                        ValidateTokenReplay = false,
-
-                        ClockSkew = TimeSpan.Zero
-                    };
-                })
-                .AddJwtBearerSignIn(IdentityConstants.ExternalScheme)
-                .AddJwtBearerSignIn(IdentityConstants.TwoFactorRememberMeScheme)
-                .AddJwtBearerSignIn(IdentityConstants.TwoFactorUserIdScheme)
-                // IdentityServer内部Cookie登陆方案名称，避免跟正常使用的JwtBearerSignIn方案名称一致，
-                // TODO 一样的话将会验证多一些声明，具体未详细记录
-                //.AddJwtBearerSignIn("Jwt-Cookie")
-                .AddOpenIdConnect("IdentityServer4", options =>
-                {
-                    options.Authority = "https://localhost:44352";
-                    options.ClientId = "client";
-                    options.ClientSecret = "client";
-                    options.ResponseType = "code";
-                    options.SaveTokens = true;
-
-                    options.CallbackPath = "/sign-client";
-                    options.SignInScheme = IdentityConstants.ApplicationScheme;
-
-                    options.Scope.Add("api1");
-                });
+            // 添加身份验证
+            services.ConfigAuthentication();
 
             services.AddSingleton<OAuthConfiguration>();
 

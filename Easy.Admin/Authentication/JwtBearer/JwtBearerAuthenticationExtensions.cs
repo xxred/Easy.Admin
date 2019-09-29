@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Easy.Admin.Authentication;
+using Easy.Admin.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,10 +21,10 @@ namespace Microsoft.Extensions.DependencyInjection
         public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme)
             => builder.AddJwtBearerSignIn(authenticationScheme, configureOptions: null);
 
-        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, Action<JwtBearerOptions> configureOptions)
+        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, Action<JwtBearerAuthenticationOptions> configureOptions)
             => builder.AddJwtBearerSignIn(JwtBearerAuthenticationDefaults.AuthenticationScheme, configureOptions);
 
-        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme, Action<JwtBearerOptions> configureOptions)
+        public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme, Action<JwtBearerAuthenticationOptions> configureOptions)
             => builder.AddJwtBearerSignIn(authenticationScheme, displayName: null, configureOptions: configureOptions);
 
         public static AuthenticationBuilder AddJwtBearerSignIn(this AuthenticationBuilder builder, string authenticationScheme,

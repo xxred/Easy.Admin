@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace Easy.Admin.Authentication
+namespace Easy.Admin.Authentication.JwtBearer
 {
     public class JwtBearerAuthenticationOptions : JwtBearerOptions
     {
@@ -20,6 +20,9 @@ namespace Easy.Admin.Authentication
         /// </summary>
         public string ReturnUrlKey { get; set; } = "returnUrl";
 
+        /// <summary>
+        /// 第三方登录后是否自动创建用户
+        /// </summary>
         public bool CreateUserOnOAuthLogin { get; set; } = true;
     }
 }
