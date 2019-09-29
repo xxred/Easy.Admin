@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Areas.Admin.RequestParams;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.JwtBearer;
+using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
@@ -214,15 +216,16 @@ namespace Easy.Admin.Areas.Admin.Controllers
             #region 解析token，颁发本系统token
 
             var token = new JwtSecurityTokenHandler().ReadJwtToken(message.AccessToken);
-
-            var id = token.Claims.First(f => f.Type == JwtRegisteredClaimNames.Sub)?.Value;
-            if (id == null)
+            var principal = new ClaimsPrincipal(new ClaimsIdentity(token.Claims));
+            var props = new AuthenticationProperties
             {
-                throw ApiException.Common("token中找不到sub声明");
-            }
-            var applicationUser = ApplicationUser.FindByKey(id);
+                Items =
+                {
+                    {"scheme", _oAuthConfiguration.Scheme},
+                }
+            };
 
-            await _signInManager.SignInAsync(applicationUser, false);
+            await HttpContext.SignInAsync(OAuthSignInAuthenticationDefaults.AuthenticationScheme, principal, props);
 
             var jwtToken = HttpContext.Features.Get<JwtToken>();
 

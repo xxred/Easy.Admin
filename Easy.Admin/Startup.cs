@@ -48,8 +48,6 @@ namespace Easy.Admin
             // 添加身份验证
             services.ConfigAuthentication();
 
-            services.AddSingleton<OAuthConfiguration>();
-
             services.AddMvc(options =>
             {
                 options.ModelBinderProviders.Insert(0, new PagerModelBinderProvider());
@@ -88,8 +86,20 @@ namespace Easy.Admin
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
+                var oAuthConfiguration = app.ApplicationServices.GetRequiredService<OAuthConfiguration>();
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
                 //c.InjectJavascript("/swagger.js");//注入js
+
+                if (!oAuthConfiguration.Authority.IsNullOrEmpty())
+                {
+                    c.OAuthClientId(oAuthConfiguration.ClientId);
+                    c.OAuthClientSecret(oAuthConfiguration.ClientSecret);
+                    //c.OAuthRealm("test-realm");
+                    c.OAuthAppName(Configuration["ApiTitle"]);
+                    //c.OAuthScopeSeparator(" ");
+                    //c.OAuthAdditionalQueryStringParams(new { foo = "bar" });
+                    c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+                }
             });
 
             app.UseDefaultFiles();
