@@ -27,7 +27,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpPost]
         [ApiAuthorizeFilter(PermissionFlags.Detail)]
         [DisplayName("搜索{type}")]
-        public virtual ApiResult<IList<TEntity>> Search([FromQuery]PageParameter p, [FromBody]Search search)
+        public virtual ApiResult<IList<TEntity>> Search([FromQuery]PageParameter p, [FromQuery]string key)
         {
             var exp = Entity<TEntity>.SearchWhereByKey(key);
             var list = Entity<TEntity>.FindAll(exp, p);

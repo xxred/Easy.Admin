@@ -107,6 +107,7 @@ namespace Easy.Admin
             services.AddMvc(options =>
             {
                 options.ModelBinderProviders.Insert(0, new PagerModelBinderProvider());
+                options.ModelBinderProviders.Insert(0, new EntityModelBinderProvider());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .ConfigJsonOptions();
