@@ -64,7 +64,24 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Err("用户类型错误", 500);
             }
 
-            return ApiResult.Ok(identity);
+            var data = new
+            {
+                identity.Avatar,
+                identity.DisplayName,
+                identity.ID,
+                identity.Name,
+                identity.RoleID,
+                identity.RoleIDs,
+                identity.Sex,
+                Roles = identity.Roles.Select(s => new
+                {
+                    s.ID,
+                    s.Name,
+                    s.Permission
+                })
+            };
+
+            return ApiResult.Ok(data);
         }
 
         /// <summary>

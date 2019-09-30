@@ -87,7 +87,7 @@ namespace Easy.Admin
             app.UseSwaggerUI(c =>
             {
                 var oAuthConfiguration = app.ApplicationServices.GetRequiredService<OAuthConfiguration>();
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Easy.Admin API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", Configuration["ApiTitle"] ?? "EasyAdmin API");
                 //c.InjectJavascript("/swagger.js");//注入js
 
                 if (!oAuthConfiguration.Authority.IsNullOrEmpty())

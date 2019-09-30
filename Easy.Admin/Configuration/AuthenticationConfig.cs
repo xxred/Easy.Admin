@@ -57,7 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static void ConfigureJwtBearerOptions(JwtBearerAuthenticationOptions options, IConfiguration configuration)
+        public static void ConfigureJwtBearerOptions(JwtBearerAuthenticationOptions options, IConfiguration configuration)
         {
             options.SaveToken = true;
 
