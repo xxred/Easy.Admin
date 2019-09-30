@@ -1,4 +1,4 @@
-using System;
+锘縰sing System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
@@ -27,15 +27,15 @@ namespace Easy.Admin.Authentication.QQ
 
         protected override async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, OAuthTokenResponse tokens)
         {
-            // 首先获取OpenId
-            var openIdEndpoint = QueryHelpers.AddQueryString(Options.OpenIdEndpoint, 
+            // 棣栧厛鑾峰彇OpenId
+            var openIdEndpoint = QueryHelpers.AddQueryString(Options.OpenIdEndpoint,
                 "access_token", tokens.AccessToken);
             var openIdResponse = await Backchannel.GetAsync(openIdEndpoint, Context.RequestAborted);
             var openIdContent = await openIdResponse.Content.ReadAsStringAsync();
             openIdContent = openIdContent.TrimStart("callback( ").TrimEnd(" );\n");
             var openIdPayload = JObject.Parse(openIdContent);
 
-            // 存储openid，绑定到系统的用户，作为系统在第三方的唯一标识
+            // 瀛樺偍openid锛岀粦瀹氬埌绯荤粺鐨勭敤鎴凤紝浣滀负绯荤粺鍦ㄧ涓夋柟鐨勫敮涓�鏍囪瘑
             var openId = openIdPayload["openid"].Value<string>();
 
             var tokenRequestParameters = new Dictionary<string, string>()
@@ -64,7 +64,7 @@ namespace Easy.Admin.Authentication.QQ
             var context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity), properties, Context, Scheme,
                 Options, Backchannel, tokens, payload);
 
-            // 填充openid
+            // 濉厖openid
             payload["openid"] = openId;
 
             context.RunClaimActions();

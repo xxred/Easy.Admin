@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation. All rights reserved.
+ï»¿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -40,7 +40,7 @@ namespace Easy.Admin.Authentication.QQ
         }
 
         /// <summary>
-        /// »ñÈ¡OpenIdµÄÁ´½Ó
+        /// è·å–OpenIdçš„é“¾æ¥
         /// </summary>
         public string OpenIdEndpoint { get; set; }
 
