@@ -88,7 +88,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 throw new ApiException(402, "未找到实体");
             }
 
-            entity.Update();
+            value.Update();
             var id = value[key];
             return ApiResult.Ok(id);
         }
