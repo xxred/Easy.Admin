@@ -1,4 +1,5 @@
 # 虚拟环境 https://help.github.com/cn/articles/virtual-environments-for-github-actions
+# action市场 https://github.com/marketplace?type=actions
 name: ASP.NET Core CI
 
 on: [push]
@@ -18,6 +19,7 @@ jobs:
       - uses: actions/setup-nuget@v1
       - name: Pack and push
         run: |
-          nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password ${{ secrets.GITHUB_TOKEN }}
+          wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+          nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password ${{ secrets.GITHUB_TOKEN }}
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          nuget push "Easy.Admin/pack/*.nupkg" -Source "GitHub"
+          nuget.exe push "Easy.Admin/pack/*.nupkg" -Source "GitHub"
