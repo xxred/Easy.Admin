@@ -17,4 +17,4 @@ jobs:
       - name: Pack and push
         run: |
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          dotnet nuget push pack/*.nupkg -k ${{ secrets.SuperSecret }} -s "https://nuget.pkg.github.com/xxred/index.json"
+          dotnet nuget push pack/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s "https://nuget.pkg.github.com/xxred/index.json"
