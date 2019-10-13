@@ -16,6 +16,7 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
       - name: Pack and push
+        uses: actions/setup-nuget@v1
         run: |
           nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password ${{ secrets.GITHUB_TOKEN }}
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
