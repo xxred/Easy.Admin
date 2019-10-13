@@ -16,7 +16,6 @@ jobs:
           dotnet-version: 2.2.108
       - name: Build with dotnet
         run: dotnet build --configuration Release
-      - uses: actions/setup-nuget@v1
       - name: Pack and push
         run: |
           wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
