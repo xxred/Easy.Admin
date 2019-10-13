@@ -4,14 +4,17 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-18.04
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 2.2.108
-    - name: Build with dotnet
-      run: docker -v # dotnet build --configuration Release
+      - uses: actions/checkout@v1
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.2.108
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+      - name: Pack and push
+        run: |
+          dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o /app
+          dotnet nuget push /app/*.nupkg -k ${{ secrets.SuperSecret }} -s "https://nuget.pkg.github.com/xxred/index.json"
