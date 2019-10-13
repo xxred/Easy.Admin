@@ -16,5 +16,5 @@ jobs:
         run: dotnet build --configuration Release
       - name: Pack and push
         run: |
-          dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o /app
+          dotnet pack "Easy.Admin.csproj" -c Release -o /app
           dotnet nuget push /app/*.nupkg -k ${{ secrets.SuperSecret }} -s "https://nuget.pkg.github.com/xxred/index.json"
