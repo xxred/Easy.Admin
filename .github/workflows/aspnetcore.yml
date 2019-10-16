@@ -1,5 +1,8 @@
 # 虚拟环境 https://help.github.com/cn/articles/virtual-environments-for-github-actions
 # action市场 https://github.com/marketplace?type=actions
+# 自定义action https://help.github.com/cn/articles/metadata-syntax-for-github-actions
+# action例子 https://github.com/actions
+# github-nuget https://help.github.com/en/articles/configuring-nuget-for-use-with-github-package-registry
 name: ASP.NET Core CI
 
 on: [push]
@@ -16,9 +19,14 @@ jobs:
           dotnet-version: 2.2.108
       - name: Build with dotnet
         run: dotnet build --configuration Release
+      - name: Setup Nuget
+        run: |
+          mkdir ~/.nuget && cd ~/.nuget
+          wget -O tar https://github.com/microsoft/artifacts-credprovider/releases/download/0.1.18/Microsoft.NuGet.CredentialProvider.tar.gz
+          tar -xvf tar
+          export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.GITHUB_TOKEN }}"    }  ]}'
       - name: Pack and push
         run: |
-          wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
           nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password ${{ secrets.GITHUB_TOKEN }}
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          nuget.exe push "Easy.Admin/pack/*.nupkg" -Source "GitHub"
+          dotnet nuget push "Easy.Admin/pack/*.nupkg" -s "https://nuget.pkg.github.com/xxred/index.json"
