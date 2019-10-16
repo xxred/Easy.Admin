@@ -27,6 +27,5 @@ jobs:
           export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.GITHUB_TOKEN }}"    }  ]}'
       - name: Pack and push
         run: |
-          nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password ${{ secrets.GITHUB_TOKEN }}
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
           dotnet nuget push "Easy.Admin/pack/*.nupkg" -s "https://nuget.pkg.github.com/xxred/index.json"
