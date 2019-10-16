@@ -21,9 +21,11 @@ jobs:
         run: dotnet build --configuration Release
       - name: Setup Nuget
         run: |
-          mkdir ~/.nuget && cd ~/.nuget
+          mkdir ~/.nuget
+          cd ~/.nuget
+          pwd
           wget -O tar https://github.com/microsoft/artifacts-credprovider/releases/download/0.1.18/Microsoft.NuGet.CredentialProvider.tar.gz
-          tar -xvf tar
+          tar -xf tar
           echo "${{ secrets.GITHUB_TOKEN }}"
           export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.nuget_token }}"    }  ]}'
       - name: Pack and push
