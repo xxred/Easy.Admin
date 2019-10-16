@@ -24,7 +24,8 @@ jobs:
           mkdir ~/.nuget && cd ~/.nuget
           wget -O tar https://github.com/microsoft/artifacts-credprovider/releases/download/0.1.18/Microsoft.NuGet.CredentialProvider.tar.gz
           tar -xvf tar
-          export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.GITHUB_TOKEN }}"    }  ]}'
+          echo "${{ secrets.GITHUB_TOKEN }}"
+          export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.nuget_token }}"    }  ]}'
       - name: Pack and push
         run: |
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
