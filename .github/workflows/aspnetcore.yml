@@ -21,7 +21,7 @@ jobs:
         run: dotnet build --configuration Release
       - name: Setup Nuget
         run: |
-          mkdir ~/.nuget
+          if [ -d  ~/.nuget ]; then mkdir ~/.nuget; fi
           cd ~/.nuget
           pwd
           wget -O tar https://github.com/microsoft/artifacts-credprovider/releases/download/0.1.18/Microsoft.NuGet.CredentialProvider.tar.gz
