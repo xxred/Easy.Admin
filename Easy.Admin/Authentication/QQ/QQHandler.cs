@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
-//using System.Text.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -60,40 +60,54 @@ namespace Easy.Admin.Authentication.QQ
                 throw new HttpRequestException($"An error occurred when retrieving Facebook user information ({response.StatusCode}). Please check if the authentication information is correct and the corresponding Facebook Graph API is enabled.");
             }
 
-            var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity), properties, Context, Scheme,
-                Options, Backchannel, tokens, payload);
-
+            var jObj = JObject.Parse(await response.Content.ReadAsStringAsync());
             // 填充openid
-            payload["openid"] = openId;
+            jObj["openid"] = openId;
 
-            context.RunClaimActions();
-            await Events.CreatingTicket(context);
+            using (var payload = JsonDocument.Parse(jObj.ToString()))// 
+            {
+                var context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity), properties, Context, Scheme,
+                    Options, Backchannel, tokens, payload.RootElement);
 
-            return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
+                context.RunClaimActions();
+                await Events.CreatingTicket(context);
+                return new AuthenticationTicket(context.Principal, properties, Scheme.Name);
+            }
         }
 
-        protected override async Task<OAuthTokenResponse> ExchangeCodeAsync(string code, string redirectUri)
+        /// <summary>
+        /// 重载此方法主要是请求回来的token格式是"access_token=xxx&abc=123"的形式，需要另做处理
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected override async Task<OAuthTokenResponse> ExchangeCodeAsync(OAuthCodeExchangeContext context)
         {
             var tokenRequestParameters = new Dictionary<string, string>()
             {
                 { "client_id", Options.ClientId },
-                { "redirect_uri", redirectUri },
+                { "redirect_uri", context.RedirectUri },
                 { "client_secret", Options.ClientSecret },
-                { "code", code },
+                { "code", context.Code },
                 { "grant_type", "authorization_code" },
             };
-            var endpoint = QueryHelpers.AddQueryString(Options.TokenEndpoint, tokenRequestParameters);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            // PKCE https://tools.ietf.org/html/rfc7636#section-4.5, see BuildChallengeUrl
+            if (context.Properties.Items.TryGetValue(OAuthConstants.CodeVerifierKey, out var codeVerifier))
+            {
+                tokenRequestParameters.Add(OAuthConstants.CodeVerifierKey, codeVerifier);
+                context.Properties.Items.Remove(OAuthConstants.CodeVerifierKey);
+            }
+
+            var requestContent = new FormUrlEncodedContent(tokenRequestParameters);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, Options.TokenEndpoint);
             requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            requestMessage.Content = requestContent;
             var response = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
-            //var response = await Backchannel.GetAsync(endpoint, Context.RequestAborted);
-
-
             if (response.IsSuccessStatusCode)
             {
-                var payload = await ConvertContentToJObject(response);
+                var jObj = await ConvertContentToJObject(response);
+                var payload = JsonDocument.Parse(jObj.ToString());
                 return OAuthTokenResponse.Success(payload);
             }
             else

@@ -1,24 +1,21 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using System.Text;
-using Easy.Admin.Authentication;
 using Easy.Admin.Configuration;
 using Easy.Admin.ModelBinders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Hosting;
 
 namespace Easy.Admin
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             // 清空所有ClaimType映射，不进行任何转换
             // JwtBearer认证后会将简短的声明转成长声明
@@ -29,7 +26,7 @@ namespace Easy.Admin
         }
 
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -48,12 +45,11 @@ namespace Easy.Admin
             // 添加身份验证
             services.ConfigAuthentication();
 
-            services.AddMvc(options =>
+            services.AddControllers(options =>
             {
                 options.ModelBinderProviders.Insert(0, new PagerModelBinderProvider());
                 options.ModelBinderProviders.Insert(0, new EntityModelBinderProvider());
             })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .ConfigJsonOptions();
 
             // 文档
@@ -64,6 +60,9 @@ namespace Easy.Admin
 
             // 扫描控制器添加菜单
             services.ScanController();
+
+            // 添加HttpClient
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -106,17 +105,20 @@ namespace Easy.Admin
 
             app.UseStaticFiles();
 
+            app.UseRouting();
+
             // 跨域
-            app.UseCors(config =>
-                config.AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin()
-                    .AllowCredentials());
+            app.UseCors("default");
 
             // 身份认证
             app.UseAuthentication();
 
-            app.UseMvc();
+            // 授权
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers();
+            });
 
             // 以下为SPA准备
             if (Environment.WebRootPath != null)

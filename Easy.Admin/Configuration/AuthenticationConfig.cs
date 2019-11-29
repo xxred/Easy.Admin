@@ -33,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         options.DefaultScheme = IdentityConstants.ApplicationScheme;
                         options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
                         options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+                        options.RequireAuthenticatedSignIn = false;
                     })
                 // SignManager内部使用IdentityConstants.ApplicationScheme作为登陆方案名称
                 // 因此这里全部使用IdentityConstants开头的协议名称

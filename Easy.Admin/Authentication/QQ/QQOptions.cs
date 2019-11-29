@@ -1,15 +1,7 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using System.Globalization;
+﻿using Microsoft.AspNetCore.Authentication;
 using Easy.Admin.Authentication.OAuthSignIn;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.Facebook;
 
 namespace Easy.Admin.Authentication.QQ
 {

@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder"></param>
         public static void ConfigJsonOptions(this IMvcBuilder builder)
         {
-            builder.AddJsonOptions(options =>
+            builder.AddNewtonsoftJson(options =>
             {
                 var settings = options.SerializerSettings;
                 //日期类型默认格式化处理

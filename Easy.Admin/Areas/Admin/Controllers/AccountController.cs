@@ -35,18 +35,21 @@ namespace Easy.Admin.Areas.Admin.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JwtBearerAuthenticationOptions _authenticationOptions;
         private readonly OAuthConfiguration _oAuthConfiguration;
+        private readonly IHttpClientFactory _clientFactory;
 
 
 
         public AccountController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IOptions<JwtBearerAuthenticationOptions> authenticationOptions,
-            OAuthConfiguration oAuthConfiguration)
+            OAuthConfiguration oAuthConfiguration,
+            IHttpClientFactory clientFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _authenticationOptions = authenticationOptions.Value;
             _oAuthConfiguration = oAuthConfiguration;
+            _clientFactory = clientFactory;
         }
 
         /// <summary>
@@ -196,7 +199,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             requestMessage.Headers.Add("Authorization", Request.Headers["Authorization"].ToString());
 
-            var backchannel = HttpClientFactory.Create();
+            var backchannel =  _clientFactory.CreateClient();
             var responseMessage = await backchannel.SendAsync(requestMessage);
 
             var contentMediaType = responseMessage.Content.Headers.ContentType?.MediaType;

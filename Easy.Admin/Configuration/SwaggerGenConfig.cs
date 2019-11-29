@@ -4,24 +4,26 @@ using System.IO;
 using Easy.Admin.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.OpenApi.Models;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// https://github.com/domaindrivendev/Swashbuckle.AspNetCore
+    /// </summary>
     public static class SwaggerGenConfig
     {
         public static void ConfigSwaggerGen(this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var env = serviceProvider.GetRequiredService<IHostingEnvironment>();
+            var env = serviceProvider.GetRequiredService<IWebHostEnvironment>();
             var config = serviceProvider.GetRequiredService<IConfiguration>();
             var oAuthConfiguration = serviceProvider.GetRequiredService<OAuthConfiguration>();
             
             // 文档
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = config["ApiTitle"] ?? "Easy.Admin API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = config["ApiTitle"] ?? "Easy.Admin API", Version = "v1" });
 
                 // 添加注释说明
 
@@ -32,38 +34,50 @@ namespace Microsoft.Extensions.DependencyInjection
                     c.IncludeXmlComments(file);
                 }
 
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                var bearerScheme = new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization",
                     Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
-                });
-                
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                };
+
+                c.AddSecurityDefinition("Bearer", bearerScheme);
+
                 // 这个要加上，否则请求的时候头部不会带Authorization
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
-                    { "Bearer",new string[]{}}
-                });
+                    { bearerScheme, new List<string>()}
+
+                }); ;
 
                 if (!oAuthConfiguration.Authority.IsNullOrEmpty())
                 {
-                    c.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    var oauth2Scheme = new OpenApiSecurityScheme
                     {
-                        Type = "oauth2",
-                        Flow = "authorizationCode",
-                        TokenUrl = "/api/Account/GetToken",
-                        //oAuthConfiguration.Authority.EnsureEnd("/") + "connect/token",
-                        AuthorizationUrl = oAuthConfiguration.Authority.EnsureEnd("/") + "connect/authorize",
+                        Type = SecuritySchemeType.OAuth2,
                         Description = "OAuth2登陆授权",
-                        Scopes = new Dictionary<string, string>
+                        Flows = new OpenApiOAuthFlows()
                         {
-                            { "openid","唯一标识" }
+                            AuthorizationCode = new OpenApiOAuthFlow()
+                            {
+                                AuthorizationUrl = new Uri(oAuthConfiguration.Authority.EnsureEnd("/") + "connect/authorize"),
+                                TokenUrl = new Uri(
+                                    //oAuthConfiguration.Authority.EnsureEnd("/") + "connect/token"
+                                    "/api/Account/GetToken", UriKind.Relative
+                                    ),
+                                Scopes = new Dictionary<string, string>
+                                {
+                                    {"openid", "唯一标识"},
+                                }
+                            }
                         }
-                    });
-                    c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                    };
+
+                    c.AddSecurityDefinition("oauth2", oauth2Scheme);
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {
-                        { "oauth2",new string[]{}}
+                        { oauth2Scheme, new List<string>(){"openid"}}
                     });
                 }
             });
