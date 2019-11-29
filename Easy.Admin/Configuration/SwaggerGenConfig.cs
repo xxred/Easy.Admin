@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Easy.Admin.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
@@ -33,6 +34,17 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     c.IncludeXmlComments(file);
                 }
+
+                // 添加控制器注释
+                c.TagActionsBy(api =>
+                {
+                    var controllerActionDescriptor = (ControllerActionDescriptor)api.ActionDescriptor;
+                    var tag = controllerActionDescriptor.ControllerName + "-" + controllerActionDescriptor.ControllerTypeInfo.GetDisplayName();
+                    return new List<string>()
+                    {
+                        tag
+                    };
+                });
 
                 var bearerScheme = new OpenApiSecurityScheme
                 {
