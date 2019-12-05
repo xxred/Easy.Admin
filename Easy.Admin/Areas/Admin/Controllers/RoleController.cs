@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Entities;
 using Microsoft.AspNetCore.Mvc;
 using NewLife;
@@ -14,7 +15,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [DisplayName("角色")]
-    public class RoleController : EntityController<Role>
+    public class RoleController : EntityController<ApplicationRole>
     {
         /// <summary>
         /// 更新
@@ -33,15 +34,15 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// 相当于将这些子项当做实体的属性
         /// </remarks>
         /// <returns></returns>
-        public override ApiResult Put(Role entity)
+        public override ApiResult Put(ApplicationRole entity)
         {
-            var model = Role.FindByID(entity.ID);
+            var model = ApplicationRole.FindByID(entity.ID);
             // 反射获取脏属性，得到修改的属性集合
             var dirtys = entity.GetValue("Dirtys") as DirtyCollection;
 
             foreach (var item in dirtys)
             {
-                if (Role._.ID.Name == item)
+                if (ApplicationRole._.ID.Name == item)
                 {
                     continue;
                 }
