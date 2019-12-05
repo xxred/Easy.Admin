@@ -57,7 +57,13 @@ namespace Easy.Admin
             services.ConfigSwaggerGen();
 
             // 跨域
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            });
 
             // 扫描控制器添加菜单
             services.ScanController();
