@@ -7,6 +7,6 @@ namespace Easy.Admin.Areas.Admin.Models
     /// </summary>
     public class ApplicationUser : User<ApplicationUser>
     {
-
+        public override string RoleName => base.RoleName;
     }
 }
