@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Configuration;
 using Easy.Admin.ModelBinders;
 using Microsoft.AspNetCore.Builder;
@@ -36,7 +37,7 @@ namespace Easy.Admin
             services.AddConnectionStr();
 
             // 添加身份标识Identity
-            services.AddIdentity(options =>
+            services.AddAdminIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
                 options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.UniqueName;

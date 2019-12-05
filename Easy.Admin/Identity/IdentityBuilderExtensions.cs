@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Easy.Admin.Areas.Admin.Models;
+using Easy.Admin.Extensions;
 using Easy.Admin.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -10,12 +11,18 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IdentityBuilderExtensions
     {
-        public static IdentityBuilder AddIdentity(this IServiceCollection services, Action<IdentityOptions> setupAction = null)
+        public static IdentityBuilder AddAdminIdentity<TApplicationUser, TApplicationRole>(this IServiceCollection services, Action<IdentityOptions> setupAction = null)
+            where TApplicationUser : User<TApplicationUser>, new()
+            where TApplicationRole : Role<TApplicationRole>, new()
         {
-            return services.AddIdentityCore<ApplicationUser>(setupAction).AddRoles<ApplicationRole>().AddStores()
+            var builder = services.AddIdentityCore<TApplicationUser>(setupAction).AddRoles<TApplicationRole>().AddStores()
                 .AddUserManager()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
+
+            services.AddUserServiceCollection<TApplicationUser>();
+
+            return builder;
         }
 
         public static IdentityBuilder AddStores(this IdentityBuilder builder)
@@ -27,7 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IdentityBuilder AddUserManager(this IdentityBuilder builder)
         {
             builder.Services.AddScoped(typeof(UserManager<>).MakeGenericType(builder.UserType),
-                typeof(ApplicationUserManager));
+                typeof(ApplicationUserManager<>).MakeGenericType(builder.UserType));
 
             return builder;
         }

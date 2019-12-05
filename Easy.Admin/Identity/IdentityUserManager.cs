@@ -1,34 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using XCode.Membership;
 
 namespace Easy.Admin.Identity
 {
     /// <summary>
     /// 用户管理
     /// </summary>
-    public class ApplicationUserManager : UserManager<ApplicationUser>
+    public class ApplicationUserManager<TUser> : UserManager<TUser> where TUser : User<TUser>, new()
     {
-        public ApplicationUserManager(IUserStore<ApplicationUser> store, IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
-            IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<ApplicationUser>> logger) :
+        public ApplicationUserManager(IUserStore<TUser> store, IOptions<IdentityOptions> optionsAccessor,
+            IPasswordHasher<TUser> passwordHasher, IEnumerable<IUserValidator<TUser>> userValidators,
+            IEnumerable<IPasswordValidator<TUser>> passwordValidators, ILookupNormalizer keyNormalizer,
+            IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<TUser>> logger) :
             base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer,
                 errors, services, logger)
         {
-        }
-
-        public override async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
-        {
-            user.Password = password.MD5();
-
-            return await CreateAsync(user);
-            //return await Store.CreateAsync(user, CancellationToken);
         }
 
         /// <summary>
@@ -38,8 +30,8 @@ namespace Easy.Admin.Identity
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        protected override async Task<PasswordVerificationResult> VerifyPasswordAsync(IUserPasswordStore<ApplicationUser> store,
-            ApplicationUser user, string password)
+        protected override async Task<PasswordVerificationResult> VerifyPasswordAsync(IUserPasswordStore<TUser> store,
+            TUser user, string password)
         {
             string text = await store.GetPasswordHashAsync(user, CancellationToken);
             if (text == null)
