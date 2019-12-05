@@ -72,13 +72,14 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = signingKey,
-                ValidateIssuer = false,
-                //ValidIssuer = configuration["ValidIssuer"]
-                //              ?? JwtBearerAuthenticationDefaults.ValidIssuer,
+                ValidateIssuer = true,
+                ValidIssuer = configuration["ValidIssuer"]
+                              ?? JwtBearerAuthenticationDefaults.ValidIssuer,
 
-                ValidateAudience = false,
-                //ValidAudience = configuration["ValidAudience"]
-                //                ?? JwtBearerAuthenticationDefaults.ValidAudience,
+                ValidateAudience = true,
+                ValidAudience = configuration["ValidAudience"]
+                                ?? JwtBearerAuthenticationDefaults.ValidAudience,
+
 
                 ValidateLifetime = true,
                 ValidateTokenReplay = false,
