@@ -14,6 +14,7 @@ using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
+using Easy.Admin.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -31,25 +32,19 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [DisplayName("账号")]
     public class AccountController : AdminControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JwtBearerAuthenticationOptions _authenticationOptions;
         private readonly OAuthConfiguration _oAuthConfiguration;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly IUserService _userService;
 
-
-
-        public AccountController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IOptions<JwtBearerAuthenticationOptions> authenticationOptions,
+        public AccountController(IOptions<JwtBearerAuthenticationOptions> authenticationOptions,
             OAuthConfiguration oAuthConfiguration,
-            IHttpClientFactory clientFactory)
+            IHttpClientFactory clientFactory, IUserService userService, UserManager<ApplicationUser> i)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _authenticationOptions = authenticationOptions.Value;
             _oAuthConfiguration = oAuthConfiguration;
             _clientFactory = clientFactory;
+            _userService = userService;
         }
 
         /// <summary>
@@ -60,7 +55,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         public ApiResult GetUserInfo()
         {
             //var principal = User;
-            var identity = User.Identity as ApplicationUser;
+            var identity = User.Identity as IUser;
 
             if (identity == null)
             {
@@ -100,8 +95,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         public async Task<JwtToken> Login([FromQuery]string username, [FromQuery]string password,
             [FromQuery]bool rememberMe = false)
         {
-            var result = await _signInManager.PasswordSignInAsync(
-                username, password, rememberMe, false);
+            var result = await _userService.LoginAsync(username, password, rememberMe);
 
             if (result.Succeeded)
             {
@@ -121,8 +115,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [AllowAnonymous]
         public async Task<ApiResult> Register(RequestRegister model)
         {
-            var user = new ApplicationUser { Name = model.UserName };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userService.CreateAsync(model.UserName, model.Password);
 
             if (result.Succeeded)
             {
@@ -130,51 +123,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
 
             return ApiResult.Err("注册失败");
-        }
-
-        /// <summary>
-        /// 修改用户信息
-        /// </summary>
-        /// <remarks>只能本人修改，或者管理员</remarks>
-        /// <returns></returns>
-        [HttpPut("[action]")]
-        [ApiAuthorizeFilter(PermissionFlags.Update)]
-        public async Task<ApiResult> UpdateUserInfo(RequestUpdateUserInfo requestUpdateUserInfo)
-        {
-            var user = await _userManager.FindByIdAsync(requestUpdateUserInfo.UserId);
-            user.DisplayName = requestUpdateUserInfo.DisplayName;
-
-            var appUser = AppUser;
-            if (!IsSupperAdmin || appUser.ID != user.ID)
-            {
-                return ApiResult.Err("无权限修改");
-            }
-
-            await _userManager.UpdateAsync(user);
-
-            return ApiResult.Ok();
-        }
-
-        /// <summary>
-        /// 修改密码
-        /// </summary>
-        /// <remarks>只能本人修改，或者管理员</remarks>
-        /// <returns></returns>
-        [HttpPut("[action]")]
-        public async Task<ApiResult> UpdatePwd(RequestUpdateUserInfo requestUpdateUserInfo)
-        {
-            var user = await _userManager.FindByIdAsync(requestUpdateUserInfo.UserId);
-            user.Password = requestUpdateUserInfo.Pwd;
-
-            var appUser = AppUser;
-            if (!IsSupperAdmin || appUser.ID != user.ID)
-            {
-                return ApiResult.Err("无权限修改");
-            }
-
-            await _userManager.UpdateAsync(user);
-
-            return ApiResult.Ok();
         }
 
         /// <summary>
@@ -326,7 +274,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [Route("Logout")]
         public async Task<ApiResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _userService.SignOutAsync();
 
             return ApiResult.Ok();
         }

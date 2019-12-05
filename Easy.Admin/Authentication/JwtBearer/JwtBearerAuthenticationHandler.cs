@@ -17,15 +17,12 @@ namespace Easy.Admin.Authentication.JwtBearer
     public class JwtBearerAuthenticationHandler : SignInAuthenticationHandler<JwtBearerAuthenticationOptions>
     {
         IConfiguration _configuration;
-        private readonly UserManager<ApplicationUser> _userManager;
-
 
         public JwtBearerAuthenticationHandler(IOptionsMonitor<JwtBearerAuthenticationOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IConfiguration configuration, UserManager<ApplicationUser> userManager)
+            UrlEncoder encoder, ISystemClock clock, IConfiguration configuration)
             : base(options, logger, encoder, clock)
         {
             _configuration = configuration;
-            _userManager = userManager;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()

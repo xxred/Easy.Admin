@@ -4,6 +4,7 @@ using Easy.Admin.Entities;
 using Easy.Admin.Filters;
 using Microsoft.AspNetCore.Mvc;
 using NewLife.Data;
+using XCode.Membership;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
@@ -17,14 +18,14 @@ namespace Easy.Admin.Areas.Admin.Controllers
     public class AdminControllerBase : ControllerBase
     {
 
-        private ApplicationUser _appUser;
+        private IUser _appUser;
 
         /// <summary>
         /// 当前用户
         /// </summary>
-        public ApplicationUser AppUser
+        public IUser AppUser
         {
-            get => _appUser ?? (_appUser = HttpContext.Features.Get<ApplicationUser>());
+            get => _appUser ?? (_appUser = HttpContext.Features.Get<IUser>());
             set => _appUser = value;
         }
 

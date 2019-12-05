@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-stretch
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone # 设置时区
 ARG AppKey
 ARG Source
-ARG ProjName=Winoble.Admin.Base
+ARG ProjName=Easy.Admin
 WORKDIR /src
 COPY ["${ProjName}/${ProjName}.csproj", "${ProjName}/"]
 RUN dotnet restore "${ProjName}/${ProjName}.csproj"

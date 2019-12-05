@@ -1,5 +1,7 @@
 ﻿
+using System;
 using System.ComponentModel;
+using Easy.Admin.Entities;
 #if DEBUG
 using Easy.Admin.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +15,14 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [DisplayName("用户")]
-    public class UserController : EntityController<UserX>
+    public class UserController : EntityController<ApplicationUser>
     {
+        public override ApiResult Post(ApplicationUser value)
+        {
+            // 新增账号默认密码123456
+            value.Password = "123456".MD5();
+            return base.Post(value);
+        }
     }
 }
 #endif

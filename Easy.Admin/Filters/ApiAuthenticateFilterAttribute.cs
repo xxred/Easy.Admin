@@ -7,11 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Entities;
+using Easy.Admin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using NewLife.Log;
+using XCode.Membership;
 
 namespace Easy.Admin.Filters
 {
@@ -55,7 +58,8 @@ namespace Easy.Admin.Filters
         bool SetPrincipal(AuthorizationFilterContext actionContext)
         {
             var context = actionContext.HttpContext;
-
+            var userService =
+                (actionContext.HttpContext.RequestServices.GetRequiredService(typeof(IUserService)) as IUserService) ?? throw new ArgumentNullException("IUserService没有注册");
             //获取浏览器的token
             //var token = context.Features.Get<JwtToken>()?.Token;
 
@@ -84,7 +88,7 @@ namespace Easy.Admin.Filters
                 throw new ApiException(500, "context.User中找不到存放id的声明");
             }
 
-            var user = ApplicationUser.FindByKey(id);
+            var user = userService.FindByIdAsync(id).Result;
 
             if (user == null)
             {
@@ -99,7 +103,7 @@ namespace Easy.Admin.Filters
             // 角色列表
             var up = new GenericPrincipal(iid, new[] { iid.AuthenticationType });
 
-            context.Features[typeof(ApplicationUser)] = (ApplicationUser) iid;
+            context.Features[typeof(IUser)] = iid as IUser;
             context.User = up;
 
             Thread.CurrentPrincipal = up;
