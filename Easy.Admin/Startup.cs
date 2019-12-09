@@ -4,6 +4,7 @@ using System.IO;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Configuration;
 using Easy.Admin.ModelBinders;
+using Easy.Admin.SpaServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -123,24 +124,49 @@ namespace Easy.Admin
             // 授权
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => {
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapControllers();
             });
 
             // 以下为SPA准备
             if (Environment.WebRootPath != null)
             {
-                app.UseSpaStaticFiles(new StaticFileOptions()
-                {
-                    FileProvider = new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"))
-                });
+
 
                 app.UseSpa(options =>
                 {
-                    options.Options.DefaultPageStaticFileOptions = new StaticFileOptions()
+                    if (Environment.IsDevelopment())
                     {
-                        FileProvider = new PhysicalFileProvider(Path.Combine(Environment.WebRootPath, "dist"))
-                    };
+                        // 如果前端源码路径配置为空，说明不需要代理服务
+                        var clientAppSourcePath = Configuration["ClientAppSourcePath"];
+                        if (clientAppSourcePath.IsNullOrWhiteSpace())
+                        {
+                            return;
+                        }
+
+                        // 开发时，当前目录就是项目目录，而不是bin目录
+                        options.Options.SourcePath = clientAppSourcePath;
+                        //options.Options.StartupTimeout = TimeSpan.FromSeconds(20);
+                        options.UseVueDevelopmentServer("yarn", "start");
+                    }
+                    else
+                    {
+                        // 如果dist文件夹不存在，说明没有部署前端文件
+                        var dist = Path.Combine(Environment.WebRootPath, "dist");
+                        if (!Directory.Exists(dist))
+                        {
+                            return;
+                        }
+
+                        var staticFileOptions = new StaticFileOptions()
+                        {
+                            FileProvider = new PhysicalFileProvider(dist)
+                        };
+
+                        app.UseSpaStaticFiles(staticFileOptions);
+                        options.Options.DefaultPageStaticFileOptions = staticFileOptions;
+                    }
                 });
             }
         }

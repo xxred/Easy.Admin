@@ -32,7 +32,6 @@
   <ItemGroup>
     <Content Remove="appsettings*.json" Pack="false" />
     <Content Remove="Properties\**" Pack="false" />
-    <Content Remove="wwwroot\**" Pack="false" />
     <Content Include="appsettings*.json" Pack="false" />
     <Content Include="Properties\**" Pack="false" />
     <Content Include="wwwroot\**" Pack="false" />
@@ -62,5 +61,8 @@
       <LastGenOutput>aBuild.log</LastGenOutput>
     </None>
   </ItemGroup>
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" appsettings_1json__JsonSchema="" appsettings_1development_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>
