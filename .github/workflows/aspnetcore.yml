@@ -1,4 +1,4 @@
-# 虚拟环境 https://help.github.com/cn/articles/virtual-environments-for-github-actions
+﻿# 虚拟环境 https://help.github.com/cn/articles/virtual-environments-for-github-actions
 # action市场 https://github.com/marketplace?type=actions
 # 自定义action https://help.github.com/cn/articles/metadata-syntax-for-github-actions
 # action例子 https://github.com/actions
@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 2.2.108
+          dotnet-version: 3.1.100
       - name: Build with dotnet
         run: dotnet build --configuration Release
       - name: Setup Nuget
