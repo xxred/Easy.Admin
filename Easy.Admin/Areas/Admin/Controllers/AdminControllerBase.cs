@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using NewLife.Data;
 using XCode.Membership;
@@ -15,6 +16,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [ApiResultFilter]
     [ApiController]
     [ApiAuthenticateFilter()]
+    [EnableCors]
     public class AdminControllerBase : ControllerBase
     {
 

@@ -116,7 +116,7 @@ namespace Easy.Admin
             app.UseRouting();
 
             // 跨域
-            app.UseCors("default");
+            app.UseCors();
 
             // 身份认证
             app.UseAuthentication();
