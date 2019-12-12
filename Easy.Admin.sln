@@ -5,13 +5,6 @@ VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Easy.Admin", "Easy.Admin\Easy.Admin.csproj", "{842D299F-6DFD-425E-9BFD-2D1F64F82922}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "其它", "其它", "{B4ADEA60-6A19-4E06-8460-81CA0943A0D1}"
-	ProjectSection(SolutionItems) = preProject
-		.github\workflows\aspnetcore.yml = .github\workflows\aspnetcore.yml
-		azure-pipelines.yml = azure-pipelines.yml
-		Dockerfile = Dockerfile
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
