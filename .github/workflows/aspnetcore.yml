@@ -26,9 +26,8 @@ jobs:
       - name: Setup Nuget
         run: nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password ${{secrets.GITHUB_TOKEN}}
       - name: Pack
-        if: github
         run: |
-          dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
+          dotnet pack "Easy.Admin/Easy.Admin.csproj" -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -c Release -o pack
       - name: push to github
         run: |
           nuget push .\pack\*.nupkg -Source "GPR"
