@@ -12,9 +12,9 @@
 
   <PropertyGroup>
     <Deterministic>false</Deterministic>
-    <AssemblyVersion>1.1.*</AssemblyVersion>
-    <FileVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</FileVersion>
-    <PackageVersion>1.1.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</PackageVersion>
+    <AssemblyVersion>1.2.*</AssemblyVersion>
+    <FileVersion>1.2.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</FileVersion>
+    <PackageVersion>1.2.$([System.DateTime]::Now.ToString(`yyyy.MMddHHmm`))</PackageVersion>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <Authors>xxred</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
