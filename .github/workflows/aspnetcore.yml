@@ -5,7 +5,7 @@
 # github-nuget https://help.github.com/en/articles/configuring-nuget-for-use-with-github-package-registry
 name: ASP.NET Core CI
 
-on: [push]
+on: [create]
 
 jobs:
   build:
@@ -24,10 +24,16 @@ jobs:
         with:
           nuget-version: '5.x'
       - name: Setup Nuget
-        run: nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password "${{ secrets.GITHUB_TOKEN }}"
-      - name: Pack and push
+        run: |
+          nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password "${{ secrets.GITHUB_TOKEN }}"
+          nuget setapikey  "${{ secrets.nuget_token }}"
+      - name: Pack
+        if: github
         run: |
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          pwd
-          ls ./pack
+      - name: push to github
+        run: |
           nuget push .\pack\*.nupkg -Source "GPR"
+      - name: push to nuget.org
+        run: |
+          nuget push .\pack\*.nupkg
