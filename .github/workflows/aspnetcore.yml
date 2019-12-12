@@ -5,7 +5,7 @@
 # github-nuget https://help.github.com/en/articles/configuring-nuget-for-use-with-github-package-registry
 name: ASP.NET Core CI
 
-on: [push]
+on: [create]
 
 jobs:
   build:
