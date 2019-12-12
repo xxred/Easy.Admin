@@ -30,4 +30,4 @@ jobs:
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
           pwd
           ls ./pack
-          nuget push ./pack/*.nupkg -Source "GPR"
+          nuget push .\pack\*.nupkg -Source "GPR"
