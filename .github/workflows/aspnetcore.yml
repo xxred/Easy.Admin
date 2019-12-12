@@ -33,4 +33,4 @@ jobs:
           ls ~/.nuget
           ls ~/.nuget/plugins
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          dotnet nuget push "Easy.Admin/pack/*.nupkg" -s "https://nuget.pkg.github.com/xxred/index.json"
+          dotnet nuget push "./pack/*.nupkg" -s "https://nuget.pkg.github.com/xxred/index.json"
