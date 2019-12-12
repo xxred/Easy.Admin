@@ -9,7 +9,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v1
@@ -19,18 +19,13 @@ jobs:
           dotnet-version: 3.1.100
       - name: Build with dotnet
         run: dotnet build --configuration Release
+      - name: Install Nuget
+        uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: '5.x'
       - name: Setup Nuget
-        run: |
-          if [ ! -d  ~/.nuget ]; then mkdir ~/.nuget; fi
-          cd ~/.nuget
-          pwd
-          wget -O tar https://github.com/microsoft/artifacts-credprovider/releases/download/0.1.18/Microsoft.NuGet.CredentialProvider.tar.gz
-          tar -xf tar
-          echo "${{ secrets.GITHUB_TOKEN }}"
-          export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.nuget_token }}"    }  ]}'
+        run: nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password "${{ secrets.GITHUB_TOKEN }}"
       - name: Pack and push
         run: |
-          ls ~/.nuget
-          ls ~/.nuget/plugins
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          dotnet nuget push "./pack/*.nupkg" -s "https://nuget.pkg.github.com/xxred/index.json"
+          nuget push "./pack/*.nupkg" -Source "GPR"
