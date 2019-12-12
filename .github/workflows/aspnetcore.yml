@@ -25,7 +25,7 @@ jobs:
           nuget-version: '5.x'
       - name: Setup Nuget
         run: |
-          nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password "${{ secrets.GITHUB_TOKEN }}
+          nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password "${{ secrets.GITHUB_TOKEN }}"
       - name: Pack
         if: github
         run: |
