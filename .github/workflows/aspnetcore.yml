@@ -28,4 +28,6 @@ jobs:
       - name: Pack and push
         run: |
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          nuget push "./pack/*.nupkg" -Source "GPR"
+          pwd
+          tree
+          nuget push "Easy.Admin/pack/*.nupkg" -Source "GPR"
