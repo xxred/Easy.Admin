@@ -5,32 +5,35 @@
 # github-nuget https://help.github.com/en/articles/configuring-nuget-for-use-with-github-package-registry
 name: ASP.NET Core CI
 
-on: [push]
+on: [create]
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v1
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 2.2.108
+          dotnet-version: 3.1.100
       - name: Build with dotnet
         run: dotnet build --configuration Release
+      - name: Install Nuget
+        uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: '5.x'
       - name: Setup Nuget
         run: |
-          if [ ! -d  ~/.nuget ]; then mkdir ~/.nuget; fi
-          cd ~/.nuget
-          pwd
-          wget -O tar https://github.com/microsoft/artifacts-credprovider/releases/download/0.1.18/Microsoft.NuGet.CredentialProvider.tar.gz
-          tar -xf tar
-          echo "${{ secrets.GITHUB_TOKEN }}"
-          export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{  "endpointCredentials": [    {      "endpoint": "https://nuget.pkg.github.com/xxred/index.json",      "username": "xxred",      "password": "${{ secrets.nuget_token }}"    }  ]}'
-      - name: Pack and push
+          nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/xxred/index.json" -UserName xxred -Password "${{ secrets.GITHUB_TOKEN }}"
+          nuget setapikey  "${{ secrets.nuget_token }}"
+      - name: Pack
+        if: github
         run: |
-          ls ~/.nuget
-          ls ~/.nuget/plugins
           dotnet pack "Easy.Admin/Easy.Admin.csproj" -c Release -o pack
-          dotnet nuget push "Easy.Admin/pack/*.nupkg" -s "https://nuget.pkg.github.com/xxred/index.json"
+      - name: push to github
+        run: |
+          nuget push .\pack\*.nupkg -Source "GPR"
+      - name: push to nuget.org
+        run: |
+          nuget push .\pack\*.nupkg
