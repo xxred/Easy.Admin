@@ -3,6 +3,7 @@
 
 ![ ](https://github.com/xxred/Easy.Admin/workflows/ASP.NET%20Core%20CI/badge.svg)
 [![Easy.Admin](https://img.shields.io/nuget/vpre/Easy.Admin.svg?style=flat&label=Easy.Admin)](https://www.nuget.org/packages/Easy.Admin/)
+演示 ids4.hebinghong.com
 
 开发中...
 
