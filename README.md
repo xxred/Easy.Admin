@@ -9,4 +9,4 @@
 
 前端项目位于[Easy.Front-End](https://github.com/xxred/Easy.Front-End)
 
-技术交流群：1600800
+技术交流群：829687360
