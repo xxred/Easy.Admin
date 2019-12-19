@@ -101,6 +101,10 @@ namespace Easy.Admin.ModelBinders
         /// </summary>
         private void SetRequestValue(HttpRequest req)
         {
+            // 允许同步IO
+            var ft = req.HttpContext.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpBodyControlFeature>();
+            if (ft != null) ft.AllowSynchronousIO = true;
+
             var stream = new MemoryStream();
             req.Body.CopyTo(stream);
 
