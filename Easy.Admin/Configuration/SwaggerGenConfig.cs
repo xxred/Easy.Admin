@@ -59,9 +59,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 // 这个要加上，否则请求的时候头部不会带Authorization
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
-                    { bearerScheme, new List<string>()}
-
-                }); ;
+                    {
+                        new OpenApiSecurityScheme{ Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme,Id = "Bearer"}},
+                        new List<string>()
+                    }
+                });
 
                 if (!oAuthConfiguration.Authority.IsNullOrEmpty())
                 {
@@ -89,7 +91,9 @@ namespace Microsoft.Extensions.DependencyInjection
                     c.AddSecurityDefinition("oauth2", oauth2Scheme);
                     c.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {
-                        { oauth2Scheme, new List<string>(){"openid"}}
+                        { 
+                            new OpenApiSecurityScheme{ Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme,Id = "oauth2"}},
+                            new List<string>(){"openid"}}
                     });
                 }
             });

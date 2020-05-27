@@ -344,3 +344,4 @@ ASALocalRun/
 /Easy.Admin/IdentityServer.db
 /Easy.Admin/AspIdUsers.db
 /.vscode
+/wwwroot/dist

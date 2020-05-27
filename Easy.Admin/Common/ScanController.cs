@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var mf = ManageProvider.Menu;
             if (mf == null) return;
 
-            using (var tran = (mf as IEntityOperate)?.CreateTrans())
+            using (var tran = (mf as IEntityFactory)?.CreateTrans())
             {
                 XTrace.WriteLine("初始化[{0}]的菜单体系", rootUrl);
                 var ms = mf.ScanController(rootUrl, assembly, ns);

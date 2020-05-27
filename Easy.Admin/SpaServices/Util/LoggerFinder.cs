@@ -12,8 +12,7 @@ namespace Easy.Admin.SpaServices.Util
             string logCategoryName)
         {
             // If the DI system gives us a logger, use it. Otherwise, set up a default one
-            var loggerFactory = appBuilder.ApplicationServices.GetService<ILoggerFactory>();
-            var logger = loggerFactory != null
+            var logger = appBuilder.ApplicationServices.GetService(typeof(ILoggerFactory)) is ILoggerFactory loggerFactory
                 ? loggerFactory.CreateLogger(logCategoryName)
                 : NullLogger.Instance;
             return logger;

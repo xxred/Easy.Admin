@@ -9,9 +9,9 @@ namespace Easy.Admin.Areas.Admin.Models
     public class ApplicationRole : Role<ApplicationRole>
     {
         /// <summary>本角色权限集合</summary>
-        public IDictionary<int, PermissionFlags> Permissions => base.Permissions;
+        public new IDictionary<int, PermissionFlags> Permissions => base.Permissions;
 
         /// <summary>当前角色拥有的资源</summary>
-        public int[] Resources => base.Resources;
+        public new int[] Resources => base.Resources;
     }
 }
