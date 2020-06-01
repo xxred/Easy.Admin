@@ -162,10 +162,12 @@ namespace Easy.Admin.Areas.Admin.Controllers
             return ApiResult.Ok(fieldDtoList);
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        [AllowAnonymous]
-        public virtual ApiResult UploadFile(string keyPrefix)
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="keyPrefix"></param>
+        /// <returns></returns>
+        protected virtual ApiResult UploadFile(string keyPrefix)
         {
             if (!Request.HasFormContentType)
             {
