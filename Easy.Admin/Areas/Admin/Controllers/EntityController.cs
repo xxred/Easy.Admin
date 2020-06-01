@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Text;
+using Easy.Admin.Common;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewLife.Data;
 using NewLife.Reflection;
@@ -156,6 +160,65 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
 
             return ApiResult.Ok(fieldDtoList);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [AllowAnonymous]
+        public virtual ApiResult UploadFile(string keyPrefix)
+        {
+            if (!Request.HasFormContentType)
+            {
+                return ApiResult.Err("没有表单内容");
+            }
+
+            var files = Request.Form.Files;
+
+            if (files.Count < 1)
+            {
+                return ApiResult.Err("没有找到上传的文件");
+            }
+
+            var keyBase = $"{keyPrefix ?? ""}/{DateTime.Now:yyyy/MM/dd}/".TrimStart('/');
+            var urlList = new List<string>();
+            var fileUpload = (IFileUpload)HttpContext.RequestServices.GetService(typeof(IFileUpload));
+
+            foreach (var file in files)
+            {
+                var ext = System.IO.Path.GetExtension(file.FileName);
+                var content = file.OpenReadStream();
+
+                var fileName = content.ToMD5() + ext;
+                var key = keyBase + fileName;
+
+                var picUrl = fileUpload.PutObject(key, content);
+
+                urlList.Add(picUrl);
+            }
+
+            return ApiResult.Ok(urlList);
+        }
+    }
+    public static class StreamToMD5
+    {
+        public static string ToMD5(this Stream stream)
+        {
+            //计算文件的MD5值
+            System.Security.Cryptography.MD5 calculator = System.Security.Cryptography.MD5.Create();
+            Byte[] buffer = calculator.ComputeHash(stream);
+            calculator.Clear();
+
+            //将字节数组转换成十六进制的字符串形式
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                stringBuilder.Append(buffer[i].ToString("x2"));
+            }
+            var hashMD5 = stringBuilder.ToString();
+
+            stream.Position = 0; // 重置位置，避免下一个使用者使用报错
+
+            return hashMD5;
         }
     }
 }
