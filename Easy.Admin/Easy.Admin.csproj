@@ -35,15 +35,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="wwwroot\UploadImages\**" />
-    <None Remove="wwwroot\UploadImages\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="wwwroot\UploadImages\**" />
     <Content Remove="appsettings*.json" Pack="false" />
     <Content Remove="Properties\**" Pack="false" />
-    <Content Remove="wwwroot\UploadImages\**" />
     <Content Include="appsettings*.json" Pack="false" />
     <Content Include="Properties\**" Pack="false" />
     <Content Include="wwwroot\**" Pack="false" />

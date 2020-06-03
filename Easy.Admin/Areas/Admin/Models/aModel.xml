@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Tables Version="9.12.7126.42294" NameSpace="Winoble.Admin.Base.Areas.Admin.Models" ConnName="EasyAdmin" Output="" BaseClass="Entity" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com https://raw.githubusercontent.com/NewLifeX/X/master/XCode/ModelSchema.xsd" xmlns="http://www.newlifex.com/ModelSchema.xsd">
-  <Table Name="UserConnect" Description="用户链接。第三方绑定" ConnName="Membership" RenderGenEntity="True">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Tables Version="9.16.7426.39094" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com http://www.newlifex.com/Model2020.xsd" NameSpace="Easy.Admin.Areas.Admin.Models" ConnName="EasyAdmin" Output="" BaseClass="Entity" IgnoreNameCase="True" xmlns="http://www.newlifex.com/Model2020.xsd">
+  <Table Name="UserConnect" Description="用户链接。第三方绑定" ConnName="Membership" IgnoreNameCase="False" RenderGenEntity="True">
     <Columns>
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="Provider" DataType="String" Description="提供商" />
@@ -25,5 +25,10 @@
       <Index Columns="Provider,OpenID" Unique="True" />
       <Index Columns="UserID" />
     </Indexes>
+  </Table>
+  <Table Name="ApplicationUser" TableName="User" ConnName="Membership" IgnoreNameCase="False" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Birthday" DataType="DateTime" Description="生日" />
+    </Columns>
   </Table>
 </Tables>

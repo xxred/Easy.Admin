@@ -346,3 +346,5 @@ ASALocalRun/
 /.vscode
 /wwwroot/dist
 /Easy.Admin/Easy.Admin.xml
+/Easy.Admin/Areas/Admin/Models/Config
+UploadImages
