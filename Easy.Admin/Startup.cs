@@ -159,7 +159,7 @@ namespace Easy.Admin
             {
                 // 2020-06-01 增加前端文件部署路径配置
                 // 如果dist文件夹不存在，说明没有部署前端文件
-                var dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"]);
+                var dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"]??"dist");
                 if (!Directory.Exists(dist))
                 {
                     return;
@@ -169,7 +169,7 @@ namespace Easy.Admin
                 {
                     var staticFileOptions = new StaticFileOptions()
                     {
-                        FileProvider = new PhysicalFileProvider(env.WebRootPath)
+                        FileProvider = new PhysicalFileProvider(dist)
                     };
 
                     app.UseSpaStaticFiles(staticFileOptions);
