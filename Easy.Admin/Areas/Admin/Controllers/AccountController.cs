@@ -11,6 +11,7 @@ using Easy.Admin.Areas.Admin.RequestParams;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.OAuthSignIn;
+using Easy.Admin.Common;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
@@ -92,8 +93,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<JwtToken> Login([FromQuery]string username, [FromQuery]string password,
-            [FromQuery]bool rememberMe = false)
+        public async Task<JwtToken> Login([FromQuery] string username, [FromQuery] string password,
+            [FromQuery] bool rememberMe = false)
         {
             var result = await _userService.LoginAsync(username, password, rememberMe);
 
@@ -107,7 +108,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
-        /// 注册
+        /// 注册，包含四种模式，设置参数Type选择
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -115,14 +116,61 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [AllowAnonymous]
         public async Task<ApiResult> Register(RequestRegister model)
         {
-            var result = await _userService.CreateAsync(model.UserName, model.Password);
+            string[] names;
+            object[] values;
+
+            switch (model.Type)
+            {
+                case 1:
+                case 2:
+                    if (!CheckVerCode(model.Mobile, model.VerCode,0))
+                    {
+                        return ApiResult.Err("验证码不正确或已过期！");
+                    }
+                    names = new[]
+                    {
+                        nameof(IUser.Name),
+                        nameof(IUser.DisplayName),
+                        nameof(IUser.Mobile),
+                        nameof(IUser.Password),
+                    };
+                    // 模式2，不带密码，默认密码由内部生成，应用应该引导用户修改密码后使用
+                    values = new object[] { model.Mobile, model.Mobile, model.Mobile, model.Password };
+                    break;
+                case 3:
+                    if (!CheckVerCode(model.Mail, model.VerCode, 1))
+                    {
+                        return ApiResult.Err("验证码不正确或已过期！");
+                    }
+                    names = new[]
+                    {
+                        nameof(IUser.Name),
+                        nameof(IUser.DisplayName),
+                        nameof(IUser.Mail),
+                        nameof(IUser.Password),
+                    };
+                    values = new object[] { model.Mail, model.Mail, model.Mail, model.Password };
+                    break;
+                case 0:
+                default:
+                    names = new[]
+                    {
+                        nameof(IUser.Name),
+                        nameof(IUser.DisplayName),
+                        nameof(IUser.Password),
+                    };
+                    values = new object[] { model.UserName, model.UserName, model.Password };
+                    break;
+            }
+
+            var result = await _userService.CreateAsync(names, values);
 
             if (result.Succeeded)
             {
                 return ApiResult.Ok();
             }
 
-            return ApiResult.Err("注册失败");
+            return ApiResult.Err("注册失败:" + result.Errors.ToArray()[0].Description);
         }
 
         /// <summary>
@@ -132,7 +180,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpPost]
         [Route("GetToken")]
         [AllowAnonymous]
-        public async Task<ActionResult> GetTokenAsync([FromForm]string grant_type, [FromForm]string code, [FromForm]string client_id, [FromForm]string redirect_uri)
+        public async Task<ActionResult> GetTokenAsync([FromForm] string grant_type, [FromForm] string code, [FromForm] string client_id, [FromForm] string redirect_uri)
         {
             #region 获取token
             var tokenEndpoint = _oAuthConfiguration.Authority.EnsureEnd("/") + "connect/token";
@@ -147,7 +195,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             requestMessage.Headers.Add("Authorization", Request.Headers["Authorization"].ToString());
 
-            var backchannel =  _clientFactory.CreateClient();
+            var backchannel = _clientFactory.CreateClient();
             var responseMessage = await backchannel.SendAsync(requestMessage);
 
             var contentMediaType = responseMessage.Content.Headers.ContentType?.MediaType;
@@ -270,6 +318,10 @@ namespace Easy.Admin.Areas.Admin.Controllers
             return Redirect(returnUrl);
         }
 
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <returns></returns>
         [HttpPost()]
         [Route("Logout")]
         public async Task<ApiResult> Logout()
@@ -277,6 +329,44 @@ namespace Easy.Admin.Areas.Admin.Controllers
             await _userService.SignOutAsync();
 
             return ApiResult.Ok();
+        }
+
+        /// <summary>
+        /// 根据类型获取验证码
+        /// </summary>
+        /// <param name="key">手机或邮箱</param>
+        /// <param name="type">类型，0-手机，1-邮箱</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("[action]")]
+        public ApiResult GetVerCode(string key, int type)
+        {
+            switch (type)
+            {
+                case 1:
+                    VerCodeHelper.MailSendVerCode(key);
+                    break;
+                case 0:
+                default:
+                    VerCodeHelper.PhoneSendVerCode(key);
+                    break;
+            }
+
+            return ApiResult.Ok(true);
+        }
+
+        /// <summary>
+        /// 检查验证码
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="code"></param>
+        /// <param name="type">类型，0-手机，1-邮箱</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("[action]")]
+        public bool CheckVerCode(string key, string code, int type)
+        {
+            return VerCodeHelper.CheckVerCode(key, code, type);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Easy.Admin.Services
 {
     public interface IUserService
     {
-        IUser CreateAsync(string[] names, object[] values);
+        Task<IdentityResult> CreateAsync(string[] names, object[] values);
         Task<IdentityResult> CreateAsync(string userName, string password);
         Task<IUser> FindByIdAsync(string userId);
 

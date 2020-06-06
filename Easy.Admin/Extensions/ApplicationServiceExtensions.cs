@@ -1,4 +1,5 @@
 ﻿using Easy.Admin.Services;
+using Easy.Admin.Services.Impl;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

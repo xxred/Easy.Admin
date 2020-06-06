@@ -17,6 +17,11 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [DisplayName("用户")]
     public class UserController : EntityController<ApplicationUser>
     {
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public override ApiResult Post(ApplicationUser value)
         {
             // 新增账号默认密码123456

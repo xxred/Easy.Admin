@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Easy.Admin.Common
+namespace Easy.Admin.Services.Impl
 {
-    public interface IFileUpload
-    {
-        string PutObject(string key, Stream content);
-    }
-
     public class DefaultFileUpload : IFileUpload
     {
         private readonly IWebHostEnvironment _env;

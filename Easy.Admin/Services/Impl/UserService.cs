@@ -11,7 +11,7 @@ using NewLife.Log;
 using NewLife.Model;
 using XCode.Membership;
 
-namespace Easy.Admin.Services
+namespace Easy.Admin.Services.Impl
 {
     public class UserService<TUser> : IUserService where TUser : User<TUser>, new()
     {
@@ -32,7 +32,7 @@ namespace Easy.Admin.Services
         /// <param name="names"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public virtual IUser CreateAsync(string[] names, object[] values)
+        public virtual async Task<IdentityResult> CreateAsync(string[] names, object[] values)
         {
             var user = new TUser();
 
@@ -41,8 +41,8 @@ namespace Easy.Admin.Services
                 user.SetItem(names[i], values[i]);
             }
 
-            _userManager.CreateAsync(user, user.Password);
-            return user;
+            var result = await _userManager.CreateAsync(user, user.Password);
+            return result;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Easy.Admin.Services
         /// <returns></returns>
         public virtual async Task<IdentityResult> CreateAsync(string userName, string password)
         {
-            var user = new TUser {Name = userName};
+            var user = new TUser { Name = userName };
 
             var result = await _userManager.CreateAsync(user, password);
             return result;

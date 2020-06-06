@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <!--复制依赖的插件到本地-->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8</LangVersion>
     <UserSecretsId>79e66a00-f0b6-4a90-ba08-3ac212e4a57e</UserSecretsId>
     <!--默认web项目不可打包，设置此属性可打包-->
     <IsPackable>true</IsPackable>
