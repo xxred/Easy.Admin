@@ -76,8 +76,8 @@ namespace Easy.Admin
             // 添加文件上传
             services.AddDefaultFileUpload(options =>
             {
-                options.SaveFileDir = "UploadImages";
-                options.Url = "http://localhost:44336/";
+                options.SaveFileDir = Configuration["UploadFile:SaveFileDir"] ?? "UploadImages";
+                options.Url = Configuration["UploadFile:Url"] ?? "/";
             });
         }
 
