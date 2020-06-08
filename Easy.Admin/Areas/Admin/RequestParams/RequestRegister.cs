@@ -28,6 +28,11 @@
         public string VerCode { get; set; }
 
         /// <summary>
+        /// 国际区号，用于手机
+        /// </summary>
+        public string InternationalAreaCode { get; set; }
+
+        /// <summary>
         /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码
         /// </summary>
         public int Type { get; set; }

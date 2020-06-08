@@ -123,7 +123,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             {
                 case 1:
                 case 2:
-                    if (!CheckVerCode(model.Mobile, model.VerCode,0))
+                    if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode,0))
                     {
                         return ApiResult.Err("验证码不正确或已过期！");
                     }

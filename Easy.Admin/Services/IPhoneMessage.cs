@@ -8,7 +8,7 @@
         /// <summary>
         /// 发送
         /// </summary>
-        /// <param name="key">手机号</param>
+        /// <param name="key">手机号，带上国际区号</param>
         /// <param name="message">信息 </param>
         /// <returns></returns>
         void Send(string key, string message);
