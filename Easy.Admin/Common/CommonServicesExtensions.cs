@@ -6,6 +6,7 @@ using Easy.Admin.Services;
 using Easy.Admin.Services.Impl;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NewLife.Caching;
 
 namespace Easy.Admin.Common
 {
@@ -18,6 +19,7 @@ namespace Easy.Admin.Common
         /// <returns></returns>
         public static IServiceCollection AddCommonServices(this IServiceCollection services)
         {
+            services.AddSingleton<ICache, MemoryCache>();
             services.TryAddSingleton<IRedisService, RedisService>();
 
             return services;
