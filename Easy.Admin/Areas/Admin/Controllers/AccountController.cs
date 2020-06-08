@@ -339,6 +339,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("[action]")]
+        [AllowAnonymous]
         public ApiResult GetVerCode(string key, int type)
         {
             switch (type)
@@ -364,6 +365,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("[action]")]
+        [AllowAnonymous]
         public bool CheckVerCode(string key, string code, int type)
         {
             return VerCodeHelper.CheckVerCode(key, code, type);
