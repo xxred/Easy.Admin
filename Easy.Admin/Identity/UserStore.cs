@@ -21,6 +21,9 @@ namespace Easy.Admin.Identity
                 throw new ArgumentNullException(nameof(user));
             }
 
+            user.Enable = true;
+            user.RegisterTime = DateTime.Now;
+
             user.Save();
 
             return Task.FromResult(IdentityResult.Success);
@@ -139,6 +142,8 @@ namespace Easy.Admin.Identity
                 throw new ArgumentNullException(nameof(user));
             }
 
+            user.UpdateTime = DateTime.Now;
+
             user.Save();
 
             return Task.FromResult(IdentityResult.Success);
@@ -171,7 +176,7 @@ namespace Easy.Admin.Identity
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            user.Password = passwordHash;
+            //user.Password = passwordHash; // 这里不操作，留给X组件处理
             return Task.CompletedTask;
         }
 

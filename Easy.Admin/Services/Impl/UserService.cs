@@ -57,8 +57,19 @@ namespace Easy.Admin.Services.Impl
             return result;
         }
 
+        public virtual async Task<IUser> FindByEmailAsync(string email) => await _userManager.FindByEmailAsync(email);
 
         public virtual async Task<IUser> FindByIdAsync(string userId) => await _userManager.FindByIdAsync(userId);
+
+        public virtual async Task<IUser> FindByLoginAsync(string loginProvider, string providerKey)
+            => await _userManager.FindByLoginAsync(loginProvider, providerKey);
+
+        public virtual async Task<IUser> FindByNameAsync(string name) => await _userManager.FindByNameAsync(name);
+
+        public virtual Task<IUser> FindByPhoneNumberAsync(string phoneNumber)
+        {
+            return Task.FromResult(User<TUser>.FindByMobile(phoneNumber) as IUser);
+        }
 
         /// <summary>
         /// 获取或创建用户
@@ -169,6 +180,20 @@ namespace Easy.Admin.Services.Impl
                 username, password, rememberMe, false);
 
             return result;
+        }
+
+        public async Task<SignInResult> LoginAsync(IUser user, string password, bool rememberMe = false)
+        {
+            var result = await _signInManager.PasswordSignInAsync(user as TUser, password, rememberMe, false);
+
+            return result;
+        }
+
+        public async Task<SignInResult> LoginAsync(IUser user)
+        {
+            await _signInManager.SignInAsync(user as TUser, false);
+
+            return SignInResult.Success;
         }
 
         public async Task SignOutAsync()

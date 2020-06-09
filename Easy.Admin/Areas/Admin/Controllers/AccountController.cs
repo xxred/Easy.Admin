@@ -40,7 +40,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
         public AccountController(IOptions<JwtBearerAuthenticationOptions> authenticationOptions,
             OAuthConfiguration oAuthConfiguration,
-            IHttpClientFactory clientFactory, IUserService userService, UserManager<ApplicationUser> i)
+            IHttpClientFactory clientFactory, IUserService userService)
         {
             _authenticationOptions = authenticationOptions.Value;
             _oAuthConfiguration = oAuthConfiguration;
@@ -108,7 +108,64 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
+        /// 登录，包含四种模式，设置参数Type选择
+        /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码，4-邮箱验证码
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<ApiResult> Login(RequestRegister model)
+        {
+            IUser user;
+            Microsoft.AspNetCore.Identity.SignInResult result;
+
+            switch (model.Type)
+            {
+                case 1:
+                    user = await _userService.FindByPhoneNumberAsync(model.Mobile);
+                    result = await _userService.LoginAsync(user, model.Password);
+                    break;
+                case 2:
+                    if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
+                    {
+                        return ApiResult.Err("验证码不正确或已过期！");
+                    }
+                    user = await _userService.FindByPhoneNumberAsync(model.Mobile);
+                    result = await _userService.LoginAsync(user);
+                    break;
+                case 3:
+                    user = await _userService.FindByEmailAsync(model.Mail);
+                    result = await _userService.LoginAsync(user, model.Password);
+                    break;
+                case 4:
+                    if (!CheckVerCode(model.Mail, model.VerCode, 1))
+                    {
+                        return ApiResult.Err("验证码不正确或已过期！");
+                    }
+                    user = await _userService.FindByEmailAsync(model.Mail);
+                    result = await _userService.LoginAsync(user);
+                    break;
+                case 0:
+                default:
+                    user = await _userService.FindByNameAsync(model.UserName);
+                    result = await _userService.LoginAsync(user, model.Password);
+                    break;
+            }
+
+            if (result.Succeeded)
+            {
+                var jwtToken = HttpContext.Features.Get<JwtToken>();
+                return ApiResult.Ok(jwtToken);
+            }
+
+            return ApiResult.Err("账号或密码错误");
+        }
+
+
+        /// <summary>
         /// 注册，包含四种模式，设置参数Type选择
+        /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码，4-邮箱验证码
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -123,7 +180,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             {
                 case 1:
                 case 2:
-                    if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode,0))
+                    if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
                     {
                         return ApiResult.Err("验证码不正确或已过期！");
                     }
@@ -138,6 +195,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                     values = new object[] { model.Mobile, model.Mobile, model.Mobile, model.Password };
                     break;
                 case 3:
+                case 4:
                     if (!CheckVerCode(model.Mail, model.VerCode, 1))
                     {
                         return ApiResult.Err("验证码不正确或已过期！");
@@ -332,9 +390,9 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
-        /// 根据类型获取验证码
+        /// 根据类型获取验证码。类型，0-手机，1-邮箱
         /// </summary>
-        /// <param name="key">手机或邮箱</param>
+        /// <param name="key">手机或邮箱，手机要带区号，比如8615777777777</param>
         /// <param name="type">类型，0-手机，1-邮箱</param>
         /// <returns></returns>
         [HttpGet]
@@ -357,7 +415,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
-        /// 检查验证码
+        /// 检查验证码。类型，0-手机，1-邮箱
         /// </summary>
         /// <param name="key"></param>
         /// <param name="code"></param>

@@ -44,6 +44,14 @@ namespace Easy.Admin
             {
                 options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
                 options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.UniqueName;
+
+                // 密码设置
+                var password = options.Password;
+                password.RequireDigit = false;
+                password.RequireLowercase = false;
+                password.RequiredUniqueChars = 0;
+                password.RequireNonAlphanumeric = false;
+                password.RequireUppercase = false;
             });
 
             // 添加身份验证

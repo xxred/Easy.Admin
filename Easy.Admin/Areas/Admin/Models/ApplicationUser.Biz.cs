@@ -56,6 +56,7 @@ namespace Easy.Admin.Areas.Admin.Models
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
+            base.Valid(isNew);
             // 在新插入数据或者修改了指定字段时进行修正
         }
 

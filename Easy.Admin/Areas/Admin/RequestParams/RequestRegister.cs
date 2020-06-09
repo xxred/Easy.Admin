@@ -33,7 +33,7 @@
         public string InternationalAreaCode { get; set; }
 
         /// <summary>
-        /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码
+        /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码，4-邮箱验证码
         /// </summary>
         public int Type { get; set; }
     }
