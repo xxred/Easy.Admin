@@ -8,7 +8,8 @@ namespace Easy.Admin.Identity
 {
     public class UserStore<TUser> :
         IUserPasswordStore<TUser>,
-        IUserStore<TUser>
+        IUserEmailStore<TUser>,
+        IUserPhoneNumberStore<TUser>
         where TUser : User<TUser>, new()
     {
         #region IUserStore
@@ -180,6 +181,80 @@ namespace Easy.Admin.Identity
             return Task.CompletedTask;
         }
 
+        #endregion
+
+        #region IUserEmailStore
+        public Task SetEmailAsync(TUser user, string email, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            user.Mail = email;
+            return Task.CompletedTask;
+        }
+
+        public Task<string> GetEmailAsync(TUser user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(user.Mail);
+        }
+
+        public Task<bool> GetEmailConfirmedAsync(TUser user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(false);
+        }
+
+        public Task SetEmailConfirmedAsync(TUser user, bool confirmed, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.CompletedTask;
+        }
+
+        public Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var user = User<TUser>.FindByMail(normalizedEmail);
+            return Task.FromResult(user);
+        }
+
+        public Task<string> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(user.Mail);
+        }
+
+        public Task SetNormalizedEmailAsync(TUser user, string normalizedEmail, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            //user.Mail = normalizedEmail;
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
+        #region IUserPhoneNumberStore
+        public Task SetPhoneNumberAsync(TUser user, string phoneNumber, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            user.Mobile = phoneNumber;
+            return Task.CompletedTask;
+        }
+
+        public Task<string> GetPhoneNumberAsync(TUser user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(user.Mobile);
+        }
+
+        public Task<bool> GetPhoneNumberConfirmedAsync(TUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task SetPhoneNumberConfirmedAsync(TUser user, bool confirmed, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.CompletedTask;
+        }
         #endregion
     }
 }
