@@ -37,7 +37,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <summary>
         /// 是否超级管理员
         /// </summary>
-        public bool IsSupperAdmin => AppUser.Role.IsSystem;
+        public bool? IsSupperAdmin => AppUser?.Role.IsSystem;
 
 
         /// <summary>
