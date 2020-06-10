@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,8 @@ namespace Easy.Admin.Services
 
         Task<IManageUser> GetOrCreateUserAsync(ClaimsPrincipal user, AuthenticationProperties properties,
             bool createUserOnOAuthLogin);
+
+        Task UpdateAsync(IDictionary<string, object> dic);
 
         Task<SignInResult> LoginAsync(string username, string password, bool rememberMe = false);
 

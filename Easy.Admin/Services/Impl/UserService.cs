@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using NewLife.Log;
 using NewLife.Model;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using XCode.Membership;
 
 namespace Easy.Admin.Services.Impl
@@ -170,6 +172,26 @@ namespace Easy.Admin.Services.Impl
                 }
             }
         }
+        #endregion
+
+        #region 更新
+        /// <summary>
+        /// 更新用户信息
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public async Task UpdateAsync(IDictionary<string, object> dic)
+        {
+            var user = new TUser();
+
+            foreach (var (key, value) in dic)
+            {
+                user.SetItem(key, value);
+            }
+
+            await _userManager.UpdateAsync(user);
+        }
+
         #endregion
 
         #region 登录和登出

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Areas.Admin.RequestParams;
+using Easy.Admin.Areas.Admin.ResponseParams;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.OAuthSignIn;
@@ -23,6 +24,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NewLife.Log;
+using NewLife.Model;
+using NewLife.Reflection;
 using NewLife.Serialization;
 using XCode.Membership;
 
@@ -63,24 +66,36 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Err("用户类型错误", 500);
             }
 
-            var data = new
-            {
-                identity.Avatar,
-                identity.DisplayName,
-                identity.ID,
-                identity.Name,
-                identity.RoleID,
-                identity.RoleIDs,
-                identity.Sex,
-                Roles = identity.Roles.Select(s => new
-                {
-                    s.ID,
-                    s.Name,
-                    s.Permission
-                })
-            };
+            var data = new ResponseUserInfo();
+            data.Copy(identity);
 
             return ApiResult.Ok(data);
+        }
+
+        /// <summary>
+        /// 更新用户信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("[action]")]
+        public ApiResult UpdateUserInfo(RequestUserInfo userInfo)
+        {
+            if (userInfo.ID < 1)
+            {
+                return ApiResult.Err("ID不正确！");
+            }
+
+            var u = AppUser;
+
+            if (IsSupperAdmin && u.ID == userInfo.ID)
+            {
+                _userService.UpdateAsync(userInfo.ToDictionary());
+            }
+            else
+            {
+                return ApiResult.Err("无权修改他人信息！");
+            }
+
+            return ApiResult.Ok(true);
         }
 
         /// <summary>
