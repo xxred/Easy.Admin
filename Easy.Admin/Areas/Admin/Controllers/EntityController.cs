@@ -30,9 +30,21 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpPost]
         [ApiAuthorizeFilter(PermissionFlags.Detail)]
         [DisplayName("搜索{type}")]
-        public virtual ApiResult<IList<TEntity>> Search([FromQuery]PageParameter p, [FromQuery]string key)
+        public virtual ApiResult<IList<TEntity>> Search([FromQuery] PageParameter p, [FromQuery] string key)
         {
-            var exp = Entity<TEntity>.SearchWhereByKey(key);
+            return GetList(p, key);
+        }
+
+        /// <summary>
+        /// 搜索列表数据，方便重载方法使用
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="key"></param>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        protected ApiResult<IList<TEntity>> GetList(PageParameter p, string key, WhereExpression exp = null)
+        {
+            exp &= Entity<TEntity>.SearchWhereByKey(key);
             var list = Entity<TEntity>.FindAll(exp, p);
             return ApiResult.Ok(list, p);
         }
@@ -45,7 +57,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet("{id}")]
         [ApiAuthorizeFilter(PermissionFlags.Detail)]
         [DisplayName("查看{type}")]
-        public virtual ApiResult<TEntity> Get([FromRoute]string id)
+        public virtual ApiResult<TEntity> Get([FromRoute] string id)
         {
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)
@@ -59,40 +71,40 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="value">需要添加的对象</param>
+        /// <param name="entity">需要添加的对象</param>
         [HttpPost]
         [ApiAuthorizeFilter(PermissionFlags.Insert)]
         [DisplayName("添加{type}")]
-        public virtual ApiResult Post([FromBody]TEntity value)
+        public virtual ApiResult Post([FromBody] TEntity entity)
         {
-            value.Insert();
+            entity.Insert();
 
             var key = Entity<TEntity>.Meta.Unique;
 
-            var id = value[key].ToInt();
+            var id = entity[key].ToInt();
             return ApiResult.Ok(id);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="value">需要更新的对象</param>
+        /// <param name="entity">需要更新的对象</param>
         /// <returns></returns>
         [HttpPut]
         [ApiAuthorizeFilter(PermissionFlags.Update)]
         [DisplayName("更新{type}")]
-        public virtual ApiResult Put([FromBody]TEntity value)
+        public virtual ApiResult Put([FromBody] TEntity entity)
         {
             var key = Entity<TEntity>.Meta.Unique;
-            var entity = Entity<TEntity>.FindByKey(value[key]);
+            var m = Entity<TEntity>.FindByKey(entity[key]);
 
-            if (entity == null)
+            if (m == null)
             {
                 throw new ApiException(402, "未找到实体");
             }
 
-            value.Update();
-            var id = value[key];
+            entity.Update();
+            var id = entity[key];
             return ApiResult.Ok(id);
         }
 
@@ -103,7 +115,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpDelete("{id}")]
         [ApiAuthorizeFilter(PermissionFlags.Delete)]
         [DisplayName("删除{type}")]
-        public virtual ApiResult Delete([FromRoute]string id)
+        public virtual ApiResult Delete([FromRoute] string id)
         {
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)

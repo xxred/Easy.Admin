@@ -28,16 +28,16 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <summary>
         /// 当前用户
         /// </summary>
-        public IUser AppUser
+        protected IUser AppUser
         {
-            get => _appUser ?? (_appUser = HttpContext.Features.Get<IUser>());
+            get => _appUser ??= HttpContext.Features.Get<IUser>();
             set => _appUser = value;
         }
 
         /// <summary>
         /// 是否超级管理员
         /// </summary>
-        public bool? IsSupperAdmin => AppUser?.Role.IsSystem;
+        protected bool IsSupperAdmin => AppUser?.Role != null && AppUser.Role.IsSystem;
 
 
         /// <summary>
