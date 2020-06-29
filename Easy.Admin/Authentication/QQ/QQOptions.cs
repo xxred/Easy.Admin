@@ -26,7 +26,7 @@ namespace Easy.Admin.Authentication.QQ
             ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Sub, "openid");
             ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.GivenName, "nickname");
             ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Gender, "gender");
-            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Avatar, "figureurl_2");
+            ClaimActions.MapJsonKey(OAuthSignInAuthenticationDefaults.Avatar, "figureurl_qq_2");
 
             SignInScheme = OAuthSignInAuthenticationDefaults.AuthenticationScheme;
         }

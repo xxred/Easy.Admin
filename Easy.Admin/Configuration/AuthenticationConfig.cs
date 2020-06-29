@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Easy.Admin.Authentication;
+using Easy.Admin.Authentication.ExternalSignIn;
 using Easy.Admin.Authentication.Github;
 using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.OAuthSignIn;
@@ -49,6 +50,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     //options.CreateUserOnOAuthLogin = false;
                 })
+                // 处理移动端第三方登录
+                .AddExternalSignIn()
                 .AddJwtBearerSignIn(IdentityConstants.TwoFactorRememberMeScheme)
                 .AddJwtBearerSignIn(IdentityConstants.TwoFactorUserIdScheme);
 

@@ -96,9 +96,15 @@ namespace Easy.Admin.Services.Impl
                 uc = new UserConnect() { Provider = provider, OpenID = openid, Enable = true };
                 uc.Fill(user);
 
-                appUser = new TUser { Name = Guid.NewGuid().ToString().Substring(0, 8), Enable = true, RoleID = 4 }; // 角色id 4 为游客
+                appUser = new TUser
+                {
+                    Name = Guid.NewGuid().ToString().Substring(0, 8), 
+                    Enable = true, 
+                    RoleID = 4
+                }; // 角色id 4 为游客
 
-                var result = await _userManager.CreateAsync(appUser as TUser, "123456");
+                // 通过第三方登录创建的用户设置随机密码
+                var result = await _userManager.CreateAsync((TUser) appUser, Guid.NewGuid().ToString().Substring(0, 8));
 
                 if (!result.Succeeded)
                 {

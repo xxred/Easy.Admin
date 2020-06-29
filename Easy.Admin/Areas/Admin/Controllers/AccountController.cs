@@ -9,22 +9,19 @@ using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Areas.Admin.RequestParams;
 using Easy.Admin.Areas.Admin.ResponseParams;
-using Easy.Admin.Authentication;
+using Easy.Admin.Authentication.ExternalSignIn;
 using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Common;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
-using Easy.Admin.Filters;
 using Easy.Admin.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NewLife.Log;
-using NewLife.Model;
 using NewLife.Reflection;
 using NewLife.Serialization;
 using XCode.Membership;
@@ -359,6 +356,34 @@ namespace Easy.Admin.Areas.Admin.Controllers
             };
 
             return Task.FromResult((IActionResult)Challenge(props, provider));
+        }
+
+        /// <summary>
+        /// 第三方登录
+        /// </summary>
+        /// <param name="loginProvider">提供者</param>
+        /// <param name="providerKey">token</param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        public async Task<ApiResult> ExternalLogin(string loginProvider, string providerKey)
+        {
+            var props = new AuthenticationProperties
+            {
+                Items =
+                {
+                    {"scheme", loginProvider},
+                    {"providerKey", providerKey},
+                }
+            };
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity());
+
+            await HttpContext.SignInAsync(ExternalSignInDefaults.AuthenticationScheme, user, props);
+
+            var jwtToken = HttpContext.Features.Get<JwtToken>();
+
+            return ApiResult.Ok(jwtToken);
         }
 
         /// <summary>
