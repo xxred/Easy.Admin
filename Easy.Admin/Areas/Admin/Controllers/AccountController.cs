@@ -83,7 +83,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             var u = AppUser;
 
-            if (IsSupperAdmin != null && IsSupperAdmin.Value || u.ID == userInfo.ID)
+            if (IsSupperAdmin || u.ID == userInfo.ID)
             {
                 _userService.UpdateAsync(userInfo.ToDictionary());
             }
