@@ -417,6 +417,30 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
+        /// 解绑第三方账号
+        /// </summary>
+        /// <param name="id">绑定列表id</param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public ApiResult UnbindOAuth([FromQuery]string id)
+        {
+            var uc = UserConnect.FindByKey(id);
+            if (uc == null)
+            {
+                return ApiResult.Err("该绑定不存在");
+            }
+
+            if (!IsSupperAdmin && uc.UserID != AppUser.ID)
+            {
+                return ApiResult.Err("无权操作");
+            }
+
+            uc.Delete();
+
+            return ApiResult.Ok();
+        }
+
+        /// <summary>
         /// 登出
         /// </summary>
         /// <returns></returns>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Easy.Admin.Authentication.OAuthSignIn;
 using XCode;
 using XCode.Membership;
 
@@ -153,11 +154,12 @@ namespace Easy.Admin.Areas.Admin.Models
         /// <summary>填充用户</summary>
         public virtual void Fill(ClaimsPrincipal user)
         {
-            //var uc = this;
-            //if (user.HasClaim(h => h.Type == OAuthSignInAuthenticationDefaults.GivenName))
-            //    uc.NickName = user.FindFirstValue(OAuthSignInAuthenticationDefaults.GivenName);
-            //if (user.HasClaim(h => h.Type == OAuthSignInAuthenticationDefaults.Avatar))
-            //    uc.Avatar = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Avatar);
+            var uc = this;
+            if (user.HasClaim(h => h.Type == OAuthSignInAuthenticationDefaults.GivenName))
+                uc.NickName = user.FindFirstValue(OAuthSignInAuthenticationDefaults.GivenName);
+
+            if (user.HasClaim(h => h.Type == OAuthSignInAuthenticationDefaults.Avatar))
+                uc.Avatar = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Avatar);
         }
         #endregion
     }
