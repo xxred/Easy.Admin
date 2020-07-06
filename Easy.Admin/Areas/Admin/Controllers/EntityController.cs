@@ -42,7 +42,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="key"></param>
         /// <param name="exp"></param>
         /// <returns></returns>
-        protected ApiResult<IList<TEntity>> GetList(PageParameter p, string key, WhereExpression exp = null)
+        protected ApiResult<IList<TEntity>> GetList(PageParameter p, string key, Expression exp = null)
         {
             exp &= Entity<TEntity>.SearchWhereByKey(key);
             var list = Entity<TEntity>.FindAll(exp, p);
