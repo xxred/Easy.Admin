@@ -24,8 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 // //setting.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
                 settings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
 
-                //// 空值处理
-                //setting.NullValueHandling = NullValueHandling.Ignore;
+                // 空值处理
+                settings.NullValueHandling = NullValueHandling.Ignore;
 
                 // 最大序列化深度，包括请求传参的序列化深度，不可设置太小了
                 settings.MaxDepth = 5;

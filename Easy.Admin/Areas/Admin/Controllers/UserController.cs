@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using Easy.Admin.Entities;
+using Easy.Admin.Filters;
 #if DEBUG
 using Easy.Admin.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,10 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public override ApiResult Post(ApplicationUser value)
+        [HttpPost]
+        [ApiAuthorizeFilter(PermissionFlags.Insert)]
+        [DisplayName("添加")]
+        public override ApiResult<string> Post(ApplicationUser value)
         {
             // 新增账号默认密码123456
             value.Password = "123456".MD5();

@@ -12,6 +12,9 @@ using XCode.Membership;
 
 namespace Easy.Admin.Areas.Admin.Controllers
 {
+    /// <summary>
+    /// 角色
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [DisplayName("角色")]
@@ -34,7 +37,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// 相当于将这些子项当做实体的属性
         /// </remarks>
         /// <returns></returns>
-        public override ApiResult Put(ApplicationRole entity)
+        public override ApiResult<string> Put(ApplicationRole entity)
         {
             var model = ApplicationRole.FindByID(entity.ID);
             // 反射获取脏属性，得到修改的属性集合
@@ -94,7 +97,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             // 将权限项保存为字符串
             entity.Update();
 
-            return ApiResult.Ok(entity.ID);
+            return ApiResult.Ok(entity.ID.ToString());
         }
 
         bool GetBool(string name, string v)

@@ -53,14 +53,14 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("[action]")]
-        public ApiResult GetUserInfo()
+        public ApiResult<ResponseUserInfo> GetUserInfo()
         {
             //var principal = User;
             var identity = User.Identity as IUser;
 
             if (identity == null)
             {
-                return ApiResult.Err("用户类型错误", 500);
+                throw ApiException.Common("用户类型错误", 500);
             }
 
             var data = new ResponseUserInfo();
@@ -74,11 +74,11 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("[action]")]
-        public ApiResult UpdateUserInfo(RequestUserInfo userInfo)
+        public ApiResult<bool> UpdateUserInfo(RequestUserInfo userInfo)
         {
             if (userInfo.ID < 1)
             {
-                return ApiResult.Err("ID不正确！");
+                throw ApiException.Common("ID不正确！");
             }
 
             var u = AppUser;
@@ -89,7 +89,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
             else
             {
-                return ApiResult.Err("无权修改他人信息！");
+                throw ApiException.Common("无权修改他人信息！");
             }
 
             return ApiResult.Ok(true);
@@ -105,7 +105,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<JwtToken> Login([FromQuery] string username, [FromQuery] string password,
+        public async Task<ApiResult<JwtToken>> Login([FromQuery] string username, [FromQuery] string password,
             [FromQuery] bool rememberMe = false)
         {
             var result = await _userService.LoginAsync(username, password, rememberMe);
@@ -113,7 +113,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             if (result.Succeeded)
             {
                 var jwtToken = HttpContext.Features.Get<JwtToken>();
-                return jwtToken;
+                return ApiResult.Ok(jwtToken);
             }
 
             throw new ApiException(402, "用户名或密码错误");
@@ -127,7 +127,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<ApiResult> Login(RequestRegister model)
+        public async Task<ApiResult<JwtToken>> Login(RequestRegister model)
         {
             IUser user;
             Microsoft.AspNetCore.Identity.SignInResult result;
@@ -141,7 +141,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 2:
                     if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
                     {
-                        return ApiResult.Err("验证码不正确或已过期！");
+                        throw ApiException.Common("验证码不正确或已过期！");
                     }
                     user = await _userService.FindByPhoneNumberAsync(model.Mobile);
                     result = await _userService.LoginAsync(user);
@@ -153,7 +153,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 4:
                     if (!CheckVerCode(model.Mail, model.VerCode, 1))
                     {
-                        return ApiResult.Err("验证码不正确或已过期！");
+                        throw ApiException.Common("验证码不正确或已过期！");
                     }
                     user = await _userService.FindByEmailAsync(model.Mail);
                     result = await _userService.LoginAsync(user);
@@ -171,7 +171,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Ok(jwtToken);
             }
 
-            return ApiResult.Err("账号或密码错误");
+            throw ApiException.Common("账号或密码错误");
         }
 
 
@@ -183,7 +183,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<ApiResult> Register(RequestRegister model)
+        public async Task<ApiResult<string>> Register(RequestRegister model)
         {
             string[] names;
             object[] values;
@@ -194,7 +194,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 2:
                     if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
                     {
-                        return ApiResult.Err("验证码不正确或已过期！");
+                        throw ApiException.Common("验证码不正确或已过期！");
                     }
                     names = new[]
                     {
@@ -210,7 +210,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 4:
                     if (!CheckVerCode(model.Mail, model.VerCode, 1))
                     {
-                        return ApiResult.Err("验证码不正确或已过期！");
+                        throw ApiException.Common("验证码不正确或已过期！");
                     }
                     names = new[]
                     {
@@ -240,7 +240,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Ok();
             }
 
-            return ApiResult.Err("注册失败:" + result.Errors.ToArray()[0].Description);
+            throw ApiException.Common("注册失败:" + result.Errors.ToArray()[0].Description);
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public async Task<ApiResult> ExternalLogin(string loginProvider, string providerKey)
+        public async Task<ApiResult<JwtToken>> ExternalLogin(string loginProvider, string providerKey)
         {
             var props = new AuthenticationProperties
             {
@@ -422,17 +422,17 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="id">绑定列表id</param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public ApiResult UnbindOAuth([FromQuery]string id)
+        public ApiResult<string> UnbindOAuth([FromQuery]string id)
         {
             var uc = UserConnect.FindByKey(id);
             if (uc == null)
             {
-                return ApiResult.Err("该绑定不存在");
+                throw ApiException.Common("该绑定不存在");
             }
 
             if (!IsSupperAdmin && uc.UserID != AppUser.ID)
             {
-                return ApiResult.Err("无权操作");
+                throw ApiException.Common("无权操作");
             }
 
             uc.Delete();
@@ -446,7 +446,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpPost()]
         [Route("Logout")]
-        public async Task<ApiResult> Logout()
+        public async Task<ApiResult<string>> Logout()
         {
             await _userService.SignOutAsync();
 
@@ -462,7 +462,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("[action]")]
         [AllowAnonymous]
-        public ApiResult GetVerCode(string key, int type)
+        public ApiResult<bool> GetVerCode(string key, int type)
         {
             switch (type)
             {
