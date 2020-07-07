@@ -98,6 +98,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 }
             });
 
+            services.AddSwaggerGenNewtonsoftSupport(); // explicit opt-in - needs to be placed after AddSwaggerGen()
         }
     }
 }
