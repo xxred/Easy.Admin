@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Entities;
+using Easy.Admin.Localization.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using NewLife.Log;
 using NewLife.Model;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -19,12 +21,16 @@ namespace Easy.Admin.Services.Impl
     {
         private readonly UserManager<TUser> _userManager;
         private readonly SignInManager<TUser> _signInManager;
+        /// <summary>
+        /// 用于请求的语言定位器
+        /// </summary>
+        private IStringLocalizer<Request> _requestLocalizer;
 
-        public UserService(UserManager<TUser> userManager, SignInManager<TUser> signInManager
-            )
+        public UserService(UserManager<TUser> userManager, SignInManager<TUser> signInManager, IStringLocalizer<Request> requestLocalizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _requestLocalizer = requestLocalizer;
         }
 
         #region 查找或创建
@@ -90,7 +96,7 @@ namespace Easy.Admin.Services.Impl
             {
                 if (!createUserOnOAuthLogin)
                 {
-                    throw ApiException.Common("用户不存在，请联系管理员");
+                    throw ApiException.Common(_requestLocalizer["The user does not exist, please contact the administrator"]);
                 }
 
                 uc = new UserConnect() { Provider = provider, OpenID = openid, Enable = true };
@@ -108,7 +114,7 @@ namespace Easy.Admin.Services.Impl
 
                 if (!result.Succeeded)
                 {
-                    throw ApiException.Common($"创建用户失败：{result.Errors.First().Description}");
+                    throw ApiException.Common($"{_requestLocalizer["Failed to create user"]}：{_requestLocalizer[result.Errors.First().Description]}");
                 }
 
                 uc.UserID = appUser.ID;
@@ -120,12 +126,12 @@ namespace Easy.Admin.Services.Impl
 
             if (appUser == null)
             {
-                throw ApiException.Common($"找不到该用户");
+                throw ApiException.Common(_requestLocalizer["The user was not found"]);
             }
 
             if (!appUser.Enable)
             {
-                throw ApiException.Common($"用户已被禁用");
+                throw ApiException.Common(_requestLocalizer["The user has been disabled"]);
             }
 
             // 填充用户信息

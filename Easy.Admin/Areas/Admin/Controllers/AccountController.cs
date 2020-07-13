@@ -15,10 +15,12 @@ using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Common;
 using Easy.Admin.Configuration;
 using Easy.Admin.Entities;
+using Easy.Admin.Localization.Resources;
 using Easy.Admin.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NewLife.Log;
@@ -38,9 +40,12 @@ namespace Easy.Admin.Areas.Admin.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly IUserService _userService;
 
+
+
         public AccountController(IOptions<JwtBearerAuthenticationOptions> authenticationOptions,
             OAuthConfiguration oAuthConfiguration,
-            IHttpClientFactory clientFactory, IUserService userService)
+            IHttpClientFactory clientFactory, IUserService userService
+            )
         {
             _authenticationOptions = authenticationOptions.Value;
             _oAuthConfiguration = oAuthConfiguration;
@@ -60,7 +65,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (identity == null)
             {
-                throw ApiException.Common("用户类型错误", 500);
+                throw ApiException.Common(RequestLocalizer["User type error"], 500);
             }
 
             var data = new ResponseUserInfo();
@@ -78,7 +83,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         {
             if (userInfo.ID < 1)
             {
-                throw ApiException.Common("ID不正确！");
+                throw ApiException.Common(RequestLocalizer["Incorrect ID"]);
             }
 
             var u = AppUser;
@@ -89,7 +94,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
             else
             {
-                throw ApiException.Common("无权修改他人信息！");
+                throw ApiException.Common(RequestLocalizer["No authority"]);
             }
 
             return ApiResult.Ok(true);
@@ -105,7 +110,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpGet]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<ApiResult<JwtToken>> Login([FromQuery] string username, [FromQuery] string password,
+        public async Task<ApiResult<JwtToken>> Login([FromQuery] string username, [FromQuery] string password, [FromQuery] string culture = "en-US",
             [FromQuery] bool rememberMe = false)
         {
             var result = await _userService.LoginAsync(username, password, rememberMe);
@@ -116,7 +121,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Ok(jwtToken);
             }
 
-            throw new ApiException(402, "用户名或密码错误");
+            throw new ApiException(402, RequestLocalizer["Wrong account or password"]);
         }
 
         /// <summary>
@@ -124,10 +129,11 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码，4-邮箱验证码
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="culture">语言</param>
         /// <returns></returns>
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<ApiResult<JwtToken>> Login(RequestRegister model)
+        public async Task<ApiResult<JwtToken>> Login(RequestRegister model, [FromQuery] string culture)
         {
             IUser user;
             Microsoft.AspNetCore.Identity.SignInResult result;
@@ -141,7 +147,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 2:
                     if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
                     {
-                        throw ApiException.Common("验证码不正确或已过期！");
+                        throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
                     }
                     user = await _userService.FindByPhoneNumberAsync(model.Mobile);
                     result = await _userService.LoginAsync(user);
@@ -153,7 +159,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 4:
                     if (!CheckVerCode(model.Mail, model.VerCode, 1))
                     {
-                        throw ApiException.Common("验证码不正确或已过期！");
+                        throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
                     }
                     user = await _userService.FindByEmailAsync(model.Mail);
                     result = await _userService.LoginAsync(user);
@@ -171,7 +177,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Ok(jwtToken);
             }
 
-            throw ApiException.Common("账号或密码错误");
+            throw ApiException.Common(RequestLocalizer["Wrong account or password"]);
         }
 
 
@@ -180,10 +186,11 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// 0-用户名密码，1-手机密码，2-手机验证码，3-邮箱密码，4-邮箱验证码
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="culture">语言</param>
         /// <returns></returns>
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<ApiResult<string>> Register(RequestRegister model)
+        public async Task<ApiResult<string>> Register(RequestRegister model, [FromQuery] string culture)
         {
             string[] names;
             object[] values;
@@ -194,7 +201,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 2:
                     if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
                     {
-                        throw ApiException.Common("验证码不正确或已过期！");
+                        throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
                     }
                     names = new[]
                     {
@@ -210,7 +217,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 case 4:
                     if (!CheckVerCode(model.Mail, model.VerCode, 1))
                     {
-                        throw ApiException.Common("验证码不正确或已过期！");
+                        throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
                     }
                     names = new[]
                     {
@@ -240,7 +247,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Ok();
             }
 
-            throw ApiException.Common("注册失败:" + result.Errors.ToArray()[0].Description);
+            throw ApiException.Common(RequestLocalizer[result.Errors.ToArray()[0].Description]);
         }
 
         /// <summary>
@@ -295,7 +302,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                throw new ApiException(500, $"获取token失败：{message.Error}");
+                throw new ApiException(500, message.Error);
             }
             #endregion
 
@@ -340,7 +347,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             if (Url.IsLocalUrl(returnUrl) == false)
             {
                 // user might have clicked on a malicious link - should be logged
-                throw new Exception("invalid return URL");
+                throw ApiException.Common(RequestLocalizer["Invalid return URL"]);
             }
 
             // start challenge and roundtrip the return URL and scheme 
@@ -422,17 +429,17 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="id">绑定列表id</param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public ApiResult<string> UnbindOAuth([FromQuery]string id)
+        public ApiResult<string> UnbindOAuth([FromQuery] string id)
         {
             var uc = UserConnect.FindByKey(id);
             if (uc == null)
             {
-                throw ApiException.Common("该绑定不存在");
+                throw ApiException.Common(RequestLocalizer["Data not found"]);
             }
 
             if (!IsSupperAdmin && uc.UserID != AppUser.ID)
             {
-                throw ApiException.Common("无权操作");
+                throw ApiException.Common(RequestLocalizer["No authority"]);
             }
 
             uc.Delete();

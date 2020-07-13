@@ -62,7 +62,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)
             {
-                throw new ApiException(402, "未找到实体");
+                throw new ApiException(402, RequestLocalizer["Data not found"]);
             }
 
             return ApiResult<TEntity>.Ok(entity);
@@ -100,7 +100,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (m == null)
             {
-                throw new ApiException(402, "未找到实体");
+                throw new ApiException(402, RequestLocalizer["Data not found"]);
             }
 
             entity.Update();
@@ -120,7 +120,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             var entity = Entity<TEntity>.FindByKey(id);
             if (entity == null)
             {
-                throw new ApiException(402, "未找到实体");
+                throw new ApiException(402, RequestLocalizer["Data not found"]);
             }
             entity.Delete();
 

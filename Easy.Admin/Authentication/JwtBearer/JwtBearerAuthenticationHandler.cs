@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
+using Easy.Admin.Authentication.OAuthSignIn;
+using Easy.Admin.Localization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -35,13 +40,12 @@ namespace Easy.Admin.Authentication.JwtBearer
             }
 
             var authenticateResult = await Context.AuthenticateAsync(Scheme.Name + JwtBearerDefaults.AuthenticationScheme);
-
             //// 采用Bearer方案认证，认证失败直接返回，
             //if (!authenticateResult.Succeeded) return authenticateResult;
 
             // authenticateResult.Principal 后续会被设置到 Context.User，所以在这里直接设置Context.User不生效
             // 也不要在这里设置authenticateResult.Principal，后续中间件可能用到一些声明，所以这里不能设置
-
+            
             return authenticateResult;
         }
 
@@ -72,6 +76,7 @@ namespace Easy.Admin.Authentication.JwtBearer
             var identityProvider = "idp"; // JwtClaimTypes.IdentityProvider
             //var issuedAt = "iat"; // JwtClaimTypes.IssuedAt
             var authenticationTime = "auth_time"; // JwtClaimTypes.AuthenticationTime
+            var lang = OAuthSignInAuthenticationDefaults.Lang;
 
             if (!user.HasClaim(h => h.Type == subject))
             {
@@ -86,6 +91,11 @@ namespace Easy.Admin.Authentication.JwtBearer
             if (!user.HasClaim(h => h.Type == authenticationTime))
             {
                 identity.AddClaim(new Claim(authenticationTime, DateTime.Now.ToInt() + ""));
+            }
+
+            if (!user.HasClaim(h => h.Type == lang))
+            {
+                identity.AddClaim(new Claim(lang, CultureInfo.CurrentCulture.ToString()));
             }
 
             //identity.AddClaim(new Claim(issuedAt, DateTime.Now.ToInt() + "")); // JwtSecurityTokenHandler生成的token自带iat，所以不用

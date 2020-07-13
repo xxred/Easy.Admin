@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -51,7 +52,8 @@ namespace Easy.Admin.Authentication.OAuthSignIn
             var identity = new ClaimsIdentity(new[]
             {
                 new Claim(OAuthSignInAuthenticationDefaults.Sub, appUser.ID.ToString()),
-                new Claim(OAuthSignInAuthenticationDefaults.UniqueName, appUser.Name)
+                new Claim(OAuthSignInAuthenticationDefaults.UniqueName, appUser.Name),
+                new Claim(OAuthSignInAuthenticationDefaults.Lang, CultureInfo.CurrentCulture.ToString())
             }, properties.Items["scheme"]);
 
             var securityToken = handler.CreateToken(new SecurityTokenDescriptor()

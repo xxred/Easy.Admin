@@ -33,5 +33,10 @@ namespace Easy.Admin.Authentication.OAuthSignIn
         /// 头像地址
         /// </summary>
         public const string Avatar = "avatar";
+
+        /// <summary>
+        /// 语言
+        /// </summary>
+        public const string Lang = "lang";
     }
 }

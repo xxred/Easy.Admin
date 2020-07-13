@@ -35,11 +35,34 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Admin\Models\Config\**" />
+    <Compile Remove="Areas\Admin\Models\Log\**" />
+    <Compile Remove="Localization\Models\Config\**" />
+    <Compile Remove="Localization\Models\Log\**" />
     <Content Remove="appsettings*.json" Pack="false" />
+    <Content Remove="Areas\Admin\Models\Config\**" />
+    <Content Remove="Areas\Admin\Models\Log\**" />
+    <Content Remove="Localization\Models\Config\**" />
+    <Content Remove="Localization\Models\Log\**" />
     <Content Remove="Properties\**" Pack="false" />
     <Content Include="appsettings*.json" Pack="false" />
     <Content Include="Properties\**" Pack="false" />
     <Content Include="wwwroot\**" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Areas\Admin\Models\Config\**" />
+    <EmbeddedResource Remove="Areas\Admin\Models\Log\**" />
+    <EmbeddedResource Remove="Localization\Models\Config\**" />
+    <EmbeddedResource Remove="Localization\Models\Log\**" />
+    <None Remove="Areas\Admin\Models\Config\**" />
+    <None Remove="Areas\Admin\Models\Log\**" />
+    <None Remove="Localization\Models\Config\**" />
+    <None Remove="Localization\Models\Log\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Areas\Admin\Models\aBuild.log" />
   </ItemGroup>
 
 
@@ -50,8 +73,8 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.4" />
-    <PackageReference Include="NewLife.Core" Version="8.7.2020.501" />
-    <PackageReference Include="NewLife.XCode" Version="9.17.2020.501" />
+    <PackageReference Include="NewLife.Core" Version="8.8.2020.705-beta" />
+    <PackageReference Include="NewLife.XCode" Version="9.18.2020.705-beta" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1" />
   </ItemGroup>
@@ -59,14 +82,18 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
     <ItemGroup>
-    <None Update="Areas\Admin\Models\aBuild.log">
+    <None Update="Areas\Admin\Models\aBuild.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>aBuild.log</LastGenOutput>
+    </None>
+    <None Update="Localization\Models\aBuild.log">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>aBuild.tt</DependentUpon>
     </None>
-    <None Update="Areas\Admin\Models\aBuild.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
+    <None Update="Localization\Models\aBuild.tt">
       <LastGenOutput>aBuild.log</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
     </None>
   </ItemGroup>
     <ItemGroup>

@@ -11,11 +11,13 @@ using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Authentication.QQ;
 using Easy.Admin.Entities;
+using Easy.Admin.Localization.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NewLife.Reflection;
@@ -29,12 +31,14 @@ namespace Easy.Admin.Authentication.ExternalSignIn
     public class ExternalSignInHandler : SignInAuthenticationHandler<JwtBearerAuthenticationOptions>
     {
         private readonly IHttpClientFactory _clientFactory;
+        private IStringLocalizer<Request> _requestLocalizer;
 
         public ExternalSignInHandler(IOptionsMonitor<JwtBearerAuthenticationOptions> options,
-            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IHttpClientFactory clientFactory)
+            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IHttpClientFactory clientFactory, IStringLocalizer<Request> requestLocalizer)
             : base(options, logger, encoder, clock)
         {
             _clientFactory = clientFactory;
+            _requestLocalizer = requestLocalizer;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -52,13 +56,14 @@ namespace Easy.Admin.Authentication.ExternalSignIn
             var scheme = properties.Items["scheme"];
             //var providerKey = properties.Items["providerKey"];
             
+            // TODO 此处做成可拓展，通过注入获取
             switch (scheme)
             {
                 case "QQ":
                     await QQHandler(user, properties);
                     break;
                 default:
-                    throw ApiException.Common("不支持该类型登录");
+                    throw ApiException.Common(_requestLocalizer["The login type is not supported"]);
             }
 
             await Context.SignInAsync(OAuthSignInAuthenticationDefaults.AuthenticationScheme, user, properties);
@@ -97,7 +102,7 @@ namespace Easy.Admin.Authentication.ExternalSignIn
             var ret = userInfoPayload.RootElement.GetString("ret").ToInt();
             if (ret < 0)
             {
-                throw ApiException.Common($"登陆失败：{userInfoPayload.RootElement.GetString("msg")}");
+                throw ApiException.Common(_requestLocalizer[userInfoPayload.RootElement.GetString("msg")]);
             }
 
             var options = Context.RequestServices.GetRequiredService<IOptionsMonitor<QQOptions>>().CurrentValue;

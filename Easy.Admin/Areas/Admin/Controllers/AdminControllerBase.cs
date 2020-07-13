@@ -4,9 +4,12 @@ using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Common;
 using Easy.Admin.Entities;
 using Easy.Admin.Filters;
+using Easy.Admin.Localization.Resources;
 using Easy.Admin.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using NewLife.Data;
 using XCode.Membership;
 
@@ -22,9 +25,12 @@ namespace Easy.Admin.Areas.Admin.Controllers
     [EnableCors]
     public class AdminControllerBase : ControllerBase
     {
+        /// <summary>
+        /// 用于请求的语言定位器
+        /// </summary>
+        protected IStringLocalizer<Request> RequestLocalizer => HttpContext.RequestServices.GetRequiredService<IStringLocalizer<Request>>();
 
         private IUser _appUser;
-
         /// <summary>
         /// 当前用户
         /// </summary>
@@ -38,7 +44,6 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// 是否超级管理员
         /// </summary>
         protected bool IsSupperAdmin => AppUser?.Role != null && AppUser.Role.IsSystem;
-
 
         /// <summary>
         /// 返回可带分页的结果
@@ -72,14 +77,14 @@ namespace Easy.Admin.Areas.Admin.Controllers
         {
             if (!Request.HasFormContentType)
             {
-                return ApiResult.Err("没有表单内容");
+                return ApiResult.Err(RequestLocalizer["There is no form content"]);
             }
 
             var files = Request.Form.Files;
 
             if (files.Count < 1)
             {
-                return ApiResult.Err("没有找到上传的文件");
+                return ApiResult.Err(RequestLocalizer["The uploaded file was not found"]);
             }
 
             var keyBase = $"{keyPrefix ?? ""}/{DateTime.Now:yyyy/MM/dd}/".TrimStart('/');

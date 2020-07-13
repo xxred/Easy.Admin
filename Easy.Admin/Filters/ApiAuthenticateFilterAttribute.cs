@@ -7,12 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Entities;
+using Easy.Admin.Localization.Resources;
 using Easy.Admin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using NewLife.Log;
 using XCode.Membership;
 
@@ -29,6 +31,8 @@ namespace Easy.Admin.Filters
         /// <param name="context"></param>
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            var requestLocalizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<Request>>();
+
             var ctrl = (ControllerActionDescriptor)context.ActionDescriptor;
 
             //匿名不需要验证
@@ -44,7 +48,7 @@ namespace Easy.Admin.Filters
                 var content = new ApiResult<string>
                 {
                     Status = 203,
-                    Msg = "用户信息认证失败：你没有权限，或者掉线了"
+                    Msg = requestLocalizer["No login or login timeout"]
                 };
 
                 // 此处不能直接设置Response，要设置Result，后续过滤器才不会往下执行，下游判断Result不为空，直接执行结果，自动写入响应
@@ -58,8 +62,10 @@ namespace Easy.Admin.Filters
         bool SetPrincipal(AuthorizationFilterContext actionContext)
         {
             var context = actionContext.HttpContext;
+            var requestLocalizer = context.RequestServices.GetRequiredService<IStringLocalizer<Request>>();
+
             var userService =
-                (actionContext.HttpContext.RequestServices.GetRequiredService(typeof(IUserService)) as IUserService) ?? throw new ArgumentNullException("IUserService没有注册");
+                (actionContext.HttpContext.RequestServices.GetRequiredService(typeof(IUserService)) as IUserService) ?? throw ApiException.Common(requestLocalizer["IUserService is not registered"], 500);
             //获取浏览器的token
             //var token = context.Features.Get<JwtToken>()?.Token;
 
@@ -85,7 +91,7 @@ namespace Easy.Admin.Filters
             if (id == null)
             {
                 XTrace.WriteLine("context.User中找不到存放id的声明");
-                throw new ApiException(500, "context.User中找不到存放id的声明");
+                throw new ApiException(500, requestLocalizer["Could not find the id claim in context.User"]);
             }
 
             var user = userService.FindByIdAsync(id).Result;
@@ -98,7 +104,7 @@ namespace Easy.Admin.Filters
             var ac = user;
 
             ////将搜索到的AccessToken映射到IIdentity，用户名，权限role
-            var iid = (IIdentity) ac;
+            var iid = (IIdentity)ac;
 
             // 角色列表
             var up = new GenericPrincipal(iid, new[] { iid.AuthenticationType });
