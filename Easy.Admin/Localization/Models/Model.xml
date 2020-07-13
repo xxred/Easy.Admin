@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Tables Version="9.16.7426.39094" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com http://www.newlifex.com/Model2020.xsd" NameSpace="Easy.Admin.Localization.Models" ConnName="EasyAdmin" Output="" BaseClass="Entity" ChineseFileName="True" IgnoreNameCase="True" xmlns="http://www.newlifex.com/Model2020.xsd">
+  <Table Name="Languages" Description="语言" DbType="SqlServer" RenderGenEntity="True">
+    <Columns>
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="LanguageCultureName" DataType="String" Description="语言文化名称" />
+      <Column Name="DisplayName" DataType="String" Master="True" Nullable="False" Description="语言展示名" />
+      <Column Name="EnglishName" DataType="String" Description="英语区域名" />
+      <Column Name="NativeName" DataType="String" Description="区域性名称" />
+      <Column Name="ISO639xValue" DataType="String" Description="全球语言标准码" />
+      <Column Name="Enable" DataType="Boolean" Description="启用" />
+    </Columns>
+    <Indexes>
+      <Index Columns="LanguageCultureName" Unique="True" />
+    </Indexes>
+  </Table>
+  <Table Name="LocalizationRecords" Description="本地化记录" DbType="SqlServer" RenderGenEntity="True">
+    <Columns>
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="Key" DataType="String" Master="True" Nullable="False" Description="关键字(根据此值换取相应语言文字)" />
+      <Column Name="ResourceKey" DataType="String" Description="资源关键字(将资源分类，方便管理)" />
+      <Column Name="Text" DataType="String" Length="2000" Description="文本" />
+      <Column Name="LocalizationCulture" DataType="String" Description="语言文化名称" />
+      <Column Name="CreateTime" DataType="DateTime" Description="添加时间" />
+      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+    </Columns>
+    <Indexes>
+      <Index Columns="Key,ResourceKey,LocalizationCulture" Unique="True" />
+      <Index Columns="ResourceKey" />
+    </Indexes>
+  </Table>
+</Tables>

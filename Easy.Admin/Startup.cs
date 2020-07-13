@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Common;
 using Easy.Admin.Configuration;
+using Easy.Admin.Localization;
 using Easy.Admin.ModelBinders;
 using Easy.Admin.Services.Impl;
 using Easy.Admin.SpaServices;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Easy.Admin
 {
@@ -57,12 +60,16 @@ namespace Easy.Admin
             // 添加身份验证
             services.ConfigAuthentication();
 
+            // 添加语言全球化
+            services.AddDbLocalization();
+
             services.AddControllers(options =>
             {
                 options.ModelBinderProviders.Insert(0, new PagerModelBinderProvider());
                 options.ModelBinderProviders.Insert(0, new EntityModelBinderProvider());
             })
-            .ConfigJsonOptions();
+                .AddDataAnnotationsLocalization()
+                .ConfigJsonOptions();
 
             // 文档
             services.ConfigSwaggerGen();
@@ -91,11 +98,16 @@ namespace Easy.Admin
 
             // 添加公共服务
             services.AddCommonServices();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            var locOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(locOptions.Value);
+
             var env = Environment;
 
             // 添加验证码模块
@@ -174,7 +186,7 @@ namespace Easy.Admin
             {
                 // 2020-06-01 增加前端文件部署路径配置
                 // 如果dist文件夹不存在，说明没有部署前端文件
-                var dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"]??"dist");
+                var dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"] ?? "dist");
                 if (!Directory.Exists(dist))
                 {
                     return;
