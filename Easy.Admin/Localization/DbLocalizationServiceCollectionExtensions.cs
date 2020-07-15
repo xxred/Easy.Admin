@@ -47,6 +47,7 @@ namespace Easy.Admin.Localization
                     options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
                     options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
                     options.RequestCultureProviders.Add(new DbRequestCultureProvider());
+                    options.RequestCultureProviders.Add(new AcceptLanguageHeaderRequestCultureProvider());
                 });
 
             return services;

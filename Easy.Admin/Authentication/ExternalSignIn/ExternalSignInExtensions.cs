@@ -6,6 +6,7 @@ using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.ExternalSignIn;
 using Easy.Admin.Authentication.OAuthSignIn;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Easy.Admin.Authentication.ExternalSignIn
 {
@@ -26,6 +27,7 @@ namespace Easy.Admin.Authentication.ExternalSignIn
         public static AuthenticationBuilder AddExternalSignIn(this AuthenticationBuilder builder, string authenticationScheme,
             string displayName, Action<JwtBearerAuthenticationOptions> configureOptions)
         {
+            builder.Services.TryAddSingleton<IExternalSignInHandler, ExternalSignInQQHandler>();
             return builder.AddScheme<JwtBearerAuthenticationOptions, ExternalSignInHandler>(authenticationScheme, displayName, configureOptions);
         }
     }

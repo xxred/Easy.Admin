@@ -32,13 +32,16 @@ namespace Easy.Admin.Authentication.ExternalSignIn
     {
         private readonly IHttpClientFactory _clientFactory;
         private IStringLocalizer<Request> _requestLocalizer;
+        private IEnumerable<IExternalSignInHandler> _handlers;
 
         public ExternalSignInHandler(IOptionsMonitor<JwtBearerAuthenticationOptions> options,
-            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IHttpClientFactory clientFactory, IStringLocalizer<Request> requestLocalizer)
+            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IHttpClientFactory clientFactory,
+            IStringLocalizer<Request> requestLocalizer, IEnumerable<IExternalSignInHandler> externalSignInHandlers)
             : base(options, logger, encoder, clock)
         {
             _clientFactory = clientFactory;
             _requestLocalizer = requestLocalizer;
+            _handlers = externalSignInHandlers;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -55,65 +58,22 @@ namespace Easy.Admin.Authentication.ExternalSignIn
         {
             var scheme = properties.Items["scheme"];
             //var providerKey = properties.Items["providerKey"];
-            
-            // TODO 此处做成可拓展，通过注入获取
-            switch (scheme)
+
+            var externalSignInContext = new ExternalSignInContext(_clientFactory, this, this.Context.RequestServices, _requestLocalizer, user, properties);
+
+            foreach (var handler in _handlers)
             {
-                case "QQ":
-                    await QQHandler(user, properties);
+                if (handler.CheckName(scheme))
+                {
+                    await handler.Handle(externalSignInContext);
                     break;
-                default:
-                    throw ApiException.Common(_requestLocalizer["The login type is not supported"]);
+                }
             }
 
             await Context.SignInAsync(OAuthSignInAuthenticationDefaults.AuthenticationScheme, user, properties);
         }
 
-        private async Task QQHandler(ClaimsPrincipal user, AuthenticationProperties properties)
-        {
-            var providerKey = properties.Items["providerKey"];
-
-            // 首先获取OpenId
-            var openIdEndpoint = QueryHelpers.AddQueryString(QQDefaults.OpenIdEndpoint,
-                "access_token", providerKey);
-            var backchannel = _clientFactory.CreateClient();
-
-            var openIdResponse = await backchannel.GetAsync(openIdEndpoint);
-            var openIdContent = await openIdResponse.Content.ReadAsStringAsync();
-            openIdContent = openIdContent.TrimStart("callback( ").TrimEnd(" );\n");
-            var openIdPayload = JObject.Parse(openIdContent);
-
-            // 存储openid，绑定到系统的用户，作为系统在第三方的唯一标识
-            var openId = openIdPayload["openid"].Value<string>();
-            var clientId = openIdPayload["client_id"].Value<string>();
-            var tokenRequestParameters = new Dictionary<string, string>()
-            {
-                { "access_token", providerKey },
-                { "oauth_consumer_key", clientId },
-                { "openid", openId },
-            };
-            var endpoint = QueryHelpers.AddQueryString(QQDefaults.UserInformationEndpoint, tokenRequestParameters);
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpoint);
-            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var response = await backchannel.SendAsync(requestMessage);
-            var userInfoPayload = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-
-            var ret = userInfoPayload.RootElement.GetString("ret").ToInt();
-            if (ret < 0)
-            {
-                throw ApiException.Common(_requestLocalizer[userInfoPayload.RootElement.GetString("msg")]);
-            }
-
-            var options = Context.RequestServices.GetRequiredService<IOptionsMonitor<QQOptions>>().CurrentValue;
-
-            var identity = user.Identity as ClaimsIdentity;
-            RunClaimActions(options.ClaimActions, identity, userInfoPayload.RootElement);
-
-            identity?.AddClaim(new Claim(OAuthSignInAuthenticationDefaults.Sub, openId));
-        }
-
-        private void RunClaimActions(ClaimActionCollection claimActions, ClaimsIdentity claimsIdentity, JsonElement userData)
+        public void RunClaimActions(ClaimActionCollection claimActions, ClaimsIdentity claimsIdentity, JsonElement userData)
         {
             foreach (var action in claimActions)
             {
