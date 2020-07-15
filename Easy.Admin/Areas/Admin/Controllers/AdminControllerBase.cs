@@ -73,18 +73,18 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <param name="keyPrefix"></param>
         /// <returns></returns>
-        protected virtual ApiResult UploadFile(string keyPrefix)
+        protected virtual ApiResult<List<string>> UploadFile(string keyPrefix)
         {
             if (!Request.HasFormContentType)
             {
-                return ApiResult.Err(RequestLocalizer["There is no form content"]);
+                throw ApiException.Common(RequestLocalizer["There is no form content"]);
             }
 
             var files = Request.Form.Files;
 
             if (files.Count < 1)
             {
-                return ApiResult.Err(RequestLocalizer["The uploaded file was not found"]);
+                throw ApiException.Common(RequestLocalizer["The uploaded file was not found"]);
             }
 
             var keyBase = $"{keyPrefix ?? ""}/{DateTime.Now:yyyy/MM/dd}/".TrimStart('/');
