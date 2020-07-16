@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Easy.Admin.Areas.Admin.Models;
-using Easy.Admin.Common;
-using Easy.Admin.Entities;
+﻿using Easy.Admin.Entities;
 using Easy.Admin.Filters;
 using Easy.Admin.Localization.Resources;
 using Easy.Admin.Services;
@@ -11,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using NewLife.Data;
+using System;
+using System.Collections.Generic;
 using XCode.Membership;
 
 namespace Easy.Admin.Areas.Admin.Controllers
@@ -63,9 +61,20 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <param name="msg"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        protected ApiResult Error(String msg = null, Int32 status = 402)
+        protected ApiResult Error(string msg = null, int status = 402)
         {
             return ApiResult.Err(msg, status);
+        }
+
+        /// <summary>
+        /// 返回通用异常
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        protected ApiException Err(string msg, int status = 402)
+        {
+            return ApiException.Common(msg, status);
         }
 
         /// <summary>
