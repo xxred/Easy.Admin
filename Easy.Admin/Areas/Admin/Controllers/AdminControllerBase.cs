@@ -46,11 +46,20 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <summary>
         /// 返回可带分页的结果
         /// </summary>
+        /// <returns></returns>
+        protected new ApiResult<string> Ok()
+        {
+            return ApiResult.Ok();
+        }
+
+        /// <summary>
+        /// 返回可带分页的结果
+        /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="data"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-        protected ApiResult Ok<TResult>(TResult data, PageParameter p = null)
+        protected ApiResult<TResult> Ok<TResult>(TResult data, PageParameter p = null)
         {
             return ApiResult.Ok(data, p);
         }
