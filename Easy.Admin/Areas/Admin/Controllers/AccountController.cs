@@ -94,7 +94,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
             else
             {
-                throw ApiException.Common(RequestLocalizer["No authority"]);
+                throw ApiException.Common(RequestLocalizer["No permission"]);
             }
 
             return ApiResult.Ok(true);
@@ -439,7 +439,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (!IsSupperAdmin && uc.UserID != AppUser.ID)
             {
-                throw ApiException.Common(RequestLocalizer["No authority"]);
+                throw ApiException.Common(RequestLocalizer["No permission"]);
             }
 
             uc.Delete();

@@ -74,11 +74,10 @@ namespace Easy.Admin.Localization.Models
             {
                 new[] { "User type error","Request","zh-CN","用户类型错误" },
                 new[] { "Incorrect ID", "Request","zh-CN","ID不正确" },
-                new[] { "No authority", "Request","zh-CN","没有权限" },
+                new[] { "No permission", "Request","zh-CN","没有权限" },
                 new[] { "Wrong account or password", "Request","zh-CN","账号或密码错误" },
                 new[] { "The verification code is incorrect or expired", "Request","zh-CN","验证码不正确或已过期" },
                 new[] { "Invalid return URL", "Request","zh-CN","返回URL无效" },
-                new[] { "No authority", "Request","zh-CN","没有权限" },
                 new[] { "Data not found", "Request","zh-CN","找不到数据" },
                 new[] { "There is no form content", "Request","zh-CN","没有表单内容" },
                 new[] { "The uploaded file was not found", "Request","zh-CN","没有找到上传的文件" },
