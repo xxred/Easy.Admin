@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Controllers;
 using Easy.Admin.Filters;
 using Microsoft.AspNetCore.Authorization;
+using NewLife;
 using NewLife.Log;
 using XCode;
 using XCode.Membership;

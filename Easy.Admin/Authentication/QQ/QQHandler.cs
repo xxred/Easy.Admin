@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NewLife;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

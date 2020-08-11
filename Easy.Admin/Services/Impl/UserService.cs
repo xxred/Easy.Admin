@@ -10,6 +10,7 @@ using Easy.Admin.Localization.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Localization;
+using NewLife;
 using NewLife.Log;
 using NewLife.Model;
 using Swashbuckle.AspNetCore.SwaggerGen;

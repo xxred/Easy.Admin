@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
+using NewLife;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

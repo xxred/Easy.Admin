@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Easy.Admin.Authentication.Github
 {
     /*
-     * https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/
+     * https://docs.github.com/en/developers/apps/authorizing-oauth-apps
      */
     public static class GithubDefaults
     {

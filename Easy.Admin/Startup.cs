@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using NewLife;
 
 namespace Easy.Admin
 {
@@ -41,6 +42,8 @@ namespace Easy.Admin
         {
             // 添加数据库连接
             services.AddConnectionStr();
+
+            services.AddHttpContextAccessor();
 
             // 添加身份标识Identity
             services.AddAdminIdentity<ApplicationUser, ApplicationRole>(options =>

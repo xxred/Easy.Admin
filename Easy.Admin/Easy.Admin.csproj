@@ -73,8 +73,10 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.4" />
-    <PackageReference Include="NewLife.Core" Version="8.8.2020.705-beta" />
-    <PackageReference Include="NewLife.XCode" Version="9.18.2020.705-beta" />
+    <PackageReference Include="NewLife.Core" Version="8.9.2020.802" />
+    <PackageReference Include="NewLife.XCode" Version="9.19.2020.802" />
+    <PackageReference Include="RestSharp" Version="106.11.4" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1" />
   </ItemGroup>
