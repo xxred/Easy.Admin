@@ -3,6 +3,7 @@ using System.Reflection;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Extensions;
 using Easy.Admin.Identity;
+using Easy.Admin.Identity.IAM;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using XCode.Membership;
@@ -15,6 +16,11 @@ namespace Microsoft.Extensions.DependencyInjection
             where TApplicationUser : User<TApplicationUser>, new()
             where TApplicationRole : Role<TApplicationRole>, new()
         {
+            //services.AddIAMService<TApplicationUser>(options =>
+            //{
+            //    options.Url = "http://127.0.0.1:44337";
+            //});
+
             var builder = services.AddIdentityCore<TApplicationUser>(setupAction).AddRoles<TApplicationRole>().AddStores()
                 .AddUserManager()
                 .AddSignInManager()

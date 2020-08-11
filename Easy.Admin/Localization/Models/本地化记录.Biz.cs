@@ -86,6 +86,7 @@ namespace Easy.Admin.Localization.Models
                 new[] { "Could not find the id claim in context.User", "Request","zh-CN","context.User中找不到存放id的声明" },
                 new[] { "Password is incorrect", "Request","zh-CN","密码不正确" },
                 new[] { "The user does not exist, please contact the administrator", "Request","zh-CN","用户不存在，请联系管理员" },
+                new[] { "User already exists", "Request","zh-CN","用户已存在" },
                 new[] { "Failed to create user", "Request","zh-CN","创建用户失败" },
                 new[] { "The user was not found", "Request","zh-CN","找不到该用户" },
                 new[] { "The user has been disabled", "Request","zh-CN","用户已被禁用" },
