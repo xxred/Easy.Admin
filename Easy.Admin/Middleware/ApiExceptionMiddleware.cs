@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.Builder
                     context.Response.StatusCode = (Int32)HttpStatusCode.InternalServerError;
                 }
 
-                context.Response.Headers.Add(HeaderNames.ContentType, "application/json;charset=utf8");
+                context.Response.Headers.Add(HeaderNames.ContentType, "application/json;charset=utf-8");
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(data), Encoding.UTF8);
             }
 
