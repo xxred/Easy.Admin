@@ -248,7 +248,10 @@ namespace Easy.Admin.Areas.Admin.Controllers
                 return ApiResult.Ok();
             }
 
-            throw ApiException.Common(RequestLocalizer[result.Errors.ToArray()[0].Description]);
+            var err = result.Errors.ToArray()[0];
+            XTrace.WriteLine($"创建用户发生错误：{err.Description}");
+
+            throw ApiException.Common(RequestLocalizer[err.Code]);
         }
 
         /// <summary>

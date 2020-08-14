@@ -20,12 +20,12 @@ namespace Easy.Admin.Identity.IAM
         private readonly IAMOptions _options;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-        public IAMProvider(IHttpContextAccessor httpContextAccessor, IOptions<IAMOptions> options, IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions)
+        public IAMProvider(IHttpContextAccessor httpContextAccessor, IAMOptions options, IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions)
         {
             //_httpContextAccessor = httpContextAccessor;
             var options2 = mvcNewtonsoftJsonOptions?.Value ?? throw new ArgumentNullException(nameof(mvcNewtonsoftJsonOptions));
             _jsonSerializerSettings = options2.SerializerSettings;
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options;
             _restClient = new RestClient(_options.Url);
             _restClient.UseNewtonsoftJson(_jsonSerializerSettings);
 

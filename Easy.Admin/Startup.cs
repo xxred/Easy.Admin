@@ -5,6 +5,7 @@ using System.IO;
 using Easy.Admin.Areas.Admin.Models;
 using Easy.Admin.Common;
 using Easy.Admin.Configuration;
+using Easy.Admin.Identity.IAM;
 using Easy.Admin.Localization;
 using Easy.Admin.ModelBinders;
 using Easy.Admin.Services.Impl;
@@ -102,7 +103,7 @@ namespace Easy.Admin
             // 添加公共服务
             services.AddCommonServices();
 
-
+            services.AddIAMService();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -163,6 +164,8 @@ namespace Easy.Admin
 
             // 授权
             app.UseAuthorization();
+
+            app.UseIAMService();
 
             app.UseEndpoints(endpoints =>
             {

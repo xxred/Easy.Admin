@@ -66,16 +66,11 @@ namespace Easy.Admin.Filters
 
             var userService =
                 (actionContext.HttpContext.RequestServices.GetRequiredService(typeof(IUserService)) as IUserService) ?? throw ApiException.Common(requestLocalizer["IUserService is not registered"], 500);
-            //获取浏览器的token
-            //var token = context.Features.Get<JwtToken>()?.Token;
 
             if (!context.User.Identity.IsAuthenticated)
             {
                 return false;
             }
-
-            ////从数据库里拿token 验证宿主身份
-            //var ac = AccessToken.GetAccessToken(token.ToString());
 
             var id = context.User.FindFirst(JwtRegisteredClaimNames.NameId)?.Value;
             if (id == null)

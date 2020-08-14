@@ -1,26 +1,10 @@
-﻿using System;
+﻿using NewLife;
+using NewLife.Log;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Script.Serialization;
-using System.Xml.Serialization;
-using NewLife;
-using NewLife.Data;
-using NewLife.Log;
-using NewLife.Model;
-using NewLife.Reflection;
-using NewLife.Threading;
-using NewLife.Web;
 using XCode;
 using XCode.Cache;
-using XCode.Configuration;
-using XCode.DataAccessLayer;
 using XCode.Membership;
 
 namespace Easy.Admin.Localization.Models
@@ -46,13 +30,19 @@ namespace Easy.Admin.Localization.Models
 
         /// <summary>验证数据，通过抛出异常的方式提示验证失败。</summary>
         /// <param name="isNew">是否插入</param>
-        public override void Valid(Boolean isNew)
+        public override void Valid(bool isNew)
         {
             // 如果没有脏数据，则不需要进行任何处理
-            if (!HasDirty) return;
+            if (!HasDirty)
+            {
+                return;
+            }
 
             // 这里验证参数范围，建议抛出参数异常，指定参数名，前端用户界面可以捕获参数异常并聚焦到对应的参数输入框
-            if (Key.IsNullOrEmpty()) throw new ArgumentNullException(nameof(Key), "关键字不能为空！");
+            if (Key.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(Key), "关键字不能为空！");
+            }
 
             // 在新插入数据或者修改了指定字段时进行修正
             //if (!Dirtys[nameof(UpdateTime)]) UpdateTime = DateTime.Now;
@@ -66,9 +56,15 @@ namespace Easy.Admin.Localization.Models
         protected override void InitData()
         {
             // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
-            if (Meta.Session.Count > 0) return;
+            if (Meta.Session.Count > 0)
+            {
+                return;
+            }
 
-            if (XTrace.Debug) XTrace.WriteLine("开始初始化TEntity[本地化记录]数据……");
+            if (XTrace.Debug)
+            {
+                XTrace.WriteLine("开始初始化TEntity[本地化记录]数据……");
+            }
 
             var data = new[]
             {
@@ -87,6 +83,7 @@ namespace Easy.Admin.Localization.Models
                 new[] { "Password is incorrect", "Request","zh-CN","密码不正确" },
                 new[] { "The user does not exist, please contact the administrator", "Request","zh-CN","用户不存在，请联系管理员" },
                 new[] { "User already exists", "Request","zh-CN","用户已存在" },
+                new[] { "DuplicateUserName", "Request","zh-CN","用户名重复" },
                 new[] { "Failed to create user", "Request","zh-CN","创建用户失败" },
                 new[] { "The user was not found", "Request","zh-CN","找不到该用户" },
                 new[] { "The user has been disabled", "Request","zh-CN","用户已被禁用" },
@@ -94,15 +91,20 @@ namespace Easy.Admin.Localization.Models
 
             foreach (var item in data)
             {
-                var entity = new TEntity();
-                entity.Key = item[0];
-                entity.ResourceKey = item[1];
-                entity.LocalizationCulture = item[2];
-                entity.Text = item[3];
+                var entity = new TEntity
+                {
+                    Key = item[0],
+                    ResourceKey = item[1],
+                    LocalizationCulture = item[2],
+                    Text = item[3]
+                };
                 entity.Insert();
             }
 
-            if (XTrace.Debug) XTrace.WriteLine("完成初始化TEntity[本地化记录]数据！");
+            if (XTrace.Debug)
+            {
+                XTrace.WriteLine("完成初始化TEntity[本地化记录]数据！");
+            }
         }
 
         ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
@@ -127,12 +129,18 @@ namespace Easy.Admin.Localization.Models
         /// <summary>根据编号查找</summary>
         /// <param name="id">编号</param>
         /// <returns>实体对象</returns>
-        public static TEntity FindByID(Int32 id)
+        public static TEntity FindByID(int id)
         {
-            if (id <= 0) return null;
+            if (id <= 0)
+            {
+                return null;
+            }
 
             // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.ID == id);
+            if (Meta.Session.Count < 1000)
+            {
+                return Meta.Cache.Find(e => e.ID == id);
+            }
 
             // 单对象缓存
             return Meta.SingleCache[id];
@@ -145,10 +153,13 @@ namespace Easy.Admin.Localization.Models
         /// <param name="resourceKey">资源关键字</param>
         /// <param name="localizationCulture">语言文化名称</param>
         /// <returns>实体对象</returns>
-        public static TEntity FindByKeyAndResourceKeyAndLocalizationCulture(String key, String resourceKey, String localizationCulture)
+        public static TEntity FindByKeyAndResourceKeyAndLocalizationCulture(string key, string resourceKey, string localizationCulture)
         {
             // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.Key == key && e.ResourceKey == resourceKey && e.LocalizationCulture == localizationCulture);
+            if (Meta.Session.Count < 1000)
+            {
+                return Meta.Cache.Find(e => e.Key == key && e.ResourceKey == resourceKey && e.LocalizationCulture == localizationCulture);
+            }
 
             return Find(_.Key == key & _.ResourceKey == resourceKey & _.LocalizationCulture == localizationCulture);
         }
@@ -156,10 +167,13 @@ namespace Easy.Admin.Localization.Models
         /// <summary>根据资源关键字查找</summary>
         /// <param name="resourceKey">资源关键字</param>
         /// <returns>实体列表</returns>
-        public static IList<TEntity> FindAllByResourceKey(String resourceKey)
+        public static IList<TEntity> FindAllByResourceKey(string resourceKey)
         {
             // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ResourceKey == resourceKey);
+            if (Meta.Session.Count < 1000)
+            {
+                return Meta.Cache.FindAll(e => e.ResourceKey == resourceKey);
+            }
 
             return FindAll(_.ResourceKey == resourceKey);
         }
@@ -186,14 +200,17 @@ namespace Easy.Admin.Localization.Models
         //}
 
         // Select Count(ID) as ID,ResourceKey From LocalizationRecords Where CreateTime>'2020-01-24 00:00:00' Group By ResourceKey Order By ID Desc limit 20
-        static readonly FieldCache<TEntity> _ResourceKeyCache = new FieldCache<TEntity>(__.ResourceKey)
+        private static readonly FieldCache<TEntity> _ResourceKeyCache = new FieldCache<TEntity>(__.ResourceKey)
         {
             //Where = _.CreateTime > DateTime.Today.AddDays(-30) & Expression.Empty
         };
 
         /// <summary>获取资源关键字列表，字段缓存10分钟，分组统计数据最多的前20种，用于魔方前台下拉选择</summary>
         /// <returns></returns>
-        public static IDictionary<String, String> GetResourceKeyList() => _ResourceKeyCache.FindAllName();
+        public static IDictionary<string, string> GetResourceKeyList()
+        {
+            return _ResourceKeyCache.FindAllName();
+        }
         #endregion
 
         #region 业务操作

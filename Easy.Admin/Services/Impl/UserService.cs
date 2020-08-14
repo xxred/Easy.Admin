@@ -219,14 +219,24 @@ namespace Easy.Admin.Services.Impl
 
         public async Task<SignInResult> LoginAsync(IUser user, string password, bool rememberMe = false)
         {
-            var result = await _signInManager.PasswordSignInAsync(user as TUser, password, rememberMe, false);
+            if (!(user is TUser u))
+            {
+                throw ApiException.Common(_requestLocalizer["The user was not found"]);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(u, password, rememberMe, false);
 
             return result;
         }
 
         public async Task<SignInResult> LoginAsync(IUser user)
         {
-            await _signInManager.SignInAsync(user as TUser, false);
+            if (!(user is TUser u))
+            {
+                throw ApiException.Common(_requestLocalizer["The user was not found"]);
+            }
+
+            await _signInManager.SignInAsync(u, false);
 
             return SignInResult.Success;
         }
