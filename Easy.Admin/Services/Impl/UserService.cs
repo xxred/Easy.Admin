@@ -38,8 +38,8 @@ namespace Easy.Admin.Services.Impl
         /// <summary>
         /// 创建用户并保存到数据库
         /// </summary>
-        /// <param name="names"></param>
-        /// <param name="values"></param>
+        /// <param name="names">字段名</param>
+        /// <param name="values">值</param>
         /// <returns></returns>
         public virtual async Task<IdentityResult> CreateAsync(string[] names, object[] values)
         {
@@ -200,6 +200,24 @@ namespace Easy.Admin.Services.Impl
             foreach (var (key, value) in dic)
             {
                 user.SetItem(key, value);
+            }
+
+            await _userManager.UpdateAsync(user);
+        }
+
+        /// <summary>
+        /// 更新用户信息
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public async Task UpdateAsync(string[] names, object[] values)
+        {
+            var user = new TUser();
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                user.SetItem(names[i], values[i]);
             }
 
             await _userManager.UpdateAsync(user);
