@@ -13,10 +13,5 @@ namespace Easy.Admin.Identity.IAM
         /// IAM服务地址
         /// </summary>
         public string Url { get; set; }
-
-        /// <summary>
-        /// 代理链接列表
-        /// </summary>
-        public IList<string> ProxyUrlList { get; set; }
     }
 }
