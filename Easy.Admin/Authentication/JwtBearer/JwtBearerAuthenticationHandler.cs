@@ -113,7 +113,19 @@ namespace Easy.Admin.Authentication.JwtBearer
 
             var encodedToken = "Bearer " + tokenValue;
 
-            var jwtToken = new JwtToken { Token = encodedToken };
+            var jwtToken = new JwtToken
+            {
+                Token = encodedToken,
+                Expires = newTokenExpiration,
+                UserInfo = new UserInfo
+                {
+                    Avatar = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Avatar),
+                    Gender = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Gender)?.ToInt(),
+                    Name = user.FindFirstValue(OAuthSignInAuthenticationDefaults.UniqueName),
+                    NickName = user.FindFirstValue(OAuthSignInAuthenticationDefaults.GivenName),
+                    UserID = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Sub)
+                }
+            };
 
             Context.Features[typeof(JwtToken)] = jwtToken;
             properties.Items[nameof(JwtToken)] = encodedToken;

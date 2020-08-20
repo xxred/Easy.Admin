@@ -68,8 +68,21 @@ namespace Easy.Admin.Authentication.OAuthSignIn
             var tokenValue = handler.WriteToken(securityToken);
 
             var encodedToken = "Bearer " + tokenValue;
+            var u = appUser as IUser;
 
-            var jwtToken = new JwtToken { Token = encodedToken };
+            var jwtToken = new JwtToken
+            {
+                Token = encodedToken,
+                Expires = newTokenExpiration,
+                UserInfo = new UserInfo
+                {
+                    Avatar = u?.Avatar,
+                    Gender = u?.Sex.ToInt(),
+                    Name = u?.Name,
+                    NickName = u?.DisplayName,
+                    UserID = u?.ID.ToString()
+                }
+            };
 
             Context.Features[typeof(JwtToken)] = jwtToken;
             properties.Items[nameof(JwtToken)] = encodedToken;

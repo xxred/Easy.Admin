@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Easy.Admin.Authentication.OAuthSignIn;
+using Microsoft.AspNetCore.Identity;
+using NewLife;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using XCode.Membership;
 
 namespace Easy.Admin.Identity
@@ -9,7 +14,8 @@ namespace Easy.Admin.Identity
     public class UserStore<TUser> :
         IUserPasswordStore<TUser>,
         IUserEmailStore<TUser>,
-        IUserPhoneNumberStore<TUser>
+        IUserPhoneNumberStore<TUser>,
+        IUserClaimStore<TUser>
         where TUser : User<TUser>, new()
     {
         #region IUserStore
@@ -254,6 +260,52 @@ namespace Easy.Admin.Identity
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.CompletedTask;
+        }
+        #endregion
+
+        #region IUserClaimStore
+        public Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            IList<Claim> claims = new List<Claim>();
+
+            if (!user.Avatar.IsNullOrWhiteSpace())
+            {
+                claims.Add(new Claim(OAuthSignInAuthenticationDefaults.Avatar, user.Avatar));
+            }
+
+            claims.Add(new Claim(OAuthSignInAuthenticationDefaults.Gender, user.Sex.ToInt().ToString()));
+
+            if (!user.DisplayName.IsNullOrWhiteSpace())
+            {
+                claims.Add(new Claim(OAuthSignInAuthenticationDefaults.GivenName, user.DisplayName));
+            }
+
+            return Task.FromResult(claims);
+        }
+
+        public Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }
