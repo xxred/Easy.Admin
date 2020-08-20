@@ -102,6 +102,58 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
+        /// 修改密码
+        /// Type:0-旧密码，1-手机验证码，2-邮箱验证码
+        /// 0-传新旧密码
+        /// 1-传新密码和验证码，区号，手机号
+        /// 2-传新密码和验证码，邮箱
+        /// </summary> 
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut("[action]")]
+        public ApiResult<bool> ChangePassword(RequestPassword model)
+        {
+            switch (model.Type)
+            {
+                case 0:
+                    if (AppUser.Password != model.OldPassword.MD5())
+                    {
+                        throw ApiException.Common(RequestLocalizer["The old password is incorrect"]);
+                    }
+                    break;
+                case 1:
+                    if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
+                    {
+                        throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
+                    }
+
+                    if (AppUser.Mobile != model.Mobile)
+                    {
+                        throw ApiException.Common(RequestLocalizer["Incorrect mobile phone number"]);
+                    }
+                    break;
+                case 2:
+                    if (!CheckVerCode(model.Mail, model.VerCode, 1))
+                    {
+                        throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
+                    }
+
+                    if (AppUser.Mail != model.Mail)
+                    {
+                        throw ApiException.Common(RequestLocalizer["Incorrect email address"]);
+                    }
+                    break;
+                default:
+                    throw ApiException.Common("Type类型不正确！");
+            }
+
+            AppUser.Password = model.NewPassword;
+            AppUser.Save();
+
+            return ApiResult.Ok(true);
+        }
+
+        /// <summary>
         /// 登录
         /// </summary>
         /// <param name="username"></param>
