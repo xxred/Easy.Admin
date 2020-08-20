@@ -87,6 +87,9 @@ namespace Easy.Admin.Localization.Models
                 new[] { "Failed to create user", "Request","zh-CN","创建用户失败" },
                 new[] { "The user was not found", "Request","zh-CN","找不到该用户" },
                 new[] { "The user has been disabled", "Request","zh-CN","用户已被禁用" },
+                new[] { "The old password is incorrect", "Request","zh-CN","旧密码不正确" },
+                new[] { "Incorrect mobile phone number", "Request","zh-CN","手机号码不正确" },
+                new[] { "Incorrect email address", "Request","zh-CN","电子邮箱不正确" },
             };
 
             foreach (var item in data)

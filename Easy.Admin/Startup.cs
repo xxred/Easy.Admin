@@ -159,13 +159,13 @@ namespace Easy.Admin
             // 跨域
             app.UseCors();
 
+            app.UseIAMService();
+
             // 身份认证
             app.UseAuthentication();
 
             // 授权
             app.UseAuthorization();
-
-            app.UseIAMService();
 
             app.UseEndpoints(endpoints =>
             {
