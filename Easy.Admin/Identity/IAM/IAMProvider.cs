@@ -8,6 +8,7 @@ using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using System;
 using System.Threading.Tasks;
+using Easy.Admin.Authentication.IAM;
 using XCode.Membership;
 
 namespace Easy.Admin.Identity.IAM
@@ -41,7 +42,6 @@ namespace Easy.Admin.Identity.IAM
                 .AddJsonBody(user);
             //req.UseNewtonsoftJson(_jsonSerializerSettings);
 
-            var resp1 = _restClient.Post<ApiResult<string>>(req);
             var resp = await _restClient.PostAsync<ApiResult<string>>(req);
 
             if (resp.Status == 0)

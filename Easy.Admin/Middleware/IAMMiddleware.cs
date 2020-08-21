@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Easy.Admin.Identity.IAM;
+﻿using Easy.Admin.Identity.IAM;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
+using Easy.Admin.Authentication.IAM;
 
 namespace Easy.Admin.Middleware
 {
@@ -37,7 +29,7 @@ namespace Easy.Admin.Middleware
                 }
 
                 // 请求不是注册登录相关的，在这里向授权中心认证token
-
+                await context.AuthenticateAsync(IAMAuthenticationDefaults.AuthenticationScheme);
             }
 
             await _next(context);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Easy.Admin.Authentication.IAM;
 using Easy.Admin.Identity.IAM.Endpoints;
 using Easy.Admin.Middleware;
 using Microsoft.AspNetCore.Builder;
@@ -30,11 +31,11 @@ namespace Easy.Admin.Identity.IAM
             configuration.Bind("IAM",options);
             services.TryAddSingleton(options);
 
-            services.AddSingleton<EndpointBase, ChangePasswordEndpoint>();
-            services.AddSingleton<EndpointBase, GetUserInfoEndpoint>();
-            services.AddSingleton<EndpointBase, LoginEndpoint>();
-            services.AddSingleton<EndpointBase, RegisterEndpoint>();
-            services.AddSingleton<EndpointBase, VerCodeEndpoint>();
+            services.AddScoped<EndpointBase, ChangePasswordEndpoint>();
+            //services.AddScoped<EndpointBase, GetUserInfoEndpoint>();
+            services.AddScoped<EndpointBase, LoginEndpoint>();
+            services.AddScoped<EndpointBase, RegisterEndpoint>();
+            services.AddScoped<EndpointBase, VerCodeEndpoint>();
 
             //services.TryAddScoped<IAMProvider>();
             //services.TryAddScoped<IUserStore<TUser>, IAMUserStore<TUser>>();

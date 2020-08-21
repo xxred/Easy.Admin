@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Easy.Admin.Authentication;
 using Easy.Admin.Authentication.ExternalSignIn;
 using Easy.Admin.Authentication.Github;
+using Easy.Admin.Authentication.IAM;
+using Easy.Admin.Authentication.IAMAuthentication;
 using Easy.Admin.Authentication.JwtBearer;
 using Easy.Admin.Authentication.OAuthSignIn;
 using Easy.Admin.Authentication.QQ;
@@ -15,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NewLife;
+using NewLife.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -25,7 +28,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection ConfigAuthentication(this IServiceCollection services)
         {
-            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            var serviceProvider = services.BuildServiceProvider();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
             // 身份验证
             var authenticationBuilder = services
@@ -54,7 +58,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 // 处理移动端第三方登录
                 .AddExternalSignIn()
                 .AddJwtBearerSignIn(IdentityConstants.TwoFactorRememberMeScheme)
-                .AddJwtBearerSignIn(IdentityConstants.TwoFactorUserIdScheme);
+                .AddJwtBearerSignIn(IdentityConstants.TwoFactorUserIdScheme)
+                .AddIAMAuthentication(options =>
+                {
+                    if (options == null) throw new ArgumentNullException(nameof(options));
+                    var options2 = serviceProvider.GetRequiredService<IAMOptions>() ?? new IAMOptions();
+                    options.Copy(options2);
+                });
 
             // 从设置中读取并设置OAuth客户端
             SetOAuthClient(authenticationBuilder, configuration);

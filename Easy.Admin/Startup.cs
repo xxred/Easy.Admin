@@ -61,6 +61,9 @@ namespace Easy.Admin
                 password.RequireUppercase = false;
             });
 
+            // 添加IAM服务
+            services.AddIAMService();
+
             // 添加身份验证
             services.ConfigAuthentication();
 
@@ -102,8 +105,6 @@ namespace Easy.Admin
 
             // 添加公共服务
             services.AddCommonServices();
-
-            services.AddIAMService();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

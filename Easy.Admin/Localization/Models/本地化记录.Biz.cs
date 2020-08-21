@@ -80,6 +80,7 @@ namespace Easy.Admin.Localization.Models
                 new[] { "The login type is not supported", "Request","zh-CN","不支持该登录类型" },
                 new[] { "No login or login timeout", "Request","zh-CN","没有登陆或登录超时" },
                 new[] { "Could not find the id claim in context.User", "Request","zh-CN","context.User中找不到存放id的声明" },
+                new[] { "Could not find the exp claim in token", "Request","zh-CN","Token中找不到存放exp的声明" },
                 new[] { "Password is incorrect", "Request","zh-CN","密码不正确" },
                 new[] { "The user does not exist, please contact the administrator", "Request","zh-CN","用户不存在，请联系管理员" },
                 new[] { "User already exists", "Request","zh-CN","用户已存在" },
@@ -90,6 +91,7 @@ namespace Easy.Admin.Localization.Models
                 new[] { "The old password is incorrect", "Request","zh-CN","旧密码不正确" },
                 new[] { "Incorrect mobile phone number", "Request","zh-CN","手机号码不正确" },
                 new[] { "Incorrect email address", "Request","zh-CN","电子邮箱不正确" },
+                new[] { "Server error", "Request","zh-CN","后台服务异常" },
             };
 
             foreach (var item in data)

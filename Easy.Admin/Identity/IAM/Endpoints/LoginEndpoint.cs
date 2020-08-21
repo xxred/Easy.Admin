@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
+using Easy.Admin.Authentication.IAM;
 using Easy.Admin.Entities;
+using Easy.Admin.Localization.Resources;
 using Easy.Admin.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,12 +26,14 @@ namespace Easy.Admin.Identity.IAM.Endpoints
         /// <inheritdoc />
         public override string Path => "/api/Account/Login";
         private readonly IUserService _userService;
+        private readonly IStringLocalizer<Request> _requestLocalizer;
 
-
-        public LoginEndpoint(IAMOptions options, IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions, IUserService userService)
+        public LoginEndpoint(IAMOptions options, IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions,
+            IUserService userService, IStringLocalizer<Request> requestLocalizer)
             : base(options, mvcNewtonsoftJsonOptions)
         {
             _userService = userService;
+            _requestLocalizer = requestLocalizer;
         }
 
         public override async Task ProcessAsync(HttpContext context)
@@ -37,7 +44,7 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
             if (resp.Content.Contains("Bearer"))
             {
-               await SaveToken(resp.Content);
+                await SaveToken(resp.Content);
             }
 
             await ExecuteAsync(context);
@@ -45,7 +52,14 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
         private async Task SaveToken(string content)
         {
-            var jwtToken = JsonConvert.DeserializeObject<JwtToken>(content);
+            var jwtTokenResult = JsonConvert.DeserializeObject<ApiResult<JwtToken>>(content);
+            if (jwtTokenResult.Status != 0)
+            {
+                throw ApiException.Common(jwtTokenResult.Msg);
+            }
+
+            var jwtToken = jwtTokenResult.Data;
+
             var idp = "IdentityServer4";
             var userInfo = jwtToken.UserInfo;
 
@@ -68,10 +82,15 @@ namespace Easy.Admin.Identity.IAM.Endpoints
             uc.AccessToken = jwtToken.Token;
             uc.Avatar = userInfo.Avatar;
             uc.NickName = userInfo.NickName;
-            uc.Expire = jwtToken.Expires ?? DateTime.Now.AddMinutes(15);
+            uc.Expire = jwtToken.Expires ?? GetExpire(jwtToken.Token);
             uc.Save();
         }
 
+        /// <summary>
+        /// 更新用户信息，不存在则创建
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <returns></returns>
         private async Task<IUser> UpdateUserAsync(UserInfo userInfo)
         {
             var user = await _userService.FindByNameAsync(userInfo.Name);
@@ -90,6 +109,28 @@ namespace Easy.Admin.Identity.IAM.Endpoints
             user = await _userService.FindByNameAsync(userInfo.Name);
 
             return user;
+        }
+
+        /// <summary>
+        /// 获取过期时间
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private DateTime GetExpire(string token)
+        {
+            token = token.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+
+            var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            var exp = jwtToken.Claims.FirstOrDefault(f => f.Type == "exp");
+
+            if (exp == null)
+            {
+                throw ApiException.Common(_requestLocalizer["Could not find the exp claim in token"], 500);
+            }
+
+            var d = new DateTime(1970, 1, 1, 0, 0, 0, DateTime.Now.Kind).AddSeconds(exp.Value.ToInt());
+
+            return d;
         }
     }
 }

@@ -135,6 +135,17 @@ namespace Easy.Admin.Areas.Admin.Models
             return Find(_.Provider == provider & _.OpenID == openid);
         }
 
+        /// <summary>根据accessToken查找</summary>
+        /// <param name="accessToken">token</param>
+        /// <returns>实体对象</returns>
+        public static TEntity FindByAccessToken(String accessToken)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.AccessToken == accessToken);
+
+            return Find(_.AccessToken == accessToken);
+        }
+
         /// <summary>根据用户查找</summary>
         /// <param name="userid">用户</param>
         /// <returns>实体列表</returns>
