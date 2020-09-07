@@ -27,7 +27,8 @@ namespace Easy.Admin.Services.Impl
         /// </summary>
         private IStringLocalizer<Request> _requestLocalizer;
 
-        public UserService(UserManager<TUser> userManager, SignInManager<TUser> signInManager, IStringLocalizer<Request> requestLocalizer)
+        public UserService(UserManager<TUser> userManager, SignInManager<TUser> signInManager, 
+            IStringLocalizer<Request> requestLocalizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -84,7 +85,7 @@ namespace Easy.Admin.Services.Impl
         /// 获取或创建用户
         /// </summary>
         /// <returns></returns>
-        public async Task<IManageUser> GetOrCreateUserAsync(ClaimsPrincipal user, AuthenticationProperties properties, bool createUserOnOAuthLogin)
+        public virtual async Task<IManageUser> GetOrCreateUserAsync(ClaimsPrincipal user, AuthenticationProperties properties, bool createUserOnOAuthLogin)
         {
             var provider = properties.Items["scheme"];
             var openid = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Sub);
@@ -193,7 +194,7 @@ namespace Easy.Admin.Services.Impl
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public async Task UpdateAsync(IDictionary<string, object> dic)
+        public virtual async Task UpdateAsync(IDictionary<string, object> dic)
         {
             var user = new TUser();
 
@@ -211,7 +212,7 @@ namespace Easy.Admin.Services.Impl
         /// <param name="names"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public async Task UpdateAsync(string[] names, object[] values)
+        public virtual async Task UpdateAsync(string[] names, object[] values)
         {
             var user = new TUser();
 
@@ -227,7 +228,7 @@ namespace Easy.Admin.Services.Impl
 
         #region 登录和登出
 
-        public async Task<SignInResult> LoginAsync(string username, string password, bool rememberMe = false)
+        public virtual async Task<SignInResult> LoginAsync(string username, string password, bool rememberMe = false)
         {
             var result = await _signInManager.PasswordSignInAsync(
                 username, password, rememberMe, false);
@@ -235,7 +236,7 @@ namespace Easy.Admin.Services.Impl
             return result;
         }
 
-        public async Task<SignInResult> LoginAsync(IUser user, string password, bool rememberMe = false)
+        public virtual async Task<SignInResult> LoginAsync(IUser user, string password, bool rememberMe = false)
         {
             if (!(user is TUser u))
             {
@@ -247,7 +248,7 @@ namespace Easy.Admin.Services.Impl
             return result;
         }
 
-        public async Task<SignInResult> LoginAsync(IUser user)
+        public virtual async Task<SignInResult> LoginAsync(IUser user)
         {
             if (!(user is TUser u))
             {
@@ -259,11 +260,18 @@ namespace Easy.Admin.Services.Impl
             return SignInResult.Success;
         }
 
-        public async Task SignOutAsync()
+        public virtual async Task SignOutAsync()
         {
             await _signInManager.SignOutAsync();
         }
 
+
+        public virtual Task DeleteAccountAsync(IUser user)
+        {
+            (user as TUser)?.Delete();
+
+            return Task.CompletedTask;
+        }
         #endregion
     }
 }

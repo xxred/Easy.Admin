@@ -117,5 +117,11 @@ namespace Easy.Admin.Services
         /// </summary>
         /// <returns></returns>
         Task SignOutAsync();
+
+        /// <summary>
+        /// 删除账号资料
+        /// </summary>
+        /// <returns></returns>
+        Task DeleteAccountAsync();
     }
 }

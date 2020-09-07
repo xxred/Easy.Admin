@@ -517,6 +517,18 @@ namespace Easy.Admin.Areas.Admin.Controllers
         }
 
         /// <summary>
+        /// 删除账号资料
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public async Task<ApiResult<string>> DeleteAccount()
+        {
+            await _userService.DeleteAccountAsync();
+
+            return ApiResult.Ok();
+        }
+
+        /// <summary>
         /// 根据类型获取验证码。类型，0-手机，1-邮箱
         /// </summary>
         /// <param name="key">手机或邮箱，手机要带区号，比如8615777777777</param>
