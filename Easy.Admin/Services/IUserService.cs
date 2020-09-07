@@ -122,6 +122,6 @@ namespace Easy.Admin.Services
         /// 删除账号资料
         /// </summary>
         /// <returns></returns>
-        Task DeleteAccountAsync();
+        Task DeleteAccountAsync(IUser user);
     }
 }

@@ -523,7 +523,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [HttpPost("[action]")]
         public async Task<ApiResult<string>> DeleteAccount()
         {
-            await _userService.DeleteAccountAsync();
+            await _userService.DeleteAccountAsync(AppUser);
 
             return ApiResult.Ok();
         }
