@@ -78,6 +78,7 @@ namespace Easy.Admin.Authentication.JwtBearer
             var result = await Authenticate(token);
             if (result.Status != 0)
             {
+                XTrace.WriteLine($"IAM中心请求认证结果异常：{result.ToJson()}");
                 throw ApiException.Common(result.Msg);
             }
 
