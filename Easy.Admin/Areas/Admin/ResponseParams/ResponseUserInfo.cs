@@ -25,25 +25,30 @@ namespace Easy.Admin.Areas.Admin.ResponseParams
         /// </summary>
         public string RoleName { get; set; }
 
-        private IRole[] _roles;
+        private Role[] _roles;
         /// <summary>
         /// 角色组
         /// </summary>
-        public IRole[] Roles
+        public Role[] Roles
         {
-            get => _roles?.Select(s =>
+            get => _roles;
+            set => _roles = value;
+        }
+
+        public void SetRoles(IRole[] roles)
+        {
+            Roles = roles?.Select(s =>
             {
                 var r = new Role();
                 r.Copy(s);
                 return r;
-            }).ToArray<IRole>();
-            set => _roles = value;
+            }).ToArray();
         }
 
         /// <summary>
         /// 角色
         /// </summary>
-        private class Role : IRole
+        public class Role : IRole
         {
             /// <summary>
             /// 角色ID

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -29,6 +30,7 @@ using Microsoft.IdentityModel.Tokens;
 using NewLife;
 using NewLife.Log;
 using NewLife.Serialization;
+using Newtonsoft.Json;
 using RestSharp;
 using XCode.Membership;
 
@@ -76,11 +78,20 @@ namespace Easy.Admin.Authentication.JwtBearer
 
             // 登录记录不存在，请求授权中心
             var result = await Authenticate(token);
+
+            if (result == null)
+            {
+                XTrace.WriteLine("请求授权中心失败");
+                throw ApiException.Common("Request authorization center failed", 500);
+            }
+
             if (result.Status != 0)
             {
                 XTrace.WriteLine($"IAM中心请求认证结果异常：{result.ToJson()}");
-                throw ApiException.Common(result.Msg);
+                throw ApiException.Common(result.Msg, result.Status);
             }
+
+            XTrace.WriteLine($"IAM中心请求认证后本地记录：{result.ToJson()}\\s\ntoken: {token}");
 
             return await LocalSignIn(result.Data, token);
         }
@@ -122,7 +133,7 @@ namespace Easy.Admin.Authentication.JwtBearer
             var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(OAuthSignInAuthenticationDefaults.Sub,uc.UserID.ToString()),
-            }));
+            }, Idp));
 
             var ticket = new AuthenticationTicket(user, Idp);
 
@@ -140,15 +151,15 @@ namespace Easy.Admin.Authentication.JwtBearer
             restClient.AddDefaultHeader("Authorization", token);
             var path = "/api/Account/GetUserInfo";
             var restRequest = new RestRequest(path);
-            var restResponse = await restClient.ExecuteAsync<ApiResult<ResponseUserInfo>>(restRequest);
+            var restResponse = await restClient.ExecuteAsync(restRequest);
 
             if (restResponse.StatusCode != HttpStatusCode.OK)
             {
-                XTrace.WriteLine(restResponse.Data.ToJson());
+                XTrace.WriteLine(restResponse.Content.ToJson());
                 throw ApiException.Common(_requestLocalizer["Server error"], 500);
             }
 
-            var result = restResponse.Data;
+            var result = JsonConvert.DeserializeObject<ApiResult<ResponseUserInfo>>(restResponse.Content);
 
             return result;
         }
@@ -193,6 +204,11 @@ namespace Easy.Admin.Authentication.JwtBearer
 
             if (user == null)
             {
+                // 创建用户没有密码会报错
+                var nList = new List<string>(names);
+                nList.Add(nameof(IUser.Password));
+                var vList = new List<object>(values);
+                vList.Add("123456");
                 await _userService.CreateAsync(names, values);
             }
             else

@@ -99,7 +99,12 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
             if (user == null)
             {
-                await _userService.CreateAsync(names, values);
+                // 创建用户没有密码会报错
+                var nList = new List<string>(names);
+                nList.Add(nameof(IUser.Password));
+                var vList = new List<object>(values);
+                vList.Add("123456");
+                await _userService.CreateAsync(nList.ToArray(), vList.ToArray());
             }
             else
             {

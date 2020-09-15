@@ -70,7 +70,8 @@ namespace Easy.Admin.Areas.Admin.Controllers
             }
 
             var data = new ResponseUserInfo();
-            data.Copy(identity);
+            data.Copy(identity, false, "Roles");
+            data.SetRoles(identity.Roles);
 
             return ApiResult.Ok(data);
         }
@@ -539,16 +540,26 @@ namespace Easy.Admin.Areas.Admin.Controllers
         [AllowAnonymous]
         public ApiResult<bool> GetVerCode(string key, int type)
         {
-            switch (type)
+            XTrace.WriteLine("GetVerCode");
+            try
             {
-                case 1:
-                    VerCodeHelper.MailSendVerCode(key);
-                    break;
-                case 0:
-                default:
-                    VerCodeHelper.PhoneSendVerCode(key);
-                    break;
+                switch (type)
+                {
+                    case 1:
+                        VerCodeHelper.MailSendVerCode(key);
+                        break;
+                    case 0:
+                    default:
+                        VerCodeHelper.PhoneSendVerCode(key);
+                        break;
+                }
             }
+            catch (Exception e)
+            {
+                XTrace.WriteException(e);
+                throw;
+            }
+
 
             return ApiResult.Ok(true);
         }

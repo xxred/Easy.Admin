@@ -13,13 +13,13 @@ namespace Easy.Admin.Common
     public static class CommonServicesExtensions
     {
         /// <summary>
-        /// 添加默认文件上传模块
+        /// 添加公共服务
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
         public static IServiceCollection AddCommonServices(this IServiceCollection services)
         {
-            services.AddSingleton<ICache, MemoryCache>();
+            services.TryAddSingleton<ICache, MemoryCache>();
             services.TryAddSingleton<IRedisService, RedisService>();
 
             return services;
