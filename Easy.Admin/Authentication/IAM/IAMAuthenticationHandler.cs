@@ -133,9 +133,9 @@ namespace Easy.Admin.Authentication.JwtBearer
             var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(OAuthSignInAuthenticationDefaults.Sub,uc.UserID.ToString()),
-            }, Idp));
+            }, IAMAuthenticationDefaults.AuthenticationScheme));
 
-            var ticket = new AuthenticationTicket(user, Idp);
+            var ticket = new AuthenticationTicket(user, IAMAuthenticationDefaults.AuthenticationScheme);
 
             return AuthenticateResult.Success(ticket);
         }

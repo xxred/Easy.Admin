@@ -35,7 +35,9 @@ namespace Easy.Admin.Middleware
                 XTrace.WriteLine($"向授权中心认证：{context.Request.Path}");
 
                 // 请求不是注册登录相关的，在这里向授权中心认证token
-                await context.AuthenticateAsync(IAMAuthenticationDefaults.AuthenticationScheme);
+                var authenticateResult = await context.AuthenticateAsync(IAMAuthenticationDefaults.AuthenticationScheme);
+                if (authenticateResult?.Principal != null)
+                    context.User = authenticateResult.Principal;
             }
 
             await _next(context);

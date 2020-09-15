@@ -32,6 +32,11 @@ namespace Easy.Admin.Authentication.JwtBearer
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            if (Context.User.Identity.IsAuthenticated)
+            {
+                return AuthenticateResult.NoResult();
+            }
+
             // 认证之前检查Cookie中是否携带Token，有则设置头部的Authorization
             var authorization = "Authorization";
             if (!Request.Headers.ContainsKey(authorization) && Request.Cookies.TryGetValue(Options.TokenKey, out var token))
