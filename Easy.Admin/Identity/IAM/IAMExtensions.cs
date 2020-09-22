@@ -36,6 +36,7 @@ namespace Easy.Admin.Identity.IAM
             services.AddScoped<EndpointBase, GetUserInfoEndpoint>(); 
             services.AddScoped<EndpointBase, LoginEndpoint>();
             services.AddScoped<EndpointBase, RegisterEndpoint>();
+            services.AddScoped<EndpointBase, UpdateUserInfoEndpoint>();
             services.AddScoped<EndpointBase, VerCodeEndpoint>();
 
             //services.TryAddScoped<IAMProvider>();

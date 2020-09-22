@@ -81,7 +81,7 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("[action]")]
-        public ApiResult<bool> UpdateUserInfo(RequestUserInfo userInfo)
+        public async Task<ApiResult<bool>> UpdateUserInfo(RequestUserInfo userInfo)
         {
             if (userInfo.ID < 1)
             {
@@ -92,7 +92,9 @@ namespace Easy.Admin.Areas.Admin.Controllers
 
             if (IsSupperAdmin || u.ID == userInfo.ID)
             {
-                _userService.UpdateAsync(userInfo.ToDictionary());
+                userInfo.ID = u.ID;
+                userInfo.Name = u.Name;
+                await _userService.UpdateAsync(userInfo.ToDictionary());
             }
             else
             {

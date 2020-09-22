@@ -17,7 +17,8 @@ namespace Easy.Admin.Identity.IAM.Endpoints
     {
         private readonly IRestClient _restClient;
         protected IRestResponse RestResponse;
-        
+        protected JObject Body;
+
         /// <summary>
         /// 请求路径
         /// </summary>
@@ -32,12 +33,22 @@ namespace Easy.Admin.Identity.IAM.Endpoints
             _restClient.UseNewtonsoftJson(mvcNewtonsoftJsonOptions.Value.SerializerSettings);
         }
 
+        /// <summary>
+        /// 处理请求
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public virtual async Task ProcessAsync(HttpContext context)
         {
             await HandleRequestAsync(context);
             await ExecuteAsync(context);
         }
 
+        /// <summary>
+        /// 处理请求参数
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         protected async Task HandleRequestAsync(HttpContext context)
         {
             SetAuthorization(context);
@@ -64,13 +75,18 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
                 var total = await req.Body.ReadAsync(b);
                 var s = Encoding.UTF8.GetString(b);
-                var body = JObject.Parse(s);
-                restRequest.AddJsonBody(body);
+                Body = JObject.Parse(s);
+                restRequest.AddJsonBody(Body);
             }
 
             RestResponse = await _restClient.ExecuteAsync(restRequest);
         }
 
+        /// <summary>
+        /// 返回结果
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         protected async Task ExecuteAsync(HttpContext context)
         {
             context.Response.Headers.Add(HeaderNames.ContentType, "application/json;charset=utf-8");

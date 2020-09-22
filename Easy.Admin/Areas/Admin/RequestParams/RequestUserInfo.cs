@@ -32,7 +32,7 @@ namespace Easy.Admin.Areas.Admin.RequestParams
         /// <summary>
         /// 性别
         /// </summary>
-        public SexKinds Sex { get; set; }
+        public SexKinds? Sex { get; set; }
 
         /// <summary>
         /// 邮箱
@@ -47,6 +47,6 @@ namespace Easy.Admin.Areas.Admin.RequestParams
         /// <summary>
         /// 生日
         /// </summary>
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
     }
 }

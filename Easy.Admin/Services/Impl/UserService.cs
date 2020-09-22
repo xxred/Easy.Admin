@@ -27,7 +27,7 @@ namespace Easy.Admin.Services.Impl
         /// </summary>
         private IStringLocalizer<Request> _requestLocalizer;
 
-        public UserService(UserManager<TUser> userManager, SignInManager<TUser> signInManager, 
+        public UserService(UserManager<TUser> userManager, SignInManager<TUser> signInManager,
             IStringLocalizer<Request> requestLocalizer)
         {
             _userManager = userManager;
@@ -106,13 +106,13 @@ namespace Easy.Admin.Services.Impl
 
                 appUser = new TUser
                 {
-                    Name = Guid.NewGuid().ToString().Substring(0, 8), 
-                    Enable = true, 
+                    Name = Guid.NewGuid().ToString().Substring(0, 8),
+                    Enable = true,
                     RoleID = 4
                 }; // 角色id 4 为游客
 
                 // 通过第三方登录创建的用户设置随机密码
-                var result = await _userManager.CreateAsync((TUser) appUser, Guid.NewGuid().ToString().Substring(0, 8));
+                var result = await _userManager.CreateAsync((TUser)appUser, Guid.NewGuid().ToString().Substring(0, 8));
 
                 if (!result.Succeeded)
                 {
@@ -200,10 +200,15 @@ namespace Easy.Admin.Services.Impl
 
             foreach (var (key, value) in dic)
             {
+                if (value == null) continue; // 空值表示不改变
                 user.SetItem(key, value);
             }
 
-            await _userManager.UpdateAsync(user);
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                throw ApiException.Common(_requestLocalizer[result.Errors.ToArray()[0].Code]);
+            }
         }
 
         /// <summary>
