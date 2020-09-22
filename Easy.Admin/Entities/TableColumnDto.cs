@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Easy.Admin.Entities
@@ -51,20 +52,46 @@ namespace Easy.Admin.Entities
         }
 
         /// <summary>属性类型</summary>
-        //[JsonIgnore]
-        [IgnoreDataMember]
+        // [JsonIgnore]
+        // [IgnoreDataMember]
         public Type Type
         {
-            get;
-            set;
+            get => null;
+            set => _type = value;
         }
+
+        private Type _type;
 
         /// <summary>
         /// 数据类型
         /// </summary>
-        public string TypeStr
+        public string TypeStr => _type.Name;
+
+        /// <summary>
+        /// 是否是枚举
+        /// </summary>
+        /// <value></value>
+        public bool IsEnum => _type != null && _type.IsEnum;
+
+        /// <summary>
+        /// 枚举值
+        /// </summary>
+        /// <value></value>
+        public Dictionary<object, string> EnumValues
         {
-            get=>Type?.Name;
+            get
+            {
+                if (!IsEnum) return null;
+                var type = _type;
+                var dic = new Dictionary<object, string>();
+                var values = Enum.GetValues(_type);
+                foreach (var item in values)
+                {
+                    dic.Add(item.ToInt(), Enum.GetName(type, item));
+                }
+
+                return dic;
+            }
         }
 
         /// <summary>是否只读</summary>
