@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
+using Easy.Admin.Entities;
 using NewLife;
 using NewLife.Data;
 using NewLife.Log;
@@ -76,12 +77,25 @@ namespace Easy.Admin.Areas.Admin.Models
         //    if (XTrace.Debug) XTrace.WriteLine("完成初始化TEntity[ApplicationUser]数据！");
         //}
 
-        ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
-        ///// <returns></returns>
-        //public override Int32 Insert()
-        //{
-        //    return base.Insert();
-        //}
+        /// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
+        /// <returns></returns>
+        public override Int32 Insert()
+        {
+            // 赋予默认角色
+            if (RoleID >= 1) return base.Insert();
+
+            var role = ApplicationRole.FindByName("普通用户");
+            if (role != null)
+            {
+                RoleID = role.ID;
+            }
+            else
+            {
+                throw ApiException.Common("不存在“普通用户”这个角色",500);
+            }
+
+            return base.Insert();
+        }
 
         ///// <summary>已重载。在事务保护范围内处理业务，位于Valid之后</summary>
         ///// <returns></returns>
