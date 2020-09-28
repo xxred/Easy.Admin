@@ -7,9 +7,9 @@
       <Column Name="UserID" DataType="Int32" Description="用户。本地用户" />
       <Column Name="OpenID" DataType="String" Description="身份标识。用户名、OpenID" />
       <Column Name="LinkID" DataType="Int64" Description="用户编号。第三方用户编号" />
-      <Column Name="NickName" DataType="String" Description="昵称" />
+      <Column Name="DisplayName" DataType="String" Description="昵称" />
       <Column Name="Avatar" DataType="String" Length="200" Description="头像" />
-      <Column Name="AccessToken" DataType="String" Length="500" Description="访问令牌" />
+      <Column Name="AccessToken" DataType="String" Length="1000" Description="访问令牌" />
       <Column Name="RefreshToken" DataType="String" Length="500" Description="刷新令牌" />
       <Column Name="Expire" DataType="DateTime" Description="过期时间" />
       <Column Name="Enable" DataType="Boolean" Description="启用" />

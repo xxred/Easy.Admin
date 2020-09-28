@@ -75,14 +75,19 @@ namespace Easy.Admin.Identity.IAM.Endpoints
                 Provider = idp,
                 UserID = u.ID,
                 OpenID = userInfo.Name,
-                LinkID = userInfo.UserID.ToInt(),
+                LinkID = userInfo.ID.ToInt(),
                 Enable = true
             };
 
             uc.AccessToken = jwtToken.Token;
             uc.Avatar = userInfo.Avatar;
-            uc.NickName = userInfo.NickName;
+            uc.NickName = userInfo.DisplayName;
             uc.Expire = jwtToken.Expires ?? GetExpire(jwtToken.Token);
+
+            // 下面这两个防止uc没有删除导致再次注册时，id换了但还是以前的记录
+            uc.UserID = u.ID;
+            uc.LinkID = userInfo.ID.ToInt();
+
             uc.Save();
         }
 
@@ -95,7 +100,7 @@ namespace Easy.Admin.Identity.IAM.Endpoints
         {
             var user = await _userService.FindByNameAsync(userInfo.Name);
             var names = new[] { nameof(IUser.Name), nameof(IUser.DisplayName), nameof(IUser.Avatar), nameof(IUser.Sex), };
-            var values = new object[] { userInfo.Name, userInfo.NickName, userInfo.Avatar, userInfo.Gender };
+            var values = new object[] { userInfo.Name, userInfo.DisplayName, userInfo.Avatar, userInfo.Sex };
 
             if (user == null)
             {

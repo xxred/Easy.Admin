@@ -70,7 +70,7 @@ namespace Easy.Admin.Areas.Admin.Models
         //    entity.UserID = 0;
         //    entity.OpenID = "abc";
         //    entity.LinkID = 0;
-        //    entity.NickName = "abc";
+        //    entity.DisplayName = "abc";
         //    entity.Avatar = "abc";
         //    entity.AccessToken = "abc";
         //    entity.RefreshToken = "abc";

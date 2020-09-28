@@ -65,7 +65,7 @@ namespace Easy.Admin.Areas.Admin.Models
         [DisplayName("昵称")]
         [Description("昵称")]
         [DataObjectField(false, false, true, 50)]
-        [BindColumn("NickName", "昵称", "")]
+        [BindColumn("DisplayName", "昵称", "")]
         public String NickName { get => _NickName; set { if (OnPropertyChanging(__.NickName, value)) { _NickName = value; OnPropertyChanged(__.NickName); } } }
 
         private String _Avatar;
@@ -304,7 +304,7 @@ namespace Easy.Admin.Areas.Admin.Models
             public const String LinkID = "LinkID";
 
             /// <summary>昵称</summary>
-            public const String NickName = "NickName";
+            public const String NickName = "DisplayName";
 
             /// <summary>头像</summary>
             public const String Avatar = "Avatar";

@@ -10,6 +10,11 @@ namespace Easy.Admin.Areas.Admin.RequestParams
     public class RequestPassword
     {
         /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
         /// 旧密码
         /// </summary>
         public string OldPassword { get; set; }

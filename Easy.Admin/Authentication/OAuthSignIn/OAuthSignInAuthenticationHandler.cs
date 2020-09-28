@@ -77,10 +77,10 @@ namespace Easy.Admin.Authentication.OAuthSignIn
                 UserInfo = new UserInfo
                 {
                     Avatar = u?.Avatar,
-                    Gender = u?.Sex.ToInt(),
+                    Sex = u?.Sex.ToInt(),
                     Name = u?.Name,
-                    NickName = u?.DisplayName,
-                    UserID = u?.ID.ToString()
+                    DisplayName = u?.DisplayName,
+                    ID = u?.ID.ToString()
                 }
             };
 

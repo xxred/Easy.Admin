@@ -44,9 +44,18 @@ namespace Easy.Admin.Areas.Admin.RequestParams
         /// </summary>
         public string Mobile { get; set; }
 
+        private DateTime? _birthday;
         /// <summary>
         /// 生日
         /// </summary>
-        public DateTime? Birthday { get; set; }
+        public DateTime? Birthday
+        {
+            get
+            {
+                var _1970 = new DateTime(1970, 01, 01);
+                return _birthday == null || _birthday < _1970 ? _1970 : _birthday;
+            }
+            set => _birthday = value;
+        }
     }
 }

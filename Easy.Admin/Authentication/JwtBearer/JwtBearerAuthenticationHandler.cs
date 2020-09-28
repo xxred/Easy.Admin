@@ -125,10 +125,10 @@ namespace Easy.Admin.Authentication.JwtBearer
                 UserInfo = new UserInfo
                 {
                     Avatar = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Avatar),
-                    Gender = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Gender)?.ToInt(),
+                    Sex = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Gender)?.ToInt(),
                     Name = user.FindFirstValue(OAuthSignInAuthenticationDefaults.UniqueName),
-                    NickName = user.FindFirstValue(OAuthSignInAuthenticationDefaults.GivenName),
-                    UserID = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Sub)
+                    DisplayName = user.FindFirstValue(OAuthSignInAuthenticationDefaults.GivenName),
+                    ID = user.FindFirstValue(OAuthSignInAuthenticationDefaults.Sub)
                 }
             };
 
