@@ -33,7 +33,8 @@ namespace Easy.Admin.Identity.IAM
 
             services.AddScoped<EndpointBase, ChangePasswordEndpoint>();
             // 如果获取本地用户信息，token中的userid在本地不是一一对应，因此可能出现找不到的情况，因此还是采用用户中心信息
-            services.AddScoped<EndpointBase, GetUserInfoEndpoint>(); 
+            services.AddScoped<EndpointBase, GetUserInfoEndpoint>();
+            services.AddScoped<EndpointBase, DeleteAccountEndpoint>();
             services.AddScoped<EndpointBase, LoginEndpoint>();
             services.AddScoped<EndpointBase, RegisterEndpoint>();
             services.AddScoped<EndpointBase, UpdateUserInfoEndpoint>();

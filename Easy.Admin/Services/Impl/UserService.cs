@@ -14,6 +14,7 @@ using NewLife;
 using NewLife.Log;
 using NewLife.Model;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using XCode;
 using XCode.Membership;
 
 namespace Easy.Admin.Services.Impl
@@ -273,7 +274,16 @@ namespace Easy.Admin.Services.Impl
 
         public virtual Task DeleteAccountAsync(IUser user)
         {
+            XTrace.WriteLine($"删除用户信息:{(user as TUser)}");
+
+            if (user == null || user.ID < 1)
+            {
+                throw ApiException.Common(_requestLocalizer["The user was not found"]);
+            }
+
             (user as TUser)?.Delete();
+            var ucs = UserConnect.FindAllByUserID(user.ID);
+            ucs.Delete();
 
             return Task.CompletedTask;
         }

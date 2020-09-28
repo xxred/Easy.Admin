@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using NewLife;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -75,8 +76,11 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
                 var total = await req.Body.ReadAsync(b);
                 var s = Encoding.UTF8.GetString(b);
-                Body = JObject.Parse(s);
-                restRequest.AddJsonBody(Body);
+                if (!s.IsNullOrWhiteSpace())
+                {
+                    Body = JObject.Parse(s);
+                    restRequest.AddJsonBody(Body);
+                }
             }
 
             RestResponse = await _restClient.ExecuteAsync(restRequest);
@@ -92,7 +96,7 @@ namespace Easy.Admin.Identity.IAM.Endpoints
             context.Response.Headers.Add(HeaderNames.ContentType, "application/json;charset=utf-8");
             await context.Response.WriteAsync(RestResponse.Content, Encoding.UTF8);
         }
-        
+
         private void SetAuthorization(HttpContext context)
         {
             if (context.Request.Headers.TryGetValue("Authorization", out var token))
