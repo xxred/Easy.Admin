@@ -107,41 +107,49 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// <summary>
         /// 修改密码
         /// Type:0-旧密码，1-手机验证码，2-邮箱验证码
-        /// 0-传新旧密码
+        /// 0-传新旧密码，用户名
         /// 1-传新密码和验证码，区号，手机号
         /// 2-传新密码和验证码，邮箱
         /// </summary> 
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut("[action]")]
+        [AllowAnonymous]
         public ApiResult<bool> ChangePassword(RequestPassword model)
         {
+            IUser user;
             switch (model.Type)
             {
                 case 0:
-                    if (AppUser.Password != model.OldPassword.MD5())
+                    user = ApplicationUser.FindByName(model.UserName);
+                    CheckUser(user);
+                    if (user.Password != model.OldPassword.MD5())
                     {
                         throw ApiException.Common(RequestLocalizer["The old password is incorrect"]);
                     }
                     break;
                 case 1:
+                    user = ApplicationUser.FindByMobile(model.Mobile);
+                    CheckUser(user);
                     if (!CheckVerCode(model.InternationalAreaCode + model.Mobile, model.VerCode, 0))
                     {
                         throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
                     }
 
-                    if (AppUser.Mobile != model.Mobile)
+                    if (user.Mobile != model.Mobile)
                     {
                         throw ApiException.Common(RequestLocalizer["Incorrect mobile phone number"]);
                     }
                     break;
                 case 2:
+                    user = ApplicationUser.FindByMail(model.Mail);
+                    CheckUser(user);
                     if (!CheckVerCode(model.Mail, model.VerCode, 1))
                     {
                         throw ApiException.Common(RequestLocalizer["The verification code is incorrect or expired"]);
                     }
 
-                    if (AppUser.Mail != model.Mail)
+                    if (user.Mail != model.Mail)
                     {
                         throw ApiException.Common(RequestLocalizer["Incorrect email address"]);
                     }
@@ -150,8 +158,13 @@ namespace Easy.Admin.Areas.Admin.Controllers
                     throw ApiException.Common("Type类型不正确！");
             }
 
-            AppUser.Password = model.NewPassword;
-            AppUser.Save();
+            void CheckUser(IUser u)
+            {
+                if (u == null) throw ApiException.Common(RequestLocalizer["The user was not found"]);
+            }
+
+            user.Password = model.NewPassword;
+            user.Save();
 
             return ApiResult.Ok(true);
         }
@@ -524,11 +537,11 @@ namespace Easy.Admin.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public async Task<ApiResult<string>> DeleteAccount()
+        public async Task<ApiResult<bool>> DeleteAccount()
         {
             await _userService.DeleteAccountAsync(AppUser);
 
-            return ApiResult.Ok();
+            return ApiResult.Ok(true);
         }
 
         /// <summary>
