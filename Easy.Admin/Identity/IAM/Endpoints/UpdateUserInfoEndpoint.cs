@@ -36,9 +36,9 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
             var resp = RestResponse;
 
-            var apiResult = JsonConvert.DeserializeObject<ApiResult<bool>>(resp.Content);
+            var apiResult = JsonConvert.DeserializeObject<ApiResult<bool?>>(resp.Content);
 
-            if (apiResult != null && apiResult.Data)
+            if (apiResult?.Data != null && apiResult.Data.Value)
             {
                 await UpdateUserInfo(context);
             }

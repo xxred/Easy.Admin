@@ -36,9 +36,9 @@ namespace Easy.Admin.Identity.IAM.Endpoints
 
             var resp = RestResponse;
 
-            var apiResult = JsonConvert.DeserializeObject<ApiResult<bool>>(resp.Content);
+            var apiResult = JsonConvert.DeserializeObject<ApiResult<bool?>>(resp.Content);
             XTrace.WriteLine($"删除账号返回结果{apiResult.ToJson()}");
-            if (apiResult != null && apiResult.Data)
+            if (apiResult?.Data != null && apiResult.Data.Value)
             {
                 XTrace.WriteLine($"执行删除账号");
 
