@@ -3,11 +3,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Easy.Admin.Authentication.IAM;
+using Easy.Admin.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using NewLife;
+using NewLife.Log;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -84,6 +86,13 @@ namespace Easy.Admin.Identity.IAM.Endpoints
             }
 
             RestResponse = await _restClient.ExecuteAsync(restRequest);
+
+            // 判断是否有异常
+            if (RestResponse.ErrorException != null)
+            {
+                XTrace.WriteException(RestResponse.ErrorException);
+                throw ApiException.Common("The IAM Server is not available", 500);
+            }
         }
 
         /// <summary>

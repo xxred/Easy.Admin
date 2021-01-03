@@ -151,14 +151,20 @@ namespace Easy.Admin
                 }
             });
 
-            var dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"] ?? "dist");
-            var staticFileOptions = new StaticFileOptions()
+            var dist = string.Empty;
+            StaticFileOptions staticFileOptions = null;
+            if (env.WebRootPath != null)
             {
-                FileProvider = new PhysicalFileProvider(dist)
-            };
+                dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"] ?? "dist");
+                staticFileOptions = new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(dist)
+                };
 
-            app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = staticFileOptions.FileProvider });
-            app.UseStaticFiles(staticFileOptions);
+                app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = staticFileOptions.FileProvider });
+                app.UseStaticFiles(staticFileOptions);
+            }
+
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
