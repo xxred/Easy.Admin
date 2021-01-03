@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Easy.Admin.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using NewLife.Log;
@@ -52,14 +53,25 @@ namespace Microsoft.AspNetCore.Builder
                 if (e is ApiException apiexc)
                 {
                     data.Status = apiexc.Status;
+
                     data.Msg = apiexc.Message;
-                    context.Response.StatusCode = 200;
+
+                    //data.Status = ResponseStatusCode.GetStatusCode(apiexc.Status);
+
+                    //context.Response.StatusCode = ResponseStatusCode.SetHttpStatusCode ?
+                    //    data.Status : 200;
+
+                    ResponseStatusCode.SetResponseStatusCode(data, context.Response);
                 }
                 else
                 {
-                    data.Status = 500;
                     data.Msg = e.Message;
-                    context.Response.StatusCode = (Int32)HttpStatusCode.InternalServerError;
+                    data.Status = ResponseStatusCode.GetStatusCode(500);
+
+                    //context.Response.StatusCode = ResponseStatusCode.SetHttpStatusCode ?
+                    //    data.Status : (Int32)HttpStatusCode.InternalServerError;
+
+                    ResponseStatusCode.SetResponseStatusCode(data, context.Response);
                 }
 
                 context.Response.Headers.Add(HeaderNames.ContentType, "application/json;charset=utf-8");

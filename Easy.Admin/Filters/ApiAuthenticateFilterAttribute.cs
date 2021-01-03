@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Easy.Admin.Areas.Admin.Models;
+using Easy.Admin.Common;
 using Easy.Admin.Entities;
 using Easy.Admin.Localization.Resources;
 using Easy.Admin.Services;
@@ -47,9 +48,18 @@ namespace Easy.Admin.Filters
             {
                 var content = new ApiResult<string>
                 {
-                    Status = 203,
                     Msg = requestLocalizer["No login or login timeout"]
                 };
+
+                //content.Status = ResponseStatusCode.GetStatusCode(203);
+
+                //if (ResponseStatusCode.SetHttpStatusCode)
+                //{
+                //    context.HttpContext.Response.StatusCode = content.Status;
+                //}
+
+                ResponseStatusCode.SetResponseStatusCode(content, context.HttpContext.Response);
+
 
                 // 此处不能直接设置Response，要设置Result，后续过滤器才不会往下执行，下游判断Result不为空，直接执行结果，自动写入响应
                 // 否则此处设置响应流，请求到达控制器，又会执行控制器的结果，因再次写入Response而抛异常

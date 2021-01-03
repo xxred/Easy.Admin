@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
@@ -105,6 +106,45 @@ namespace Easy.Admin
 
             // 添加公共服务
             services.AddCommonServices();
+
+            //// 重新定义状态码
+            //ResponseStatusCode.SetHttpStatusCode = true;
+            //ResponseStatusCode.StatusCode = new Dictionary<int, int>
+            //{
+            //    { 203, 401 },
+            //    { 401, 403 },
+            //    { 402, 400 },
+            //};
+
+            //// 如果上面两个选项不能满足，可以全部自定义处理所有状态码
+            //ResponseStatusCode.SetStatusCodeAndHttpStatusCode = (result, response) =>
+            //{
+            //    switch (result.Status)
+            //    {
+            //        case 0:
+            //            response.StatusCode = 200;
+            //            break;
+            //        case 203:
+            //            result.Status = 401;
+            //            response.StatusCode = 401;
+            //            break;
+            //        case 401:
+            //            result.Status = 403;
+            //            response.StatusCode = 403;
+            //            break;
+            //        case 402:
+            //            result.Status = 400;
+            //            response.StatusCode = 400;
+            //            break;
+            //        case 500:
+            //            result.Status = 500;
+            //            response.StatusCode = 500;
+            //            break;
+            //        default:
+            //            response.StatusCode = 200;
+            //            break;
+            //    }
+            //};
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

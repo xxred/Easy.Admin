@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using Easy.Admin.Common;
 using Easy.Admin.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -105,13 +106,23 @@ namespace Easy.Admin.Filters
         {
             var content = new ApiResult<String>
             {
-                Status = 401,
-                Msg = "没有权限"
+                Msg = "No permission" // 没有权限
             };
+
+            //content.Status = ResponseStatusCode.GetStatusCode(401);
+
+            //if (ResponseStatusCode.SetHttpStatusCode)
+            //{
+            //    filterContext.HttpContext.Response.StatusCode = content.Status;
+            //}
+
+            ResponseStatusCode.SetResponseStatusCode(content, filterContext.HttpContext.Response);
 
             // 此处不能直接设置Response，要设置Result，后续过滤器才不会往下执行，下游判断Result不为空，直接执行结果，自动写入响应
             // 否则此处设置响应流，请求到达控制器，又会执行控制器的结果，因再次写入Response而抛异常
             filterContext.Result = new ObjectResult(content);
+
+
         }
 
         private IMenu GetMenu(AuthorizationFilterContext filterContext)
