@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Easy.Admin.Common;
 using Easy.Admin.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -46,6 +47,8 @@ namespace Microsoft.Extensions.DependencyInjection
                         tag
                     };
                 });
+
+                c.OperationFilter<FileUploadOperationFilter>();
 
                 var bearerScheme = new OpenApiSecurityScheme
                 {

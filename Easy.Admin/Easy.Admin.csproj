@@ -39,12 +39,14 @@
     <Compile Remove="Areas\Admin\Models\Log\**" />
     <Compile Remove="Localization\Models\Config\**" />
     <Compile Remove="Localization\Models\Log\**" />
+    <Compile Remove="wwwroot\UploadImages\**" />
     <Content Remove="appsettings*.json" Pack="false" />
     <Content Remove="Areas\Admin\Models\Config\**" />
     <Content Remove="Areas\Admin\Models\Log\**" />
     <Content Remove="Localization\Models\Config\**" />
     <Content Remove="Localization\Models\Log\**" />
     <Content Remove="Properties\**" Pack="false" />
+    <Content Remove="wwwroot\UploadImages\**" />
     <Content Include="appsettings*.json" Pack="false" />
     <Content Include="Properties\**" Pack="false" />
     <Content Include="wwwroot\**" Pack="false" />
@@ -55,10 +57,17 @@
     <EmbeddedResource Remove="Areas\Admin\Models\Log\**" />
     <EmbeddedResource Remove="Localization\Models\Config\**" />
     <EmbeddedResource Remove="Localization\Models\Log\**" />
+    <EmbeddedResource Remove="wwwroot\UploadImages\**" />
     <None Remove="Areas\Admin\Models\Config\**" />
     <None Remove="Areas\Admin\Models\Log\**" />
     <None Remove="Localization\Models\Config\**" />
     <None Remove="Localization\Models\Log\**" />
+    <None Remove="wwwroot\UploadImages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\UploadImages\Test\2021\01\06\52fda49e883e6f5ed0389316a939f3f1.jpg" />
+    <Content Remove="wwwroot\UploadImages\Test\2021\01\06\52fda49e883e6f5ed0389316a939f3f1.jpg" />
   </ItemGroup>
 
 
@@ -101,6 +110,9 @@
   </ItemGroup>
     <ItemGroup>
       <Folder Include="wwwroot\" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="..\.editorconfig" Link=".editorconfig" />
     </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

@@ -196,13 +196,16 @@ namespace Easy.Admin
             if (env.WebRootPath != null)
             {
                 dist = Path.Combine(env.WebRootPath, Configuration["ClientAppPublishPath"] ?? "dist");
-                staticFileOptions = new StaticFileOptions()
+                if (Directory.Exists(dist))
                 {
-                    FileProvider = new PhysicalFileProvider(dist)
-                };
+                    staticFileOptions = new StaticFileOptions()
+                    {
+                        FileProvider = new PhysicalFileProvider(dist)
+                    };
 
-                app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = staticFileOptions.FileProvider });
-                app.UseStaticFiles(staticFileOptions);
+                    app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = staticFileOptions.FileProvider });
+                    app.UseStaticFiles(staticFileOptions);
+                }
             }
 
 
@@ -247,16 +250,16 @@ namespace Easy.Admin
             {
                 // 2020-06-01 增加前端文件部署路径配置
                 // 如果dist文件夹不存在，说明没有部署前端文件
-                if (!Directory.Exists(dist))
+                if (Directory.Exists(dist))
                 {
-                    return;
+                    app.UseSpa(options =>
+                    {
+                        app.UseSpaStaticFiles(staticFileOptions);
+                        options.Options.DefaultPageStaticFileOptions = staticFileOptions;
+                    });
                 }
 
-                app.UseSpa(options =>
-                {
-                    app.UseSpaStaticFiles(staticFileOptions);
-                    options.Options.DefaultPageStaticFileOptions = staticFileOptions;
-                });
+
             }
         }
     }
