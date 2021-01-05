@@ -106,15 +106,9 @@ namespace Easy.Admin.Filters
         {
             var content = new ApiResult<String>
             {
+                Status = 401,
                 Msg = "No permission" // 没有权限
             };
-
-            //content.Status = ResponseStatusCode.GetStatusCode(401);
-
-            //if (ResponseStatusCode.SetHttpStatusCode)
-            //{
-            //    filterContext.HttpContext.Response.StatusCode = content.Status;
-            //}
 
             ResponseStatusCode.SetResponseStatusCode(content, filterContext.HttpContext.Response);
 
